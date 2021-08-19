@@ -1,0 +1,14 @@
+/*
+ * Copyright 1989, 1990 NeXT, Inc.  All rights reserved.
+ *
+ * Loadable kernel server example showing how to panic.
+ */
+
+subsystem panic 100;
+
+#include <std_types.defs>
+
+serverprefix panic_;
+userprefix panic_;
+
+simpleroutine panic(panic_port : port_t);

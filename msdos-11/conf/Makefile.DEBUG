@@ -1,0 +1,6 @@
+#
+# 	DEBUG-specific makefile fragment for msdos filesystem project
+#
+CFLAGS=-g -DDEBUG -MD -I../header -I.. -Wimplicit -DKERNEL -DKERNEL_FEATURES \
+	-DMACH -DNeXT_MOD
+LOADABLE_RULE=-d dosfs_loadable

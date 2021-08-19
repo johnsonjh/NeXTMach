@@ -1,0 +1,30 @@
+#!/bin/csh -f
+
+set prog=$0
+set prog=${prog:t}
+
+set TMP=/tmp/${prog}$$
+
+foreach i ($DIR/*)
+	set i = "$i:t"
+	echo "$DIR/$i"
+	diff $DIR/$i $SOURCE/$DIR/$i > $TMP
+	if ("$status" == 0) then
+		echo "[ $i not changed ]"
+	else
+		more $TMP
+		echo -n "Update $i ? [ yes ] "
+		set ans = "$<"
+		switch ("$ans")
+		case "":
+		case [yY]:
+		case [yY][eE][sS]:
+			bin/checkout $DIR/$i
+			cp -p $SOURCE/$DIR/$i $DIR/$i
+			bin/checkin $DIR/$i
+			breaksw
+		default:
+			breaksw
+		endsw
+	endif
+end

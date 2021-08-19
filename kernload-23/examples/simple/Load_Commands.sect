@@ -1,0 +1,5 @@
+# Associate ports with proc/arg
+
+CALL		simple_init		0
+HMAP	simple	simple_handler		simple
+ADVERTISE	simple

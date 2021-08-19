@@ -1,0 +1,74 @@
+/* 
+ * Mach Operating System
+ * Copyright (c) 1989 Carnegie-Mellon University
+ * Copyright (c) 1988 Carnegie-Mellon University
+ * All rights reserved.  The CMU software License Agreement specifies
+ * the terms and conditions for use and redistribution.
+ */
+/*
+ * HISTORY
+ * $Log:	std_types.defs,v $
+ * Revision 2.5  89/05/06  02:58:09  rpd
+ * 	Added the type char.
+ * 	[89/05/06  02:45:02  rpd]
+ * 
+ * Revision 2.4  89/03/09  20:23:11  rpd
+ * 	More cleanup.
+ * 
+ * Revision 2.3  89/02/25  18:40:18  gm0w
+ * 	Changes for cleanup.
+ * 
+ * Revision 2.2  89/01/15  16:31:41  rpd
+ * 	Moved from kern/ to mach/.
+ * 	[89/01/15  14:33:24  rpd]
+ * 
+ * Revision 2.2  89/01/12  07:58:48  rpd
+ * 	Created.
+ * 	[89/01/12  04:15:04  rpd]
+ * 
+ */
+/*
+ *	Mach kernel standard interface type declarations
+ */
+
+#ifndef	_MACH_STD_TYPES_DEFS_
+#define _MACH_STD_TYPES_DEFS_
+
+#ifdef	KERNEL
+#include <mach_ipc_xxxhack.h>
+#endif	KERNEL
+
+#if	defined(NeXT) && !defined(MACH_IPC_XXXHACK)
+#define MACH_IPC_XXXHACK 0
+#endif	defined(NeXT) && !defined(MACH_IPC_XXXHACK)
+
+type char = MSG_TYPE_CHAR;
+type short = MSG_TYPE_INTEGER_16;
+type int = MSG_TYPE_INTEGER_32;
+type boolean_t = MSG_TYPE_BOOLEAN;
+
+type kern_return_t = int;
+
+/* Until MIG & netmsgserver are updated, use integer type */
+#define MSG_TYPE_PORT_NAME	MSG_TYPE_INTEGER_32
+
+type port_name_t = MSG_TYPE_PORT_NAME;
+type port_name_array_t = ^array[] of port_name_t;
+type port_type_t = int;
+type port_type_array_t = ^array[] of port_type_t;
+type port_set_name_t = port_name_t;
+
+type port_t = MSG_TYPE_PORT;
+type port_all_t = MSG_TYPE_PORT_ALL;
+#if	!defined(MACH_IPC_XXXHACK) || MACH_IPC_XXXHACK
+type port_rcv_t = MSG_TYPE_PORT_RECEIVE;
+#endif	!defined(MACH_IPC_XXXHACK) || MACH_IPC_XXXHACK
+type port_array_t = ^array[] of port_t;
+
+type pointer_t = ^array [] of MSG_TYPE_BYTE;
+
+import <kern/std_types.h>;
+
+#endif	_MACH_STD_TYPES_DEFS_
+
+

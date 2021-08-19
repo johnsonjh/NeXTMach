@@ -1,0 +1,108 @@
+/* 
+ * Copyright (c) 1989 NeXT, Inc.
+ * 24-May-89  Gregg Kellogg (gk) at NeXT
+ *	Created.
+ *
+ */
+
+/*
+ * interface for kern_loader to kern_server communication.
+ */
+subsystem kern_server 100;
+
+#include <kern/std_types.defs>
+
+type port_map_proc_t = int;
+type port_death_proc_t = int;
+type call_proc_t = int;
+type vm_address_t = int;
+type vm_size_t = int;
+
+import <kernserv/kern_server_types.h>;
+userprefix	kern_serv_;
+serverprefix	ks_;
+waittime	10000;		/* Wait at most 10 seconds. */
+
+/*
+ * Provide location of kernel server's instance variables.
+ */
+routine instance_loc (
+		server_port	: port_t;
+		instance_loc	: vm_address_t);
+
+/*
+ * Set the port that the loader is going to receive on.
+ */
+routine boot_port (
+		server_port	: port_t;
+		boot_port	: port_t);
+
+/*
+ * Wire a range of memory down.
+ */
+routine wire_range (
+		server_port	: port_t;
+		addr		: vm_address_t;
+		size		: vm_size_t);
+
+/*
+ * Unire a range of memory down.
+ */
+routine unwire_range (
+		server_port	: port_t;
+		addr		: vm_address_t;
+		size		: vm_size_t);
+
+/*
+ * Specify port to proc(arg) mapping (called as a MiG handler)
+ */
+routine port_proc (
+		server_port	: port_t;
+		port		: port_all_t;
+		proc		: port_map_proc_t;
+		arg		: int);
+
+/*
+ * Specify proc to call when a port dies.
+ */
+simpleroutine port_death_proc (
+		server_port	: port_t;
+		proc		: port_death_proc_t);
+
+/*
+ * Specify proc/arg to call right now.
+ */
+routine call_proc (
+		server_port	: port_t;
+		proc		: call_proc_t;
+		arg		: int);
+
+/*
+ * Tell the kernel server to shut down.
+ */
+simpleroutine shutdown (
+		server_port	: port_t);
+
+simpleroutine log_level (
+		server_port	: port_t;
+		log_level	: int);
+
+simpleroutine get_log (
+		server_port	: port_t;
+		reply_port	: port_t);
+
+/*
+ * Specify port to proc(arg) mapping (called as a MiG server)
+ */
+routine port_serv (
+		server_port	: port_t;
+		port		: port_all_t;
+		proc		: port_map_proc_t;
+		arg		: int);
+
+/*
+ * Specify user's version of system user compiled with.
+ */
+routine version (
+		server_port	: port_t;
+		version		: int);

@@ -1,0 +1,116 @@
+#! /bin/csh -f
+
+#
+# Usage:
+#	csh include_install [owner=foo] [group=bar] [mode=xxx] [dir=/usr/foo] [incdir=/frotz/include] ...
+#		[sysdir=/usr/mumble/sys] [install=0/1] [fresh=0/1]
+#
+#	All arguments are optional
+#
+# Really ought to be done by something like "sup", as this inadequately
+# handles the problem of getting rid of files that are no longer used.
+#
+# HISTORY
+# 24-Sep-86  Michael Young (mwyoung) at Carnegie-Mellon University
+#	Only deal with links when installing.
+#
+# 18-Sep-86  Michael Young (mwyoung) at Carnegie-Mellon University
+#	Changed source directory from /usr/sys to /usr/mk.
+#
+#  7-Sep-86  Michael Young (mwyoung) at Carnegie-Mellon University
+#	Added code to make (symbolic or other) links.
+#
+#  5-Sep-86  Michael Young (mwyoung) at Carnegie-Mellon University
+#	Added "netns" directory to the list.
+#
+# 29-Aug-86  Michael Young (mwyoung) at Carnegie-Mellon University
+#	Only set arguments if there are some.
+#
+# 16-Aug-86  Michael Young (mwyoung) at Carnegie-Mellon University
+#	Created.
+#
+#
+
+if ($#argv > 0) set $argv
+
+if ($?owner == 0) set owner = mach
+if ($?group == 0) set group = mach
+if ($?mode == 0) set mode = 644
+if ($?dirmode == 0) set dirmode = 755
+if ($?dir == 0) set dir = /usr/mach
+if ($?incdir == 0) set incdir = $dir/include
+if ($?sysdir == 0) set sysdir = /usr/mk
+if ($?install == 0) set install = 1
+if ($?cpflags == 0) set cpflags = "-ip"
+if ($?fresh == 0) set fresh = 0
+if ($?make_links == 0) set make_links = 1
+if ($?lnflags == 0) set lnflags = "-s"
+
+unsetenv MORE
+
+if ($install == 0) echo 'Checking only -- will not install anything'
+
+foreach d ( accent accent/vax kern net netimp netinet netns stand sys vm \
+		vax vaxif vaxmba vaxuba \
+		ca cacons caif caio )
+	if ($fresh) then
+		(cd $incdir ; rm -r -f $d)
+	endif
+
+	if ($d == "sys") then
+		cd $sysdir/h
+	 else
+		cd $sysdir/$d
+	endif
+
+	foreach f (*.h)
+		if (-e $incdir/$d/$f) then
+			cmp -s $f $incdir/$d/$f
+			set stat = $status
+			if ($stat == 0) continue
+			echo "Updating $d/$f"
+		 else
+			echo "Creating $d/$f"
+		 endif
+
+		if (! -e $incdir) then
+			echo "Creating master include directory $incdir"
+			if ($install) then
+				mkdir $incdir
+				chown $owner $incdir
+				chgrp $group $incdir
+				chmod $dirmode $incdir
+			 endif
+		 endif
+
+		if (! -e $incdir/$d) then
+			echo "Creating include directory $incdir/$d"
+			if ($install) then
+				mkdir $incdir/$d
+				chown $owner $incdir/$d
+				chgrp $group $incdir/$d
+				chmod $dirmode $incdir
+			 endif
+		 endif
+
+		if ($install) then
+			cp $cpflags $f $incdir/$d/$f
+			chown $owner $incdir/$d/$f
+			chgrp $group $incdir/$d/$f
+			chmod $mode $incdir/$d/$f
+		 endif
+	end
+end
+
+if ($make_links && $install) then
+	echo 'Making symbolic links'
+	set links=(`cat $sysdir/lib/include_links`)
+	cd $incdir
+	foreach x ($links)
+		set ends=(` echo $x | sed 's/=/ /' `)
+		if (-e $ends[1]) rm -f $ends[1]
+		ln $lnflags $ends[2] $ends[1]
+	 end
+ endif
+
+echo -n 'Completed ' ; date

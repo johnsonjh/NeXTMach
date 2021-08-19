@@ -1,0 +1,215 @@
+*
+*	x_snan.sa 1.6 10/1/90
+*
+*	fpsp_snan --- FPSP handler for signalling NAN exception
+*
+*	SNAN for float -> integer conversions (integer conversion of
+*	an SNAN) is a non-maskable run-time exception.
+*
+*	For trap disabled 040 does the following:
+*	If the dest data format is s, d, or x, then the SNAN bit in the NAN
+*	is set to one and the resulting non-signaling NAN (truncated if
+*	necessary) is transferred to the dest.  If the dest format is b, w,
+*	or l, then garbage is written to the dest (actually the upper 32 bits
+*	of the mantissa are sent to the integer unit).
+*
+*	For trap enabled 040 does the following:
+* 	If the inst is move_out, then the results are the same as for trap 
+*	disabled with the exception posted.  If the instruction is not move_
+*    	out, the dest. is not modified, and the exception is posted.
+*
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+X_SNAN	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+	xref	get_fline
+	xref	mem_write
+	xref	real_snan
+	xref	fpsp_done
+
+	xdef	fpsp_snan
+fpsp_snan:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(a7)
+	movem.l		d0-d7,USER_D0(a6)
+	movem.l		a0-a1,USER_A0(a6)
+	fmovem.x	fp0/fp1,USER_FP0(a6)
+	fmovem.l	fpcr/fpsr/fpiar,USER_FPCR(a6)
+*
+	move.l	CMDREG1B(a6),d6
+
+***check if trap enabled
+	btst.b	#snan_bit,FPCR_ENABLE(a6)	;if SNAN enabled
+	bne.b	ena				;then branch
+
+	bsr	move_out	;else SNAN disabled
+	bra.b	end_snan
+ena:
+*check if inst is move_out
+	btst.l	#29,d6		;011 = move out, 0x0 = reg-reg, <ea>-reg
+	beq.w	not_out
+
+	bsr	move_out
+*
+report_snan:
+	movem.l		USER_D0(a6),d0-d7
+	movem.l		USER_A0(a6),a0-a1
+	fmovem.x	USER_FP0(a6),fp0/fp1
+	fmovem.l	USER_FPCR(a6),fpcr/fpsr/fpiar
+	frestore	(a7)+
+	unlk		a6
+	bra		real_snan
+
+end_snan:
+	bclr.b		#E1,E_BYTE(a6)
+	bclr.b		#E3,E_BYTE(a6)
+*
+	movem.l		USER_D0(a6),d0-d7
+	movem.l		USER_A0(a6),a0-a1
+	fmovem.x	USER_FP0(a6),fp0/fp1
+	fmovem.l	USER_FPCR(a6),fpcr/fpsr/fpiar
+	frestore	(a7)+
+	unlk		a6
+	bra		fpsp_done
+
+* move_out expects the cmd1b register value in d6 on entry
+move_out:
+	move.l	EXC_EA(a6),a0	;get the address from the exception frame
+
+	bfextu	d6{3:3},d6	;move the rx field to d6{2:0}
+	cmpi.l	#0,d6		;check for long
+	beq.b	sto_long	;branch if move_out long
+	
+	cmpi.l	#4,d6		;check for word
+	beq.b	sto_word	;branch if move_out word
+	
+	cmpi.l	#6,d6		;check for byte
+	beq.b	sto_byte	;branch if move_out byte
+	
+*not byte, word or long
+	rts
+	
+sto_long:
+*get the 32 most significant bits of etemp mantissa
+	move.l	ETEMP_HI(a6),d1
+
+*set signalling nan bit
+	bset.l	#30,d1			
+
+*store to the users destination address
+	tst.l	a0		;check if destination address is 0
+	beq.b	lng_dn		;destination is a data register
+	
+	move.l	#4,d0		;load byte count
+	move.l	d1,-(a7)	;move the snan onto the stack
+	move.l	a0,a1		;load dest addr into a1
+	move.l	a7,a0		;load source addr of snan into a0
+	bsr	mem_write	;write snan to user memory
+	move.l	(a7)+,d1	;clear off stack
+	rts
+lng_dn:
+	bsr.w	data_num	;d0 returns destination data register number
+	lea.l	USER_D0(a6),a0	;point to data registers
+	move.l	d1,(a0,d0.w*4)	;store long word  	
+	rts
+
+sto_word:
+*get the 16 most significant bits of etemp mantissa
+	move.l	ETEMP_HI(a6),d1
+	
+*set signalling nan bit
+	bset.l	#30,d1			
+
+	move.l	#16,d2
+	lsr.l	d2,d1		;shift the 16 msb's to low d1
+
+*store to the users destination address
+	tst.l	a0		;check if destination address is 0
+	beq.b	wrd_dn		;destination is a data register
+
+	move.l	#2,d0		;load byte count
+	move.l	d1,-(a7)	;move the snan onto the stack
+	move.l	a0,a1		;load dest addr into a1
+	lea	2(a7),a0	;point to low word
+	bsr	mem_write	;write snan to user memory
+	move.l	(a7)+,d1	;clear off stack
+	rts
+
+wrd_dn:
+	bsr.w	data_num	;d0 returns destination data register number
+	lea.l	USER_D0(a6),a0	;point to data registers
+	move.w	d1,(2,a0,d0.w*4) ;store long word  	
+	rts
+
+sto_byte:
+*get the 8 most significant bits of etemp mantissa
+	move.l	ETEMP_HI(a6),d1
+
+*set signalling nan bit
+	bset.l	#30,d1			
+	move.l	#24,d2
+	lsr.l	d2,d1		;shift the 16 msb's to low d1
+
+*store to the users destination address
+	tst.l	a0		;check if destination address is 0
+	beq.b	byt_dn		;destination is a data register
+	move.l	#1,d0		;load byte count
+	move.l	d1,-(a7)	;move the snan onto the stack
+	move.l	a0,a1		;load dest addr into a1
+	lea	3(a7),a0	;point to source byte
+	bsr	mem_write	;write snan to user memory
+	move.l	(a7)+,d1	;clear off stack
+	rts
+
+byt_dn:
+	bsr.b	data_num	;d0 returns destination data register number
+	lea.l	USER_D0(a6),a0	;point to data registers
+	move.b	d1,(3,a0,d0.w*4) ;store long word  	
+	rts
+
+not_out:
+*check if it is a src nan or dst nan
+	move.l	DTAG(a6),d6	
+	bfextu	d6{0:3},d6	;isolate dtag in lsbs
+
+	cmpi.b	#3,d6		;check for nan in destination
+	bne.b	issrc		;a nan in the destination has priority
+dst_nan:
+	btst.b	#6,FPTEMP_HI(a6) ;check if destination nan is an snan
+	bne.b	issrc		;no, so check source for snan
+	move.w	FPTEMP_EX(a6),d0
+	bra.b	cont
+issrc:
+	move.w	ETEMP_EX(a6),d0
+cont:
+	btst.l	#15,d0		;test for sign of snan
+	beq.b	clr_neg		;if clear, make sure fpsr is clear
+	bset.b	#neg_bit,FPSR_CC(a6)
+	bra.w	report_snan
+clr_neg:
+	bclr.b	#neg_bit,FPSR_CC(a6)
+	bra.w	report_snan
+*
+*	data_num --- get Data Register # from f-line instruction word in d0
+*
+*	Preserves d1 because the callers use it to hold the value
+*	about to be put into a data register.
+*
+data_num:
+	movem.l	d1,-(a7)
+	bsr	get_fline	;returns fline word in d0
+	andi.l	#$7,d0		;d0 now returns register number
+	movem.l	(a7)+,d1
+	rts
+
+	end

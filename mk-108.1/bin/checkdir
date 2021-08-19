@@ -1,0 +1,4 @@
+if [ ! -d RCS/$1 ]
+then
+	mkdir RCS/$1
+fi

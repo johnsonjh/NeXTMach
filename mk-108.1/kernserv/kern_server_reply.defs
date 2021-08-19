@@ -1,0 +1,67 @@
+/* 
+ * Copyright (c) 1989 NeXT, Inc.
+ *
+ * HISTORY
+ * 17-Sep-90  Gregg Kellogg (gk) at NeXT
+ *	Changed log_entry_array_t to be out-of-line.  The data structure's
+ *	too big to be sent in-line.
+ *
+ * 24-May-89  Gregg Kellogg (gk) at NeXT
+ *	Created.
+ *
+ */
+
+/*
+ * interface for kern_server to kern_loader communication.
+ */
+subsystem kern_server_reply 200;
+
+#include <std_types.defs>
+
+type panic_msg_t = (MSG_TYPE_STRING,8*256);
+type log_entry_t = struct[8] of int;
+type log_entry_array_t = ^array[] of log_entry_t;
+type vm_address_t = int;
+type vm_size_t = int;
+type macho_header_name_t = (MSG_TYPE_STRING,8*16);
+
+import <kernserv/kern_server_reply_types.h>;
+
+/*
+ * Send panic message to kern_server and suspend.
+ */
+routine kern_serv_panic (
+		boot_port	: port_t;
+		panic_msg	: panic_msg_t);
+
+/*
+ * Retreive Mach-O header information (not available directly to loadable.
+ */
+routine kern_serv_section_by_name (
+		boot_port	: port_t;
+		segname		: macho_header_name_t;
+		sectname	: macho_header_name_t;
+	out	addr		: vm_address_t;
+	out	size		: vm_size_t);
+
+/*
+ * Returned log information.
+ */
+simpleroutine kern_serv_log_data (
+		log_port	: port_t;
+		log		: log_entry_array_t, dealloc);
+
+/*
+ * Request notification on this port.
+ */
+#if	KERNEL
+/*
+ * The kernel as it's own mechanism for doing the same thing.
+ */
+skip;
+#else	KERNEL
+routine kern_serv_notify (
+		boot_port	: port_t;
+		reply_port	: port_t;
+		req_port	: port_t);
+#endif	KERNEL

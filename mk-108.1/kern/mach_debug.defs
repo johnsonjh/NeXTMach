@@ -1,0 +1,99 @@
+/* 
+ * Mach Operating System
+ * Copyright (c) 1989 Carnegie-Mellon University
+ * Copyright (c) 1988 Carnegie-Mellon University
+ * All rights reserved.  The CMU software License Agreement specifies
+ * the terms and conditions for use and redistribution.
+ */
+/*
+ * HISTORY
+ * $Log:	mach_debug.defs,v $
+ * Revision 2.8  89/05/11  14:41:47  gm0w
+ * 	Added host_ipc_bucket_info.
+ * 	[89/05/07  20:12:30  rpd]
+ * 
+ * Revision 2.7  89/05/06  02:58:21  rpd
+ * 	Added host_zone_info.
+ * 	[89/05/06  02:45:24  rpd]
+ * 
+ * Revision 2.6  89/05/01  18:09:49  rpd
+ * 	Don't define KERNEL_SERVER here; it's passed in now.
+ * 
+ * Revision 2.5  89/03/09  20:26:14  rpd
+ * 	More cleanup.
+ * 
+ * Revision 2.4  89/02/25  18:43:35  gm0w
+ * 	Changes for cleanup.
+ * 
+ * Revision 2.3  89/01/15  16:32:28  rpd
+ * 	Updated includes for the new mach/ directory.
+ * 	[89/01/15  15:11:01  rpd]
+ * 
+ * Revision 2.2  89/01/12  08:00:17  rpd
+ * 	Created.
+ * 	[89/01/12  04:20:38  rpd]
+ * 
+ */
+/*
+ *	Matchmaker definitions file for Mach kernel debugging interface.
+ */
+
+#ifdef	KERNEL
+#include <mach_ipc_stats.h>
+#else
+#define MACH_IPC_STATS		1
+#endif	KERNEL
+
+subsystem mach_debug 3000;
+
+
+#include <kern/mach_types.defs>
+#include <kern/mach_debug_types.defs>
+
+#if	MACH_IPC_STATS
+/*
+ *	Returns the accumulated Mach IPC statistics.
+ */
+routine host_ipc_statistics(
+		task		: task_t;	/* should be a host port */
+	out	statistics	: ipc_statistics_t);
+
+/*
+ *
+ *	Resets the Mach IPC statistics counters.
+ */
+routine host_ipc_statistics_reset(
+		task		: task_t);	/* should be a host port */
+
+#else	MACH_IPC_STATS
+skip;	/* host_ipc_statistics */
+skip;	/* host_ipc_statistics_reset */
+#endif	MACH_IPC_STATS
+
+skip;	/* host_callout_info */
+
+skip;	/* host_callout_statistics */
+skip;	/* host_callout_statistics_reset */
+
+/*
+ *	Returns information about the memory allocation zones.
+ */
+routine host_zone_info(
+		task		: task_t;	/* should be a host port */
+	out	names		: zone_name_array_t;
+	out	info		: zone_info_array_t);
+
+#if	MACH_IPC_STATS
+/*
+ *	Returns information about the buckets in the IPC hash tables.
+ */
+routine host_ipc_bucket_info(
+		task		: task_t;	/* should be a host port */
+	out	TLinfo		: ipc_bucket_info_array_t;
+	out	TPinfo		: ipc_bucket_info_array_t);
+
+#else	MACH_IPC_STATS
+skip;	/* host_ipc_bucket_info */
+#endif	MACH_IPC_STATS
+
+

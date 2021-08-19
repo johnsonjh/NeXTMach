@@ -1,0 +1,202 @@
+#
+# Mach Operating System
+# Copyright (c) 1986 Carnegie-Mellon University
+# All rights reserved.  The CMU software License Agreement
+# specifies the terms and conditions for use and redistribution.
+#  
+######################################################################
+# HISTORY
+# 14-Apr-90  Gregg Kellogg (gk) at NeXT
+#	Added mach.syms and mach.strip targets.
+#
+#  2-Mar-90  Gregg Kellogg (gk) at NeXT
+#	Updated rules for migmachinefiles
+#	Install defs files as well has header files.
+#
+# 24-May-87  John Seamons (jks) at NeXT
+#	Created.
+#
+######################################################################
+#
+
+######################################################################
+#BEGIN	Machine dependent Makefile fragment for NeXT
+######################################################################
+
+CFLAGS=	${COPTS} -O -fwritable-strings -fcombine-regs
+
+ASFLAGS= 
+
+LDFLAGS=-p  -e _start  -segaddr __TEXT ${RELOC}  -segalign 4
+CRULE=${CC} -c ${GDBOPTS} ${CFLAGS} 
+
+C_RULE_1A=${CRULE}
+C_RULE_1A_D=${CRULE}
+
+S_RULE_1A=${CC} -c ${SFLAGS} 
+S_RULE_1B=$*.s
+S_RULE_2=
+S_RULE_3=
+
+GPROF.EX=../next/gmon.ex
+
+LIBS_P=
+LIBS=
+
+LDOBJS_PREFIX=
+LDOBJS_SUFFIX=
+
+LDDEPS_PREFIX=
+SWAPDEPS_PREFIX=
+
+OBJSDEPS=
+
+FEATURES_EXTRA=
+
+#
+#  Special rule to generate the locore.c
+#
+LOCORE_DEPS=	assym.s ../next/locore.s ../next/scb.s
+LOCORE_HEADS=
+
+locore.c: ${LOCORE_DEPS}
+	rm -f locore.tmp locore.c
+	cat ${LOCORE_DEPS} >locore.tmp
+	mv locore.tmp locore.c
+
+#
+#  Mach IPC-based interfaces
+#
+
+NEXTDEV_DEFSFILES=\
+	../nextdev/np_buddy.defs
+
+NEXTDEV_GENFILES=\
+	./nextdev/np_buddy.h \
+	./nextdev/np_buddy_user.c \
+	./nextdev/np_buddy_server.c
+
+NEXTDEV_MKFILE=	../nextdev/Makefile
+
+$(NEXTDEV_GENFILES) : migmachinefiles
+
+migmachinefiles :: $(NEXTDEV_DEFSFILES) $(NEXTDEV_MKFILE)
+	rm -rf ./nextdev
+	mkdir ./nextdev
+	cp -p ${NEXTDEV_DEFSFILES} ./nextdev/
+	cp -p $(NEXTDEV_MKFILE) ./nextdev/
+	cd ./nextdev && make && touch ../migmachinefiles
+	cp -p $(NEXTDEV_GENFILES) ../nextdev/
+
+#
+#  Special rules to generate tags for vi and emacs --mike
+#
+TAGDIRS=../kern ../vm ../next ../nextdev ../nextif ../net ../netimp \
+	../netinet ../netns ../bsd ../rpc ../specfs ../sys ../krpc \
+	../nfs ../ufs ../uxkern
+
+tags:	ALWAYS
+	find ${TAGDIRS} -type f \
+			-name \*.[cs] \
+			! -name \*_user.c \
+			! -name \*_server.c \
+			! -name \*User.c \
+			! -name \*Server.c \
+			-print > tagfiles
+	find ${TAGDIRS} -type f \
+			-name \*.h \
+			! -name \*_user.h \
+			! -name \*_server.h \
+			! -name \*User.h \
+			! -name \*Server.h \
+			-print >> tagfiles
+	-ctags -f tagfiles
+	-@rm TAGS
+	-xargs etags -ea < tagfiles
+	@rm tagfiles
+	for i in ${TAGDIRS}; \
+	do \
+		rm -f $$i/tags $$i/TAGS; \
+		ln tags $$i/tags; \
+		ln TAGS $$i/TAGS; \
+	done
+
+cleanup: ALWAYS
+	for i in ${TAGDIRS}; \
+	do \
+		(cd $$i; rm -f *.CKP *~ *.old core); \
+	done
+
+#
+#  Special rules to install include files in release images
+#
+INCDIR=	/usr/include
+SYSDIRS= mon net netimp netinet netns next nextdev nextif sys ufs nfs \
+	kern vm kernserv
+DEFSDIRS= kern kernserv
+
+install: installkern installhdrs
+
+mach.syms: mach
+	@rm -f mach.syms
+	nm -g mach | awk '{print $$3}' > mach.syms
+
+mach.strip: mach.syms
+	@rm -f mach.strip_t mach.strip
+	cp mach mach.strip_t
+	@chmod 644 mach.strip_t
+	strip -s mach.syms mach.strip_t
+	mv mach.strip_t mach.strip
+
+installkern: mach.strip
+	install -c -m 444 -l ${DSTROOT}/private/tftpboot/mach -l ${DSTROOT}/odmach mach.strip ${DSTROOT}/sdmach
+
+installhdrs: DSTROOT migfiles features
+	cd ..; \
+	for i in ${SYSDIRS}; \
+	do \
+		( mkdirs ${DSTROOT}${INCDIR}/$$i; \
+		  cd $$i; \
+		  install -d -c -m 444 *.h ${DSTROOT}${INCDIR}/$$i; \
+		); \
+	done; \
+	for i in ${DEFSDIRS}; \
+	do \
+		( mkdirs ${DSTROOT}${INCDIR}/$$i; \
+		  cd $$i; \
+		  install -d -c -m 444 *.defs ${DSTROOT}${INCDIR}/$$i; \
+		); \
+	done
+	rm -rf ${DSTROOT}${INCDIR}/machine
+	ln -s next ${DSTROOT}${INCDIR}/machine
+
+local: LCLROOT
+	cd ..; \
+	for i in ${SYSDIRS}; \
+	do \
+		( mkdirs ${LCLROOT}${INCDIR}/$$i; \
+		  cd $$i; \
+		  for j in *.h; \
+		  do \
+			install -d -c -m 444 $$j ${LCLROOT}${INCDIR}/$$i/$$j; \
+		  done \
+		); \
+	done
+	rm -rf ${LCLROOT}${INCDIR}/machine
+	ln -s next ${LCLROOT}${INCDIR}/machine
+
+DSTROOT LCLROOT:
+	@if [ -n "${$@}" ]; \
+	then \
+		exit 0; \
+	else \
+		echo Must define $@; \
+		exit 1; \
+	fi
+
+rebuild: clean cleanup features tags all
+	@echo Don't forget to do a make install
+
+######################################################################
+#END	Machine dependent Makefile fragment for NeXT
+######################################################################

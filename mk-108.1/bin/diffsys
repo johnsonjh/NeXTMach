@@ -1,0 +1,30 @@
+#
+# HISTORY
+#  1-Sep-86  Michael Young (mwyoung) at Carnegie-Mellon University
+#	Fixed up argument handling, set of directories to be diff'ed.
+#
+#  11-Sep-85  Avadis Tevanian (avie) at Carnegie-Mellon University
+#	Added extra functionality for detecting new or deleted files.
+#	Does not detect new directories, so when new directories are
+#	created, dummy directories should be created in /usr/sys before
+#	running diffsys.
+#
+rm -f diffs
+if ($#argv > 0) set $argv
+if ($?old == 0) set old=/usr/sys
+if ($?new == 0) set new=.
+
+foreach dir (	accent bbnnet bin ca caif caio conf emul h kern lib \
+		net netimp netinet netns sensor src stand standca \
+		sys vax vaxif vaxmba vaxuba vm)
+	diff -r $old/$dir $new/$dir >>& diffs
+end
+sed '/^Common/d\
+/^Binary/d' diffs >Diffs
+grep "^diff -r" Diffs | sed "s?^.*$target/*??" > ChangedFiles
+grep "^Only" Diffs > t1
+grep "$new" t1 > t2
+sed -e "s?^.*$target/*??" -e 's?: ?/?' t2 > DeletedFiles
+grep -v "$new" t1 > t2
+sed -e 's?Only in ??' -e 's?: ?/?' t2 > NewFiles
+rm diffs t1 t2

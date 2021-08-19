@@ -1,0 +1,223 @@
+#
+# Mach Operating System
+# Copyright (c) 1986 Carnegie-Mellon University
+# All rights reserved.  The CMU software License Agreement
+# specifies the terms and conditions for use and redistribution.
+#  
+######################################################################
+#
+#  Master NeXT configuration file (see the master machine independent
+#  configuration file for a description of the file format).
+#
+######################################################################
+# HISTORY
+# 28-Aug-90	Gregg Kellogg (gk) at NeXT
+#	Removed VM disk.  It's done with a loabable driver now.
+#
+# 16-Apr-90	Gregg Kellogg (gk) at NeXT
+#	Added kern_server interface
+#
+# 09-Apr-90	Bradley Taylor (btaylor) at NeXT
+#	Added IP/ethernet virtual network interface (venip)
+#
+# 27-Mar-90	Doug Mitchell at NeXT
+#	Added fd driver.
+#
+# 16-Feb-90	Gregg Kellogg (gk) at NeXT
+#	Enable MACH_FIXPRI and MACH_HOST.
+#
+# 15-Jun-89	Mike DeMoney at NeXT
+#	Turned on SIMPLE_CLOCK option since time is advanced in
+#	hardclock() which is now run at softint1.  Time won't drift,
+#	but updates have quite a bit of "jitter".
+#
+#  2-Feb-89	Doug Mitchell at NeXT
+#	Added sg driver support
+#
+#  3-Sep-88  John Seamons (jks) at NeXT
+#	Added <xpr,debug,dma304> options.
+#
+# 19-Feb-88  John Seamons (jks) at NeXT
+#	Updated to Mach release 2.
+#
+#  2-Nov-87  Mike DeMoney (mike) at NeXT
+#	Added entries for SCSI disk "sd"
+#
+# 10-Aug-87  Peter King (king) at NeXT
+#	Added SUN_NETFIX, SUN_VFS, SUN_NFS, SUN_RPC, NFSDEBUG and
+#	 RPCDEBUG options.
+#	Added <nfs,rpcdebug,nfsdebug> to NeXT research configurations.
+#
+# 24-May-87  John Seamons (jks) at NeXT
+#	Created.
+#
+######################################################################
+#
+#  NeXT (PSEUDO-)DEVICES (select any combination)
+#	ex   = Excelan EXOS 202 Ethernet interface
+#	ip   = Interphase V/SMD 3200 disk controller
+#	od   = Canon OMD-1 Optical Disk
+#	rd   = RAM disk
+#	sd   = SCSI disk
+#	sg   = Generic SCSI Device
+#	st   = SCSI tape
+#	fd   = Floppy Disk 
+#	en   = Integrated Ethernet controller
+#	dsp  = DSP560001 digital signal processor
+#	iplmeas = ipl time measurement
+#	nextp = NeXT Laser Printer
+#	sound = sound I/O
+#	vol   = removable volume support device
+#	venip = virtual Ethernet/IP network interface
+#
+#  MULTIPROCESSOR SUPPORT (select exactly one)
+#	multi = support 4 processors
+#	uni   = supports single processor
+#
+#  SPECIAL CHARACTERISTICS (select any combination)
+#	gdb   = GNU kernel debugger
+#
+#  CPU TYPE (select exactly one)
+#	NeXT   = FIXME
+#
+######################################################################
+#  
+#  Standard NeXT Research Configurations:
+#  -------- ---- -------- ---------------
+#
+#  RELEASE = [next mach xsmall fd od sd st sg en venip km ev nfs dsp pst nextp sound nbc gdb zs simple_clock fixpri hw_ast oldvmcopy mdebug vol kernserv ]
+#  LOCKRELEASE = [next mach xsmall fd od sd st sg en venip km ev nfs dsp pst nextp sound nbc gdb zs simple_clock sunlock fixpri hw_ast oldvmcopy mdebug vol kernserv ]
+#  DEBUG = [next mach xsmall gdb zs fd od sd st sg en venip km ev nfs quota dsp pst nextp sound nbc test debug simple_clock oldvmcopy fixpri hw_ast mdebug vol kernserv mallocdebug]
+#  IPLMEAS = [next mach xsmall gdb zs fd od sd st sg en venip km ev nfs quota dsp pst nextp sound nbc test debug iplmeas simple_clock fixpri hw_ast oldvmcopy mdebug vol kernserv mallocdebug]
+#
+######################################################################
+#
+machine		NeXT						# <next>
+cpu		"NeXT"						# <next>
+
+makeoptions	"RELOC=04000000"				# <next>
+options		GDB		# GNU kernel debugger		# <gdb>
+makeoptions	"GDBOPTS=-g"	# GNU kernel debugger		# <gdb>
+options		SUN_VFS		# Sun Virtual filesystem	# <vfs,nfs>
+options		SUN_RPC		# Sun Remote Procedure Call	# <rpc,nfs,sunlock>
+options		SUN_NFS		# Sun Network Filesystem	# <nfs>
+options		NFS_CLIENT	# Be an NFS client		# <nfs>
+options		NFS_SERVER	# Be an NFS server		# <nfs>
+options		SUN_LOCK	# Suns SVID locking		# <sunlock>
+options		SECURE_NFS	# NFS using Secure RPC		# <securenfs>
+options		RPCDEBUG					# <rpcdebug>
+options		NFSDEBUG					# <nfsdebug>
+options		DEBUG		# general debugging code	# <debug>
+options		SHOW_SPACE	# print size of structures	# <debug>
+options		EVENTMETER	# event meter support		# <debug>
+options		SIMPLE_CLOCK	# don't assume fixed tick	# <simple_clock>
+options		KERNSERV	# kernel_server intarface	# <kernserv>
+options		MALLOCDEBUG	# kernel malloc debugging	# <mallocdebug>
+config		mach		swap generic			# <mach>
+
+pseudo-device	pty	32					# <next>
+controller	bus0	at nexus ?				# <next>
+
+#
+#  Virtual Ethernet/IP interface
+#
+pseudo-device	venip	init venip_config			# <venip>
+
+#
+#  Floppy Disk
+#
+controller	fc0	at bus? csr 0x02014100			# <fd>
+disk		fd0	at fc0 drive 0				# <fd>
+
+#
+#  SCSI disk
+#
+controller	sc0	at bus? csr 0x02014000			# <sd,sg>
+disk		sd0	at sc0 drive ?				# <sd>
+disk		sd1	at sc0 drive ?				# <sd>
+disk		sd2	at sc0 drive ?				# <sd>
+disk		sd3	at sc0 drive ?				# <sd>
+disk		sd4	at sc0 drive ?				# <sd>
+disk		sd5	at sc0 drive ?				# <sd>
+disk		sd6	at sc0 drive ?				# <sd>
+
+#
+#  SCSI tape
+#
+device		st0	at sc0 drive ?				# <st>
+device		st1	at sc0 drive ?				# <st>
+
+#
+#  Generic SCSI device
+#
+device		sg0	at sc0 drive ?				# <sg>
+
+#
+#  Canon OMD-1 Optical Disk
+#
+controller	oc0	at bus? csr 0x02012000			# <od>
+disk		od0	at oc0 drive 0				# <od>
+disk		od1	at oc0 drive 1				# <od>
+
+
+#
+#  Zilog Z8530 SCC
+#
+pseudo-device	zs	2 init zsintsetup			# <zs>
+
+#
+#  Keyboard & mouse via monitor serial channel
+#
+pseudo-device	km						# <km>
+
+#
+#  Event queue via monitor serial channel
+#
+pseudo-device	ev						# <ev>
+
+#
+#  Compressed Serial Line IP
+#
+pseudo-device	sl						# <sl>
+
+#
+#  Network Point-to-Point Protocol interface
+#
+pseudo-device	ppp						# <ppp>
+
+#
+#  Integrated Ethernet controller
+#
+device		en0	at bus? csr 0x02006000			# <en>
+
+#
+#  DSP560001 digital signal processor
+#
+device		dsp0	at bus? csr 0x020000d0			# <dsp>
+
+#
+#  Ipl measurement system
+#
+pseudo-device	iplmeas						# <iplmeas>
+
+#
+#  NFS measurement system
+#
+pseudo-device	nfsmeas						# <nfsmeas>
+
+#
+#  NeXT Laser Printer
+#
+device		np0	at bus? csr 0x0200f000			# <nextp>
+
+#
+#  Sound I/O
+#
+device		sound0	at bus?	csr 0x0200e000			# <sound>
+
+#
+#  Removable Volume support
+#
+pseudo-device	vol						# <vol>
+
+

@@ -1,0 +1,100 @@
+*
+*	x_unsupp.sa 1.7 10/8/90
+*
+*	fpsp_unsupp --- FPSP handler for unsupported data type/format exception
+*
+*	Trap vector #55	(See table 8-1 Mc68030 User's manual).	
+*	Invoked when the user program encounters a data format (packed) that
+*	hardware does not support or a data type (denormalized numbers or un-
+*	normalized numbers).
+*	Normalizes denorms and unnorms, unpacks packed numbers then stores 
+*	them back into the machine to let the 040 finish the operation.  
+*
+*	Unsupp calls two routines:
+*		1. get_op -  gets the operand(s)
+*		2. res_func - restore the function back into the 040 or
+*				if fmove.p fpm,<ea> then pack source (fpm)
+*				and store in users memory <ea>.
+*
+*  Input: Long fsave stack frame
+*
+*
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+X_UNSUPP	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+	xref	get_op
+	xref	res_func
+	xref	gen_except
+
+	xdef	fpsp_unsupp
+fpsp_unsupp:
+*
+	link		a6,#-LOCAL_SIZE
+	fsave		-(a7)
+	movem.l		d0-d7,USER_D0(a6)
+	movem.l		a0-a1,USER_A0(a6)
+	fmovem.x	fp0/fp1,USER_FP0(a6)
+	fmovem.l	fpcr/fpsr/fpiar,USER_FPCR(a6)
+
+#if	FP_DEBUG
+	move.l	d0,sp@-
+	move.l	d1,sp@-
+	move.l	a0,sp@-
+	move.l	a1,sp@-
+	lea	ETEMP(a6),a0
+	move.l	a0,sp@-
+	move.l	EXC_PC(a6),sp@-
+	move.l	#7,sp@-
+	jsr	_fp_trace
+	add.l	#12,sp
+	move.l	sp@+,a1
+	move.l	sp@+,a0
+	move.l	sp@+,d1
+	move.l	sp@+,d0
+#endif	FP_DEBUG
+
+*
+*	Temporary D25B Fix
+*	The following lines are used to ensure that the FPSR
+*	exception byte and condition codes are clear before proceeding,
+*	except in the case of fmove, which leaves the cc's intact.
+*
+	move.w		CMDREG1B(a6),d0	;test for fmove
+	andi.w		#$007f,d0	;strip to only command
+	beq.b		fmove_fix	;if zero, inst is fmove
+	move.l		USER_FPSR(a6),d0
+	and.l		#$FF,d0	;clear all but accrued exceptions
+	move.l		d0,USER_FPSR(a6)
+	bra.b		fix_con
+fmove_fix:
+	move.l		USER_FPSR(a6),d0
+	and.l		#$0FFF00FF,d0	;clear exceptions
+	move.l		d0,USER_FPSR(a6)
+fix_con:
+	fmove.l		#0,FPSR	;clear all user status bits for FPSP
+	fmove.l		#0,FPCR	;clear all user exceptions for FPSP
+
+*
+*	Temporary D43B fix for unimp frame stacked as a busy frame.
+*	Set bits in the flag UFLG_TMP, used in place of UFLAG on 
+*	the fsave stack.
+*
+	st		UFLG_TMP(a6)	;set flag for unsupp data
+
+	bsr	get_op		;everything okay, go get operand(s)
+	bsr	res_func	;fix up stack frame so can restore it
+	move.l	#IDLE_FMT,-(a7)
+	bra	gen_except
+*
+	end

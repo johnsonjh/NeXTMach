@@ -1,0 +1,18 @@
+# Initialization
+#
+CALL		cfs_announce		0
+
+# Set proc to be called when a port dies
+#
+PORT_DEATH	cfs_port_death
+
+# Associate ports with proc/arg
+#
+HMAP	cfs 	cfs_server		0
+ADVERTISE	cfs
+
+# must be wired
+#
+WIRE
+
+

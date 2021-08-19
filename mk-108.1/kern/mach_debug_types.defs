@@ -1,0 +1,57 @@
+/* 
+ * Mach Operating System
+ * Copyright (c) 1989 Carnegie-Mellon University
+ * Copyright (c) 1988 Carnegie-Mellon University
+ * All rights reserved.  The CMU software License Agreement specifies
+ * the terms and conditions for use and redistribution.
+ */
+/*
+ * HISTORY
+ * $Log:	mach_debug_types.defs,v $
+ * Revision 2.7  89/05/11  14:41:55  gm0w
+ * 	Added ipc_bucket_info_t, ipc_bucket_info_array_t.
+ * 	[89/05/07  20:12:59  rpd]
+ * 
+ * Revision 2.6  89/05/06  02:58:32  rpd
+ * 	Added zone_{name,info}{,_array}_t.
+ * 	[89/05/06  02:46:20  rpd]
+ * 
+ * Revision 2.5  89/03/09  20:26:20  rpd
+ * 	More cleanup.
+ * 
+ * Revision 2.4  89/02/25  18:43:41  gm0w
+ * 	Changes for cleanup.
+ * 
+ * Revision 2.3  89/01/15  16:32:43  rpd
+ * 	Updated includes for the new mach/ directory.
+ * 	[89/01/15  15:11:33  rpd]
+ * 
+ * Revision 2.2  89/01/12  08:00:34  rpd
+ * 	Created.
+ * 	[89/01/12  04:21:37  rpd]
+ * 
+ */
+/*
+ *	Mach kernel debugging interface type declarations
+ */
+
+#ifndef	_KERN_MACH_DEBUG_TYPES_DEFS_
+#define _KERN_MACH_DEBUG_TYPES_DEFS_
+
+#include <kern/std_types.defs>
+
+type ipc_statistics_t = struct[15] of int;
+
+type ipc_bucket_info_t = struct[1] of int;
+type ipc_bucket_info_array_t = ^array[] of ipc_bucket_info_t;
+
+type zone_name_t = struct[80] of char;
+type zone_name_array_t = ^array[] of zone_name_t;
+
+type zone_info_t = struct[8] of int;
+type zone_info_array_t = ^array[] of zone_info_t;
+
+import <kern/mach_debug_types.h>;
+
+#endif	_KERN_MACH_DEBUG_TYPES_DEFS_
+

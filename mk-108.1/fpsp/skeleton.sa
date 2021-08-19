@@ -1,0 +1,292 @@
+*
+*	skeleton.sa 1.6 10/2/90
+*
+*	This file contains code that is system dependent and will
+*	need to be modified to install the FPSP.
+*
+*	Each entry point for exception 'xxxx' begins with a 'jmp fpsp_xxxx'.
+*	Put any target system specific handling that must be done immediately
+*	before the jump instruction.  If there no handling necessary, then
+*	the 'fpsp_xxxx' handler entry point should be placed in the exception
+*	table so that the 'jmp' can be eliminated. If the FPSP determines that the
+*	exception is one that must be reported then there will be a
+*	return from the package by a 'jmp real_xxxx'.  At that point
+*	the machine state will be identical to the state before
+*	the FPSP was entered.  In particular, whatever condition
+*	that caused the exception will still be pending when the FPSP
+*	package returns.  Thus, there will be system specific code
+*	to handle the exception.
+*
+*	If the exception was completely handled by the package, then
+*	the return will be via a 'jmp fpsp_done'.  Unless there is 
+*	OS specific work to be done (such as handling a context switch or
+*	interrupt) the user program can be resumed via 'rte'.
+*
+*	In the following skeleton code, some typical 'real_xxxx' handling
+*	code is shown.  This code may need to be moved to an appropriate
+*	place in the target system, or rewritten.
+*	
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+SKELETON	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section 8
+
+	include	fpsp.h
+
+*
+*	Divide by Zero exception
+*
+*	All dz exceptions are 'real', hence no fpsp_dz entry point.
+*
+	xdef	real_dz
+real_dz:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E1,E_BYTE(a6)
+	frestore	(sp)+
+	unlk		a6
+	rte
+*
+*	Inexact exception
+*
+*	All inexact exceptions are real, but the 'real' handler
+*	will probably want to clear the pending exception.
+*	The provided code will clear the E3 exception (if pending), otherwise
+*	clear the E1 exception.  The frestore is not really necessary for 
+*	E1 exceptions.
+*
+	xdef	real_inex
+real_inex:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E3,E_BYTE(a6)		;clear and test E3 flag
+	bne.b		inex_done
+	bclr.b		#E1,E_BYTE(a6)
+inex_done:
+	frestore	(sp)+
+	unlk		a6
+	rte
+	
+*
+*	Overflow exception
+*
+	xdef	real_ovfl
+real_ovfl:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E3,E_BYTE(a6)		;clear and test E3 flag
+	bne.b		ovfl_done
+	bclr.b		#E1,E_BYTE(a6)
+ovfl_done:
+	frestore	(sp)+
+	unlk		a6
+	rte
+	
+*
+*	Underflow exception
+*
+	xdef	real_unfl
+real_unfl:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E3,E_BYTE(a6)		;clear and test E3 flag
+	bne.b		unfl_done
+	bclr.b		#E1,E_BYTE(a6)
+unfl_done:
+	frestore	(sp)+
+	unlk		a6
+	rte
+	
+*
+*	Signalling NAN exception
+*
+	xdef	real_snan
+real_snan:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E1,E_BYTE(a6)	;snan is always an E1 exception
+	frestore	(sp)+
+	unlk		a6
+	rte
+	
+*
+*	Operand Error exception
+*
+	xdef	real_operr
+real_operr:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E1,E_BYTE(a6)	;operr is always an E1 exception
+	frestore	(sp)+
+	unlk		a6
+	rte
+	
+*
+*	BSUN exception
+*
+*	This sample handler uses the third of the methods outlined
+*	in the 040 User's Manual pages 9-41f, that of simple clearing the
+*	bsun enable in the fpcr before attempting to reexecute the
+*	conditional.
+*
+	xdef	real_bsun
+real_bsun:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E1,E_BYTE(a6)	;bsun is always an E1 exception
+	fmove.l		FPCR,-(sp)
+	bclr.b		#bsun_bit,2(sp)
+	fmove.l		(sp)+,FPCR
+	frestore	(sp)+
+	unlk		a6
+	rte
+
+*
+*	F-line exception
+*
+*	A 'real' F-line exception is one that the FPSP isn't supposed to 
+*	handle. E.g. an instruction with a co-processor ID that is not 1.
+*
+*
+	xref	fpsp_fline
+	xdef	real_fline
+	xdef	fline
+fline:
+	cmpb	#0,_cpu_type
+	bne	1f
+real_fline:
+	jmp	emu1111
+1:
+	jmp	fpsp_fline
+
+*
+*	Unsupported data type exception
+*
+	xdef	real_unsupp
+real_unsupp:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(sp)
+	bclr.b		#E1,E_BYTE(a6)	;unsupp is always an E1 exception
+	frestore	(sp)+
+	unlk		a6
+	rte
+
+*
+*	Trace exception
+*
+	xdef	real_trace
+real_trace:
+	sub.l	 #8,a7			;allocate work space
+	move.l	 a0,(a7)		;save a0
+	movec	 vbr,a0			;get current exception table base addr
+	move.l	 $24(a0),4(a7)		;get trace handler addr & put on stack
+	movea.l	 (a7)+,a0		;restore a0
+	rts				;go to trap handler (trust me)
+
+*
+*	fpsp_done --- FPSP exit point
+*
+*	The exception has been handled by the package and we are ready
+*	to return to user mode, but there may be OS specific code
+*	to execute before we do.  If there is, do it now.
+*
+*
+	xdef	fpsp_done
+fpsp_done:
+	rte
+
+*
+*	mem_write --- write to user address space
+*
+* Writes to user memory while in supervisor mode.  copyout accomplishes
+* this via a 'moves' instruction.  copyout is a UNIX SVR3 (and later) function.
+* If you don't have copyout, use the local copy of the function below.
+*
+*	a0 - supervisor source address
+*	a1 - user destination address
+*	d0 - number of bytes to write (maximum count is 12)
+*
+* The supervisor source address is guaranteed to point into the supervisor
+* stack.  In addition, no calls to mem_write are made by the FPSP until
+* all global data areas are no longer needed.  The result is that a UNIX
+* process is allowed to sleep as a consequence of a page fault during
+* copyout.  The probability of a page fault is exceedingly small because
+* the 68040 always reads the destination address and thus the page
+* faults should have already been handled.
+*
+	xdef	mem_write
+mem_write:
+	move.l	d0,-(sp)
+	move.l	a1,-(sp)
+	move.l	a0,-(sp)
+	bsr		copyout
+	add.w	#12,sp
+	rts
+*
+*	mem_read --- read from user address space
+*
+* Reads from user memory while in supervisor mode.  copyin accomplishes
+* this via a 'moves' instruction.  copyin is a UNIX SVR3 (and later) function.
+* If you don't have copyin, use the local copy of the function below.
+*
+* The FPSP calls mem_read to read the original F-line instruction in order
+* to extract the data register number when the 'Dn' addressing mode is
+* used.
+*
+*Input:
+*	a0 - user source address
+*	a1 - supervisor destination address
+*	d0 - number of bytes to read (maximum count is 12)
+*
+* Like mem_write, mem_read always reads from user space to an address on
+* the supervisor stack.  Calls to mem_read ocurr before any global variables
+* are affected so a sleep in copyin is allowable.
+*
+	xdef	mem_read
+mem_read:
+	move.l	d0,-(sp)
+	move.l	a1,-(sp)
+	move.l	a0,-(sp)
+	bsr		copyin
+	add.w	#12,sp
+	rts
+
+*
+* Use these routines if your kernel doesn't have copyout/copyin equivalents.
+* Assumes that D0/D1/A0/A1 are scratch registers. copyout overwrites DFC,
+* and copyin overwrites SFC.
+*
+copyout:
+	move.l	4(sp),a0	; source
+	move.l	8(sp),a1	; destination
+	move.l	12(sp),d0	; count
+	sub.l	#1,d0		; dec count by 1 for dbra
+	move.l	#1,d1
+	movec	d1,DFC		; set dfc for user data space
+moreout:
+	move.b	(a0)+,d1	; fetch supervisor byte
+	moves.b	d1,(a1)+	; write user byte
+	dbf.w	d0,moreout
+	rts
+
+copyin:
+	move.l	4(sp),a0	; source
+	move.l	8(sp),a1	; destination
+	move.l	12(sp),d0	; count
+	sub.l	#1,d0		; dec count by 1 for dbra
+	move.l	#1,d1
+	movec	d1,SFC		; set sfc for user space
+morein:
+	moves.b	(a0)+,d1	; fetch user byte
+	move.b	d1,(a1)+	; write supervisor byte
+	dbf.w	d0,morein
+	rts
+
+	end

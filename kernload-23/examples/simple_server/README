@@ -1,0 +1,43 @@
+{\rtf0\ansi{\fonttbl\f0\fswiss Helvetica;\f1\fmodern Courier;\f2\fmodern Ohlfs;}
+\paperw10120
+\paperh7000
+\margl120
+\margr120
+\pard\tx520\tx1060\tx1600\tx2120\tx2660\tx3200\tx3720\tx4260\tx4800\tx5320\f0\b0\i0\ul0\fs24 This simple example of a loaded kernel server provides a trivial MIG-generated interface to demonstrate message passing between a user program and a server running within the kernel.  The server implements two services: 
+\b simple_puts()
+\b0 , which prints the supplied string on on the console using the kernel printf facilities, and 
+\b simple_vers()
+\b0  which returns the kernel version string to the user.  The following files are used in the implementation:\
+\
+
+\pard\tx2900\tx3200\tx3720\tx4260\tx4800\tx5320\i\fi-3060\li3060 simple.c
+\i0 	· This file uses the MIG generated interface to the simple server.  It obtains access to the server by looking up the port advertized on its behalf by the kernel loader.\
+\
+
+\i simple.defs
+\i0 	· This file implements the MIG interface to the server.  It generates simpleServer.c, simpleUser.c, and simple.h.\
+\
+
+\i simple_server.c
+\i0 	· This implements the guts of the server running in the kernel.  It is called from the kernel server interface routines when messages or other events are recieved for this server.\
+\
+
+\i Load_Commands.sect
+\i0 	· This file specifies the actions to be taken when loading the server.  This includes allocating and advertising a port, and setting up a mapping to call into the loaded code when a message is received on that port.\
+\
+
+\i Unload_Commands.sect
+\i0 	· This file specifies the actions to be taken when unloading the server.\
+
+\pard\tx520\tx1060\tx1600\tx2120\tx2660\tx3200\tx3720\tx4260\tx4800\tx5320 \
+To load this into the kernel loader type the following:\
+\
+	
+\f1 kl_util -a simple_reloc
+\f0 \
+\
+This will cause the server to be initialized by the kernel loader.  Running the program 
+\i simple
+\i0  will then invoke the server, causing it to be loaded into the kernel.\
+
+}

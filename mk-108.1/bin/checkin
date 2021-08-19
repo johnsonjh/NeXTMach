@@ -1,0 +1,5 @@
+#
+foreach i ($*)
+	rcsci -u -q $i RCS/$i,v < /dev/null
+	rcs -L RCS/$i,v
+end

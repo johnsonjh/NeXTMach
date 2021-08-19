@@ -1,0 +1,9 @@
+.TH pageSymbols 1 "October 5, 1990" "NeXT Computer, Inc."
+.SH NAME
+pageSymbols \- display symbols on a particlar page of a file
+.SH SYNOPSIS
+pageSymbols file page ...
+.SH DESCRIPTION
+PageSymbols prints out the symbols that are mapped to a particular logical page of a file.  The file should be in the Mach-O format.  This program is useful in conjunction with filemem(1) to determine which functions and static data structures are resident in memory at a particular time.
+.SH "SEE ALSO"
+filemem(1), Mach-O(5), 2.0 Link Optimization release notes

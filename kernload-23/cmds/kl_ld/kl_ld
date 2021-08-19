@@ -1,0 +1,87 @@
+#!/bin/sh
+#
+# Create a relocatable file that can be loaded with the kern_loader.
+# This program adds sections to the specified relocatable that the
+# kern_loader can access.
+#
+KS_TYPES=/usr/include/kernserv/kern_server_types.h
+version=`awk '/#define[ 	]+KS_VERSION/ {print $3}' < $KS_TYPES`
+if [ "$version" = "" ]
+then
+	version=1
+fi
+
+until [ $# -eq 0 ]
+do
+    case $1 in
+	-n ) KL_name=$2; shift; shift;;
+	-l ) if (echo $1 | egrep '-l.')
+	     then
+	     	KL_input="#Kl_input $1";
+	     else
+		KL_lc=$2; shift;
+	     fi
+	     shift;;
+	-u ) KL_uc=$2; shift; shift;;
+	-i ) KL_in=$2; shift; shift;;
+	-d ) KL_lo=$2; shift; shift;;
+	-o) KL_output=$2; shift; shift;;
+	* ) KL_input="$KL_input $1"; shift;;
+    esac
+done
+
+USAGE="usage: kl_ld -n <name> -l <load commands file> [-u <unload commands file>] -i <instance variable> [-d <loadable_file>] -o <output file> <input_file>"
+
+if [   "$KL_name" = "" \
+    -o "$KL_lc" = "" \
+    -o "$KL_in" = "" \
+    -o "$KL_output" = "" \
+    -o "$KL_input" = "" ]
+then
+	echo $USAGE
+	exit 1
+fi
+
+trap "rm /tmp/*$$" 0 1 2 15
+LS="\"Loaded Server\""
+
+KL_name_name="\"Server Name\""
+KL_name_file=/tmp/kl_name$$
+echo -n $KL_name > $KL_name_file
+KL_name_sect="-sectalign $LS $KL_name_name 1 -sectcreate $LS $KL_name_name $KL_name_file"
+
+KL_lc_name="\"Load Commands\""
+KL_lc_sect="-sectalign $LS $KL_lc_name 1 -sectcreate $LS $KL_lc_name $KL_lc"
+
+KL_in_name="\"Instance Var\""
+KL_in_file=/tmp/kl_instance$$
+echo -n $KL_in > $KL_in_file
+KL_in_sect="-sectalign $LS $KL_in_name 1 -sectcreate $LS $KL_in_name $KL_in_file"
+
+KL_vers_name="\"Server Version\""
+KL_vers_file=/tmp/kl_version$$
+echo -n $version > $KL_vers_file
+KL_vers_sect="-sectalign $LS $KL_vers_name 1 -sectcreate $LS $KL_vers_name $KL_vers_file"
+
+if [ "$KL_lo" = "" ]
+then
+	KL_lo_sect=""
+
+else
+	KL_lo_name="\"Loadable Name\""
+	KL_lo_file=/tmp/kl_lo_name$$
+	echo -n $KL_lo > $KL_lo_file
+	KL_lo_sect="-sectalign $LS $KL_lo_name 1 -sectcreate $LS $KL_lo_name $KL_lo_file"
+fi
+
+if [ "$KL_uc" = "" ]
+then
+	KL_uc_sect=""
+else
+	KL_uc_name="\"Unload Commands\""
+	KL_uc_sect="-sectalign $LS $KL_uc_name 1 -sectcreate $LS $KL_uc_name $KL_uc"
+fi
+
+echo ld -r -preload $KL_input -o $KL_output $KL_name_sect $KL_lc_sect $KL_uc_sect $KL_in_sect $KL_lo_sect $KL_vers_sect | sh
+
+exit 0

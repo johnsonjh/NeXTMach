@@ -1,0 +1,27 @@
+/*
+ * Simple loadable kernel server example.
+ *
+ * This example contain's mig interface declarations for a simple
+ * example of a kernel server.
+ */
+
+subsystem simple 100;
+
+#include <std_types.defs>
+
+type simple_msg_t = (MSG_TYPE_STRING,8*256);
+
+import "simple_types.h";
+
+serverprefix simple_;
+userprefix simple_;
+
+simpleroutine puts(
+		simple_port	: port_t;
+		string		: simple_msg_t);
+
+routine vers(
+		simple_port	: port_t;
+	out	string		: simple_msg_t);
+
+

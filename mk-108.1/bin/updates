@@ -1,0 +1,83 @@
+#! /bin/csh -f
+
+cd 
+set prog="$0"
+set prog="$prog:t"
+
+set BASEDATE=.$USER.date
+set DATE=$BASEDATE
+
+set print names 
+unset restart
+
+while ($#argv > 0)
+    if ("$argv[1]" =~ -*) then
+	switch ("$argv[1]")
+	    case "-r":
+	    case "-restart":
+		set restart
+		breaksw
+	    case "-o":
+	    case "-old":
+		set DATE=$BASEDATE.old
+		breaksw
+	    case "-n":
+	    case "-noprint":
+		unset print
+		breaksw
+	    case "-q":
+	    case "-quiet":
+		unset names
+		breaksw
+	    default:
+		echo "${prog}: unknown switch $argv[1]"
+		exit 1
+	endsw
+	shift
+    else
+	break
+    endif
+end
+
+if (! -f $DATE) then
+    utimes -m "Jan 1 00:00 1970" $DATE
+    echo "[ Created $DATE (from epoch) ]"
+endif
+
+set dirs=(accent conf emul h kern mp net netimp netinet netns sensor sync sys vax vaxif vaxmba vaxuba vm)
+set f=`find $dirs -newer $DATE \( -name "*.[cshm]" -o -name "*.sed" \) -type f -print | sed -e "/\/RCS\//d"`
+
+if ($#f <= 0) then
+    exit 0
+endif
+
+if ($?names) then
+    ls $f | pr -t -l1 -3
+endif
+ 
+if ($?print) then
+    wh -q czp >& /dev/null
+    if ($status != 0) then
+	set f=`ls $f | sort | split -5 - .upf`
+	foreach f (.upf*)
+	    cat $f
+	    if ($?restart) then
+		echo -n "Print? [no] "
+		set ans="$<"
+		if ("$ans" == "") set ans="no"
+		if ("$ans" !~ [Yy] && "$ans" !~ [Yy][Ee][Ss]) continue
+		unset restart
+	    endif
+	    cz `cat $f`
+	end
+	rm -f .upf??
+    else
+	czp -label "SYS changes" `ls $f`
+    endif
+    if ("$DATE" == "$BASEDATE") then
+	mv $DATE $DATE.old
+	touch $DATE
+    endif
+endif
+
+ls -l $BASEDATE*

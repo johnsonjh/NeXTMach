@@ -1,0 +1,30 @@
+{\rtf0\ansi{\fonttbl\f0\fswiss Helvetica;\f1\fmodern Ohlfs;}
+\paperw9840
+\paperh7800
+\margl120
+\margr120
+{\colortbl\red0\green0\blue0;}
+\pard\tx960\tx1920\tx2880\tx3840\tx4800\tx5760\tx6720\tx7680\tx8640\tx9600\f0\b\fs24 streams-18 changes
+\b0 :\
+
+\fi20\li700 NXOpenMemory checks it's address and size to ensure that it's allocated and readable.\
+\
+
+\b\fi0\li0 streams-19 changes
+\b0 :\
+
+\fi20\li700 Took back check in NXOpenMemory, it's too expensive.  It's up to the user to ensure tha mapped ranges are correct.\
+\
+Added
+\fi0\li0\fc0  
+\i NXStreamCreateFromZone.\
+
+\i0\fi20\li700 \
+
+\b\fi0\li0 streams-20 changes
+\b0 :\
+
+\fi20\li700 Can't seek on sockets or pipes.  Took the code out of the file_functions to do this if the file is a socket or a pipe.\
+\
+
+}

@@ -1,0 +1,199 @@
+/* 
+ * Mach Operating System
+ * Copyright (c) 1989 Carnegie-Mellon University
+ * Copyright (c) 1988 Carnegie-Mellon University
+ * All rights reserved.  The CMU software License Agreement specifies
+ * the terms and conditions for use and redistribution.
+ */
+/*
+ * HISTORY
+ * $Log:	mach_types.defs,v $
+ * Revision 2.11  90/07/20  08:48:54  mrt
+ * 	Add processor_set_name_array_t to replace processor_set_array_t.
+ * 	[90/07/13            dlb]
+ *
+ * Revision 2.9  89/10/11  14:39:01  dlb
+ * 	Add a few more array type definitions.
+ * 	[89/06/08            dlb]
+ * 
+ * 	Add host and processor type definitions.
+ * 	[89/01/25            dlb]
+ * 
+ * Revision 2.8  89/10/10  10:55:42  mwyoung
+ * 	Use vm_object_lookup directly as the in-translation for
+ * 	the memory_object type.  At some point, the memory_object
+ * 	interface should use destructors.
+ * 	[89/10/04            mwyoung]
+ * 
+ * Revision 2.7  89/07/14  15:26:33  rvb
+ * 	Fixed long-standing erroneous size for machine_slot_data_t.
+ * 	Only a new mig and a picky guy (me) would notice.
+ * 	[89/07/12            af]
+ * 
+ * Revision 2.6  89/05/21  23:12:10  mrt
+ * 	Added a simport of kern/type_conversion.h  under a KERNEL_SERVER
+ * 	conditional.
+ * 	[89/05/21            mrt]
+ * 
+ * Revision 2.5  89/04/08  23:40:32  rpd
+ * 	Use new-fangled syntax for translation/destructor functions.
+ * 	Define internal_memory_pointer_t.
+ * 	[89/04/08  22:55:37  rpd]
+ * 
+ * Revision 2.4  89/03/09  20:20:52  rpd
+ * 	More cleanup.
+ * 
+ * Revision 2.3  89/02/25  18:37:59  gm0w
+ * 	Changes for cleanup.
+ * 
+ * Revision 2.6  89/01/12  07:57:37  rpd
+ * 	Moved standard stuff to std_types.defs.  Moved debugging definitions
+ * 	like ipc_statistics_t out to other files.
+ * 	[89/01/12  04:50:24  rpd]
+ * 
+ * Revision 2.5  89/01/04  13:37:11  rpd
+ * 	Increased size of fpa_counters_t.
+ * 	[89/01/03  16:46:38  rpd]
+ * 	
+ * 	Added fpa_counters_t type.
+ * 	[89/01/01  15:03:09  rpd]
+ * 
+ * Revision 2.4  88/09/25  22:15:16  rpd
+ * 	Bumped size of callout_statistics_t to account for the
+ * 	new field, cos_num_untimeout_hit.
+ * 	[88/09/09  23:14:38  rpd]
+ * 	
+ * 	Fixed log.  Changed includes to the new style.
+ * 	Added definitions of callout_info_t,
+ * 	callout_info_array_t, callout_statistics_t.
+ * 	[88/09/09  04:46:31  rpd]
+ * 
+ */
+/*
+ *	Mach kernel interface type declarations
+ */
+
+#ifndef	_KERN_MACH_TYPES_DEFS_
+#define _KERN_MACH_TYPES_DEFS_
+
+#include <kern/std_types.defs>
+
+#if	KERNEL_SERVER
+simport <kern/type_conversion.h>;
+#endif	KERNEL_SERVER
+
+type task_t = port_t
+#if	KERNEL_SERVER
+		intran: task_t convert_port_to_task(port_t)
+		outtran: port_t convert_task_to_port(task_t)
+		destructor: task_deallocate(task_t)
+#endif	KERNEL_SERVER
+		;
+
+
+type thread_t = port_t
+#if	KERNEL_SERVER
+		intran: thread_t convert_port_to_thread(port_t)
+		outtran: port_t convert_thread_to_port(thread_t)
+		destructor: thread_deallocate(thread_t)
+#endif	KERNEL_SERVER
+		;
+
+type thread_state_t		= array[*:1024] of int;
+
+/*
+ * Mig doesn't handle translations of the components of an array,
+ * so use port_t instead of thread_t.
+ */
+type task_array_t = ^array[] of port_t;
+type thread_array_t = ^array[] of port_t;
+
+type vm_task_t = port_t
+#if	KERNEL_SERVER
+		intran: vm_map_t convert_port_to_map(port_t)
+		destructor: vm_map_deallocate(vm_map_t)
+#endif	KERNEL_SERVER
+		;
+
+type vm_address_t = int;
+type vm_offset_t = int;
+type vm_size_t = int;
+type vm_prot_t = int;
+type vm_inherit_t = int;
+type vm_statistics_data_t = struct[13] of int;
+
+type thread_info_t		= array[*:1024] of int;
+type task_info_t		= array[*:1024] of int;
+
+type memory_object_t = port_t;
+type memory_object_control_t = port_t
+#if	KERNEL_SERVER
+		intran: vm_object_t vm_object_lookup(port_t)
+		outtran: port_t NEVER_HAPPENS(vm_object_t)
+#endif	KERNEL_SERVER
+		;
+type memory_object_name_t = port_t;
+
+type memory_object_copy_strategy_t = int;
+
+type internal_memory_pointer_t =
+	^array [] of MSG_TYPE_INTERNAL_MEMORY|MSG_TYPE_BYTE
+	ctype: pointer_t;
+
+type machine_info_data_t = struct[5] of int;
+type machine_slot_data_t = struct[8] of int;
+
+type vm_page_data_t = array[4096] of MSG_TYPE_BYTE;
+
+type network_port_t = struct[6] of int;
+
+
+type host_t = port_t
+#if	KERNEL_SERVER
+		intran: host_t convert_port_to_host(port_t)
+		outtran: port_t convert_host_to_port(host_t)
+#endif	KERNEL_SERVER
+		;
+type host_priv_t = port_t
+#if	KERNEL_SERVER
+		intran: host_t convert_port_to_host_priv(port_t)
+#endif	KERNEL_SERVER
+		;
+type host_info_t 			= array[*:1024] of int;
+
+type processor_t = port_t
+#if	KERNEL_SERVER
+		intran: processor_t convert_port_to_processor(port_t)
+		outtran: port_t convert_processor_to_port(processor_t)
+#endif	KERNEL_SERVER
+		;
+type processor_array_t 		= ^array[] of port_t;
+type processor_info_t		= array[*:1024] of int;
+
+type processor_set_t = port_t
+#if	KERNEL_SERVER
+		intran: processor_set_t convert_port_to_pset(port_t)
+		outtran: port_t convert_pset_to_port(processor_set_t)
+		destructor: pset_deallocate(processor_set_t)
+#endif	KERNEL_SERVER
+		;
+
+type processor_set_name_t = port_t
+#if	KERNEL_SERVER
+		intran: processor_set_t convert_port_to_pset_name(port_t)
+		outtran: port_t convert_pset_name_to_port(processor_set_t)
+		destructor: pset_deallocate(processor_set_t)
+#endif	KERNEL_SERVER
+		;
+
+type processor_set_name_array_t = ^array[] of port_t;
+
+type processor_set_info_t	= array[*:1024] of int;	
+
+type kernel_version_t		= (MSG_TYPE_STRING, 512*8);
+
+import <kern/mach_types.h>;
+
+#endif	_KERN_MACH_TYPES_DEFS_
+
+

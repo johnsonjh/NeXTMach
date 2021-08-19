@@ -1,0 +1,39 @@
+/* 
+ * Copyright (c) 1989 NeXT, Inc.
+ *
+ * HISTORY
+ *  7-July-89  Gregg Kellogg (gk) at NeXT
+ *	Created.
+ *
+ */
+
+/*
+ * interface for kern_loader to user communication.
+ */
+subsystem kern_loader_reply 300;
+
+#include <std_types.defs>
+
+type printf_data_t = ^ array[] of char;
+
+import <kernserv/kern_loader_types.h>;
+
+waittime 1000;
+
+/*
+ * Return a string containing desired information.  The level (from
+ * syslog levels) is also returned.
+ */
+simpleroutine kern_loader_reply_string (
+		reply_port	: port_t;
+		string		: printf_data_t;
+		level		: int);
+
+simpleroutine kern_loader_reply_ping (
+		reply_port	: port_t;
+		id		: int);
+
+simpleroutine kern_loader_reply_log_data (
+		reply_port	: port_t;
+		log_data	: printf_data_t);
+

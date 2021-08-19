@@ -1,0 +1,124 @@
+/* 
+ * Mach Operating System
+ * Copyright (c) 1987 Carnegie-Mellon University
+ * All rights reserved.  The CMU software License Agreement specifies
+ * the terms and conditions for use and redistribution.
+ */
+
+subsystem pager 2200;
+
+/*
+ * File:	kern/pager.defs
+ *
+ * Abstract:
+ *	Basic Mach external memory management interface declaration.
+ *	[See kern/pager_default.defs for the interface for default pagers.]
+ *
+ * HISTORY
+ *  9-Dec-87  Michael Young (mwyoung) at Carnegie-Mellon University
+ *	Split that part of the interface applicable only to default
+ *	pagers into a separate interface definition.
+ *
+ *	Documented the interface.
+ *	
+ *	Purged history.  Contributors so far: jle, mwyoung, bolosky.
+ *
+ */
+
+/*
+ *	Basic types
+ */
+
+type int = MSG_TYPE_INTEGER_32;
+type boolean_t = MSG_TYPE_BOOLEAN;
+
+type port_t = MSG_TYPE_PORT;
+type port_all_t = MSG_TYPE_PORT_ALL;
+type paging_object_t = port_t;
+type vm_offset_t = int;
+type vm_size_t = int;
+type vm_prot_t = int;
+
+type pointer_t = ^array [] of (MSG_TYPE_INTEGER_8, 8);
+
+import "kern/mach_types.h";
+
+/*
+ *	Initialize the specified memory object, providing
+ *	a reqeust port on which control calls can be made, and
+ *	a name port that identifies this object to callers of
+ *	vm_regions.
+ *	[No reply expected.]
+ */
+simpleroutine	pager_init(
+		paging_object		: paging_object_t;
+		pager_request_port	: port_t;
+		pager_name		: port_t;
+		page_size		: vm_size_t);
+
+skip;
+
+skip;
+/* Removed until we know how we'll use it */
+/*
+ simpleroutine	pager_copy(
+		old_paging_object	: paging_object_t;
+		offset			: vm_offset_t;
+		length			: vm_size_t;
+		new_paging_object	: port_all_t;
+		new_request_port	: port_t;
+		new_name		: port_t;
+		new_page_size		: vm_size_t); */
+
+/*
+ *	Request data from this memory object.  At least
+ *	the specified data should be returned with at
+ *	least the specified access permitted.
+ *	[Reply should be pager_data_provided.]
+ */
+simpleroutine	pager_data_request(
+		paging_object		: paging_object_t;
+		pager_request_port	: port_t;
+		offset			: vm_offset_t;
+		length			: vm_size_t;
+		desired_access		: vm_prot_t);
+
+/*
+ *	Request that the specified portion of this
+ *	memory object be unlocked to allow the specified
+ *	forms of access; the kernel already has the data.
+ *	[Reply should be pager_lock_request.]
+ */
+simpleroutine	pager_data_unlock(
+		paging_object		: paging_object_t;
+		pager_request_port	: port_t;
+		offset			: vm_offset_t;
+		length			: vm_size_t;
+		desired_access		: vm_prot_t);
+
+/*
+ *	Write back modifications made to this portion of
+ *	the memory object while in memory.
+ *	Unless explicitly requested by a pager_lock_request
+ *	(clean, but not flush),	the kernel will not continue
+ *	to use this data.
+ *	[Reply should be vm_deallocate to release the data.]
+ */
+simpleroutine	pager_data_write(
+		paging_object		: paging_object_t;
+		pager_request_port	: port_t;
+		offset			: vm_offset_t;
+		data			: pointer_t);
+
+/*
+ *	Indicate that a previous pager_lock_reqeust has been
+ *	completed.  Note that this call is made on whatever
+ *	port is specified in the pager_lock_request; that need
+ *	not be the memory object port itself.
+ *	[No reply expected.]
+ */
+simpleroutine	pager_lock_completed(
+		paging_object		: paging_object_t;
+		pager_request_port	: port_t;
+		offset			: vm_offset_t;
+		length			: vm_size_t);

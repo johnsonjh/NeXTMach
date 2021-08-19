@@ -1,0 +1,328 @@
+/* 
+ * Mach Operating System
+ * Copyright (c) 1989 Carnegie-Mellon University
+ * All rights reserved.  The CMU software License Agreement specifies
+ * the terms and conditions for use and redistribution.
+ */
+/*
+ * HISTORY
+ * $Log:	mach_host.defs,v $
+ * Revision 2.5  90/07/20  08:48:47  mrt
+ * 	Delete thread_depress_abort.  Subsumed by thread_abort.
+ * 	[90/07/16            dlb]
+ * 	Convert host_processor_sets to non-privileged form: return name
+ * 	ports given host port instead of returning control ports given
+ * 	privileged host port.
+ * 	[90/07/13            dlb]
+ * 
+ * Revision 2.4  89/12/22  15:54:26  rpd
+ * 	Under KERNEL_SERVER, pass the out arguments of
+ * 	processor_set_create as port_t's.  They really are
+ * 	the appropriate processor set types, but processor_set_create
+ * 	does the type conversions internally.  This isn't pretty.
+ * 	[89/12/15            dlb]
+ * 
+ * Revision 2.3  89/10/15  02:05:40  rpd
+ * 	Minor cleanups.
+ * 
+ * Revision 2.2  89/10/11  14:38:34  dlb
+ * 	Add IsLong specifiers to variable length arguments to info calls.
+ * 	Add thread_depress_abort.
+ * 	Add processor_set_{tasks,threads}, host_processor_sets,
+ * 	       host_processor_set_priv.
+ * 	Add priority and policy calls.
+ * 	Split processor_set_default.  Add task_assign_default and
+ * 	       thread_assign_default.
+ * 	Add host_kernel_version.
+ * 
+ * Revision 2.1.1.3  89/08/02  23:58:37  dlb
+ * 	Remove KERNEL_SERVER define.  Cleanup.
+ * 	[89/08/02            dlb]
+ * 
+ * Revision 2.1.1.2  89/08/02  23:10:06  dlb
+ * 	Add IsLong specifiers to variable length arguments to info calls.
+ * 	[89/08/02            dlb]
+ * 
+ * Revision 2.1.1.1  89/07/25  17:05:31  dlb
+ * 	Add thread_depress_abort.
+ * 	[89/06/20            dlb]
+ * 
+ * 	Add processor_set_{tasks,threads}, host_processor_sets,
+ * 	host_processor_set_priv.
+ * 	[89/06/08            dlb]
+ * 
+ * 	Add priority and policy calls.
+ * 	[89/05/12            dlb]
+ * 
+ * 	Move type definitions to mach_types.defs, delete kernel keyword.
+ * 	[89/01/25            dlb]
+ * 
+ * 	Split processor_set_default.  Add task_assign_default and
+ * 	thread_assign_default.
+ * 	[88/12/21            dlb]
+ * 
+ * 	Minor cleanups, add host_kernel_version.
+ * 	[88/12/02            dlb]
+ * 
+ * Revision 2.1  89/01/30  16:17:06  dlb
+ * Created.
+ * 
+ */
+
+/*
+ * File:	kern/mach_host.defs
+ *
+ * Abstract:
+ *	Mach host operations support.  Includes processor allocation and
+ *	control.  
+ */
+
+subsystem mach_host 2600;
+
+/*
+ *	Basic types
+ */
+
+#include <kern/std_types.defs>
+#include <kern/mach_types.defs>
+
+/*
+ *	Get list of processors on this host.
+ */
+
+routine host_processors(
+		host_priv	: host_priv_t;
+	out	processor_list	: processor_array_t);
+
+/*
+ *	Return information about this host.
+ */
+
+routine host_info(
+		host		: host_t;
+		flavor		: int;
+	out	host_info_out	: host_info_t, IsLong);
+
+
+/*
+ *	Return information about this processor.
+ */
+routine processor_info(
+		processor	: processor_t;
+		flavor		: int;
+	out	host		: host_t;
+	out	processor_info_out: processor_info_t, IsLong);
+
+/*
+ *	Start processor.
+ */
+
+routine	processor_start(
+		processor	: processor_t);
+
+/*
+ *	Exit processor -- may not be restartable.
+ */
+
+routine	processor_exit(
+		processor	: processor_t);
+
+/*
+ *	Do something machine-dependent to processor.
+ */
+routine processor_control(
+		processor	: processor_t;
+		processor_cmd	: processor_info_t, IsLong);
+
+/*
+ *	Get default processor set for host.
+ */
+routine processor_set_default(
+		host		: host_t;
+	out	default_set	: processor_set_name_t);
+
+#ifndef	NeXT
+/*
+ *	Get rights to default processor set for host.
+ *	Replaced by host_processor_set_priv.
+ */
+routine xxx_processor_set_default_priv(
+		host		: host_priv_t;
+	out	default_set	: processor_set_t);
+#endif	NeXT
+
+/*
+ *	Create new processor set.  Returns real port for manipulations,
+ *	and name port for obtaining information.
+ */
+routine processor_set_create(
+		host		: host_t;
+#if	KERNEL_SERVER
+	out	new_set		: port_t;
+	out	new_name	: port_t);
+#else	KERNEL_SERVER
+	out	new_set		: processor_set_t;
+	out	new_name	: processor_set_name_t);
+#endif	KERNEL_SERVER
+
+/*
+ *	Destroy processor set.
+ */
+routine processor_set_destroy(
+		set		: processor_set_t);
+
+/*
+ *	Get information about processor set.
+ */
+routine processor_set_info(
+		set_name	: processor_set_name_t;
+		flavor		: int;
+	out	host		: host_t;
+	out	info_out	: processor_set_info_t, IsLong);
+
+/*
+ *	Assign processor to processor set.
+ */
+routine processor_assign(
+		processor	: processor_t;
+		new_set		: processor_set_t;
+		wait		: boolean_t);
+
+/*
+ *	Get current assignment for processor.
+ */
+
+routine processor_get_assignment(
+		processor	: processor_t;
+	out	assigned_set	: processor_set_name_t);
+
+/*
+ *	Assign thread to processor set.
+ */
+routine	thread_assign(
+		thread		: thread_t;
+		new_set		: processor_set_t);
+
+/*
+ *	Assign thread to default set.
+ */
+routine thread_assign_default(
+		thread		: thread_t);
+
+/*
+ *	Get current assignment for thread.
+ */
+routine thread_get_assignment(
+		thread		: thread_t;
+	out	assigned_set	: processor_set_name_t);
+
+/*
+ *	Assign task to processor set.
+ */
+routine task_assign(
+		task		: task_t;
+		new_set		: processor_set_t;
+		assign_threads	: boolean_t);
+/*
+ *	Assign task to default set.
+ */
+routine task_assign_default(
+		task		: task_t;
+		assign_threads	: boolean_t);
+
+/*
+ *	Get current assignment for task.
+ */
+routine task_get_assignment(
+		task		: task_t;
+	out	assigned_set	: processor_set_name_t);
+
+/*
+ *	Get string describing current kernel version.
+ */
+routine	host_kernel_version(
+		host		: host_t;
+	out	kernel_version	: kernel_version_t);
+
+/*
+ *	Set priority for thread.
+ */
+routine thread_priority(
+		thread		: thread_t;
+		priority	: int;
+		set_max		: boolean_t);
+
+/*
+ *	Set max priority for thread.
+ */
+routine thread_max_priority(
+		thread		: thread_t;
+		processor_set	: processor_set_t;
+		max_priority	: int);
+
+/*
+ *	Set task priority.
+ */
+routine task_priority(
+		task		: task_t;
+		priority	: int;
+		change_threads	: boolean_t);
+
+/*
+ *	Set max priority for processor_set.
+ */
+routine processor_set_max_priority(
+		processor_set	: processor_set_t;
+		max_priority	: int;
+		change_threads	: boolean_t);
+
+/*
+ *	Set policy for thread
+ */
+routine thread_policy(
+		thread		: thread_t;
+		policy		: int;
+		data		: int);
+
+/*
+ *	Enable policy for processor set
+ */
+routine processor_set_policy_enable(
+		processor_set	: processor_set_t;
+		policy		: int);
+
+/*
+ *	Disable policy for processor set
+ */
+routine processor_set_policy_disable(
+		processor_set	: processor_set_t;
+		policy		: int;
+		change_threads	: boolean_t);
+/*
+ *	List all tasks in processor set.
+ */
+routine processor_set_tasks(
+		processor_set	: processor_set_t;
+	out	task_list	: task_array_t);
+
+/*
+ *	List all threads in processor set.
+ */
+routine processor_set_threads(
+		processor_set	: processor_set_t;
+	out	thread_list	: thread_array_t);
+
+/*
+ *	List all processor sets on host.
+ */
+routine host_processor_sets(
+		host			: host_t;
+	out	processor_set_names	: processor_set_name_array_t);
+
+/*
+ *	Get control port for a processor set.
+ */
+routine host_processor_set_priv(
+		host_priv	: host_priv_t;
+		set_name	: processor_set_name_t;
+	out	set		: processor_set_t);

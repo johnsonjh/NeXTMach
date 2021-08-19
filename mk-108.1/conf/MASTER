@@ -1,0 +1,211 @@
+#
+# Mach Operating System
+# Copyright (c) 1986 Carnegie-Mellon University
+# All rights reserved.  The CMU software License Agreement
+# specifies the terms and conditions for use and redistribution.
+#  
+#######################################################################
+#
+#	Master machine independent configuration file.
+#
+#	Specific configuration files are created based on this and
+#	the machine specific master file using the doconf script.
+#
+#	Any changes to the master configuration files will affect all
+#	other configuration files based upon it.
+#
+#######################################################################
+#
+#	To build a configuration, execute "doconf <configuration>."
+#	Configurations are specified in the "Configurations:" section
+#	of the MASTER and MASTER.* files as follows:
+#
+#	<configuration> = [ <attribute0> <attribute1> ... <attributeN> ]
+#
+#	Lines in the MASTER and MASTER.* files are selected based on
+#	the attribute selector list, found in a comment at the end of
+#	the line.  This is a list of attributes separated by commas.
+#	The "!" operator selects the line if none of the attributes are
+#	specified.
+#
+#	For example:
+#
+#	<foo,bar>	selects a line if "foo" or "bar" are specified.
+#	<!foo,bar>	selects a line if neither "foo" nor "bar" is
+#			specified.
+#
+#	Lines with no attributes specified are selected for all
+#	configurations.
+#
+#######################################################################
+#
+#  STANDARD CONFIGURATION OPTIONS (select any combination)
+#
+#	debug   = extra kernel level debugging support
+#	mach    = Mach support 
+#
+#  EXPERIMENTAL CONFIGURATION OPTIONS (select any combination, carefully)
+#
+#	nbc     = no buffer cache support
+#	simple  = non-rollover clock support
+#	timing  = precision timing support
+#	host	= host resource control support
+#	fixpri	= fixed priority threads
+#
+#  MULTI-PROCESSOR CONFIGURATION (select at most one)
+#
+#	multi16 = enable 16 multi-processors
+#	multi32 = enable 32 multi-processors
+#	multi48 = enable 48 multi-processors
+#
+#  SYSTEM SIZE CONFIGURATION (select exactly one)
+#
+#	xlarge = extra large scale system configuration
+#	large  = large scale system configuration
+#	medium = medium scale system configuration
+#	small  = small scale system configuration
+#	xsmall = extra small scale system configuration
+#	bsmall = special extra small scale system configuration for
+#		 (e.g. for boot floppies)
+#
+#######################################################################
+#
+#  DEPRECATED CONFIGURATION OPTIONS (select any combination, reluctantly)
+#
+#	oldipc  = old CMU IPC support
+#
+#######################################################################
+#  
+#  Standard Mach Research Configurations:
+#  -------- ---- -------- ---------------
+#
+#  These are the default configurations that can be used by most sites.
+#  They are used internally by the Mach project.
+#
+#  MACH      = [mach multi16 medium debug]
+#
+#  Explanation of Mach IPC options:
+#
+#  The multitude of IPC options allow various features to be turned on/off
+#  for compatibility purposes.  Unless you have a specific need,
+#  they should be left with their default values.  (Note that at CMU
+#  some of the backwards-compatibility options are turned on in
+#  the conf/MASTER.local file.)  There are also a few options for
+#  for debugging/measuring purposes, that do not change IPC semantics.
+#  The options are all independent; any combination will work.
+#
+#	MACH_IPC_SIGHACK (ipc_sighack) (default is OFF)
+#		When enabled, messages sent to ports in ports sets
+#		will generate signals in the receiving task.  (If
+#		MSG_TYPE_EMERGENCY, then SIGEMSG, else SIGMSG.)  This
+#		feature (emergency messages, too) is obsolete.  It is
+#		no longer necessary now that Mach supports
+#		multi-threaded tasks, and it is very awkward to
+#		implement when Unix signal functionality is no longer
+#		in the kernel.  It is enabled at CMU in MASTER.local
+#		because CMU Common Lisp still relies on it.
+#
+#	MACH_IPC_STATS (ipc_stats) (default is OFF)
+#		When enabled, some IPC statistics are collected at
+#		runtime.  If MACH_DEBUG is also enabled, then the
+#		host_ipc_statistics and host_ipc_statistics_reset
+#		kernel calls may be used.  Otherwise, adb/kdb work.
+#		The disadvantage to enabling it is that the kernel
+#		gets a little bigger and IPC operations get a little
+#		slower.  At CMU, it is enabled in MASTER.local for EXP
+#		configurations.
+#
+#	MACH_IPC_TCACHE (ipc_tcache) (default is ON)
+#		This option enables a cache of (task, name) -> port
+#		(ie, port translations) mappings.  The MACH_IPC_STATS
+#		option enables collection of hit/miss statistics for
+#		the cache.  The advantage to enabling it is that IPC
+#		operations generally get faster.  The big disadvantage
+#		is that the task structure gets bigger.
+#
+#	MACH_IPC_WWA (ipc_wwa) (default is OFF)
+#		This option controls exactly how blocked senders are
+#		woken up when there is room in the port's queue.  If
+#		enabled, a blocked sender is woken up as soon as there
+#		is space in the queue.  If disabled, all blocked
+#		senders are woken up when the queue is completely
+#		drained.  The advantage to having it disabled is that
+#		Rick's streaming IPC test gets better times.  Presumably
+#		if we had good scheduling we could turn it on.
+#
+#	MACH_IPC_XXXHACK (ipc_xxxhack) (default is OFF)
+#		This is the main backwards-compatibility option.  When
+#		enabled (done at CMU in MASTER.local), the old message
+#		traps and kernel calls still work.  It also turns on
+#		ownership rights.  The big disadvantage is that it
+#		makes the kernel bigger.  (The time penalty is small.)
+#
+#######################################################################
+#
+ident		MACH
+
+options		QUOTA		# <quota>
+options		INET
+options		FAST_CSW	# Fast context switch code	# <fast_csw>
+options		HW_AST		# Hardware ast support		# <hw_ast>
+options 	HW_FOOTPRINT	# Cache footprint support	# <hw_foot>
+options 	MACH		# Standard Mach features	# <mach>
+options		MACH_ASSERT	# Compile in assertions		# <test>
+options		MACH_COMPAT	# Vendor syscall compatibility  # <mach>
+options		MACH_DEBUG	# IPC debugging interface	# <mdebug> options		MACH_FASTLINK	# Fast symbolic links
+options		MACH_FIXPRI	# Fixed priority threads	# <fixpri>
+options		MACH_HOST	# Mach host (resource alloc.)	# <host>
+options		MACH_IPC_SIGHACK	# Send bogus signals	# <ipc_sighack>
+options		MACH_IPC_STATS	# Collect IPC statistics	# <ipc_stats>
+options		MACH_IPC_TCACHE	# IPC Translation Cache		# <ipc_tcache>
+options		MACH_IPC_WWA	# IPC Wakeup-When-Available	# <ipc_wwa>
+options		MACH_IPC_XXXHACK	# Enable obsolete funcs	# <ipc_xxxhack>
+options		MACH_LDEBUG	# Sanity-check simple locking	# <test>
+options 	MACH_NP		# Mach IPC support		# <np>
+options		MACH_NBC	# No buffer cache		# <nbc>
+options		MACH_NET	# Fast network access		# <!unix>
+options		MACH_XP		# external pager support	# <xp>
+options		SIMPLE_CLOCK	# no hardware clock rollover	# <simple>
+options		STAT_TIME	# Use statistical timing	# <!timing>
+options		XPR_DEBUG	# kernel tracing		# <debug>
+options		MACH_OLD_VM_COPY # Old vm_copy technology	# <oldvmcopy>
+
+timezone	5 dst		# <est>
+timezone	6 dst		# <cst>
+timezone	7 dst		# <mst>
+timezone	8 dst		# <pst>
+maxusers	64		# <xlarge>
+maxusers	50		# <large>
+maxusers	32		# <medium>
+maxusers	16		# <small>
+maxusers	8		# <xsmall,msmall>
+maxusers	2		# <bsmall>
+
+#
+#  Multi-processor selection
+#
+pseudo-device	cpus		64	# <multi64>
+pseudo-device	cpus		32	# <multi32>
+pseudo-device	cpus		16	# <multi16>
+pseudo-device	cpus		1	# <!multi64,multi32,multi16>
+#
+#  Ethernet (ARP)
+#
+pseudo-device	ether
+#
+#  INTERNET protocol
+#
+pseudo-device	inet
+#
+#  Network loopback device
+#
+pseudo-device	loop
+#
+#  UCB pseudo terminal service
+#
+pseudo-device	pty	80			# <!uboot,msmall,xsmall>
+pseudo-device	pty	16			# <msmall>
+
+
+
+

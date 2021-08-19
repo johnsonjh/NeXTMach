@@ -1,0 +1,887 @@
+*
+*	res_func.sa 1.20 10/8/90
+*
+* Normalizes denormalized numbers if necessary and updates the
+* stack frame.  The function is then restored back into the
+* machine and the 040 completes the operation.  This routine
+* is only used by the unsupported data type/format handler.
+* (Exception vector 55).
+*
+* For packed move out (fmove.p fpm,<ea>) the operation is
+* completed here; data is packed and moved to user memory. 
+* The stack is restored to the 040 only in the case of a
+* reportable exception in the conversion.
+*
+*
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+RES_FUNC    IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+#if	NeXT
+nx_c1:		dc.l	$41dfffff,$ffc00000
+nx_c2:		dc.l	$c1e00000,$00000000
+nx_c3:		dc.l	$41dfffff,$ffe00000
+nx_c4:		dc.l	$c1e00000,$00100000
+#endif	NeXT
+
+sp_bnds:	dc.w	$3f80,$407e
+		dc.w	$3f6a,$0000
+dp_bnds:	dc.w	$3c00,$43fe
+		dc.w	$3bcd,$0000
+
+	xref	mem_write
+	xref	bindec
+	xref	get_fline
+	xref	round
+	xref	dest_ext
+	xref	dest_dbl
+	xref	dest_sgl
+	xref	unf_sub
+	xref	nrm_set
+	xref	dnrm_lp
+	xref	ovf_res
+
+	xdef	res_func
+	xdef 	p_move
+
+res_func:
+	clr.b	DNRM_FLG(a6)
+	clr.b	RES_FLG(a6)
+	tst.b	DY_MO_FLG(a6)
+	beq.b	monadic
+dyadic:
+	btst.b	#7,DTAG(a6)	;if dop = norm=000, zero=001, inf=010 or nan=011
+	beq.b	monadic		;then branch
+*				;else denorm
+* HANDLE DESTINATION DENORM HERE
+*				;set dtag to norm
+*				;write the tag & fpte15 to the fsave stack
+	lea.l	FPTEMP(a6),a0
+
+	bclr.b	#sign_bit,LOCAL_EX(a0)
+	sne	LOCAL_SGN(a0)
+
+	bsr	nrm_set		;normalize number (exponent will go negative)
+	bclr.b	#sign_bit,LOCAL_EX(a0) ;get rid of false sign
+
+	bset.b	#unfl_bit,FPSR_EXCEPT(a6)
+
+	bfclr	LOCAL_SGN(a0){0:8}	;change back to IEEE ext format
+	beq.b	dpos
+	bset.b	#sign_bit,LOCAL_EX(a0)
+dpos:
+	bfclr	DTAG(a6){0:4}	;set tag to normalized, FPTE15 = 0
+	bset.b	#4,DTAG(a6)	;set FPTE15
+	or.b	#$0f,DNRM_FLG(a6)
+monadic:
+	btst.b	#direction_bit,CMDREG1B(a6)	;check direction
+	bne.w	opclass3			;it is a mv out
+*
+* At this point, only oplcass 0 and 2 possible
+*
+	btst.b	#7,STAG(a6)	;if sop = norm=000, zero=001, inf=010 or nan=011
+	beq.b	normal		;then branch
+*				;else denorm
+* HANDLE SOURCE DENORM HERE
+*
+*				;clear denorm stag to norm
+*				;write the new tag & ete15 to the fsave stack
+	bset.b	#unfl_bit,FPSR_EXCEPT(a6)
+
+*
+* At this point, check for the cases in which normalizing the 
+* denorm produces incorrect results.
+*
+	tst.b	DY_MO_FLG(a6)	;all cases of dyadic instructions would
+	bne.b	nrm_src		;require normalization of denorm
+
+* At this point:
+*	monadic instructions:	fabs  = $18  fneg   = $1a  ftst   = $3a
+*				fmove = $00  fsmove = $40  fdmove = $44
+*				fsqrt = $04  fssqrt = $41  fdsqrt = $45
+*
+	move.w	CMDREG1B(a6),d0	;get command register
+	andi.w	#$007f,d0	;get opmode
+	beq.b	spos		;if opmode=00, it is fmove in of denorm
+*				;no normalization is required
+* At this point, fabs, fneg, fsmove, fdmove, ftst, fssqrt, and 
+* fdsqrt are possible.
+* For cases fabs, fneg, fsmove, and fdmove goto spos (do not normalize)
+* For cases fsqrt, fssqrt, and fdsqrt goto nrm_src (do normalize)
+*
+	btst.l	#0,d0
+	bne.b	nrm_src		;weed out fssqrt and fdsqrt cases
+	cmp.b	#$04,d0		;weed out fsqrt case
+	beq.b	nrm_src
+	bra.b	spos		;fsmove, fdmove, fabs, fneg, ftst 
+*				;cases go to spos
+nrm_src:
+	lea.l	ETEMP(a6),a0
+
+	bclr.b	#sign_bit,LOCAL_EX(a0)
+	sne	LOCAL_SGN(a0)
+
+	bsr	nrm_set		;normalize number (exponent will go 
+*				; negative)
+	bclr.b	#sign_bit,LOCAL_EX(a0) ;get rid of false sign
+
+	bfclr	LOCAL_SGN(a0){0:8}	;change back to IEEE ext format
+	beq.b	spos
+	bset.b	#sign_bit,LOCAL_EX(a0)
+spos:
+	bfclr	STAG(a6){0:4}	;set tag to normalized, FPTE15 = 0
+	bset.b	#4,STAG(a6)	;set ETE15
+	or.b	#$f0,DNRM_FLG(a6)
+normal:
+	move.w	CMDREG1B(a6),d0
+	andi.w	#$007f,d0	;extract command word
+	beq	fmovein		;if it is an fmovein instruction 
+*				;(all zeros)  branch out for possible 
+*				;optimization here
+	tst.b	DNRM_FLG(a6)	;check if any of the ops were denorms
+	bne.b	ck_muldiv	;if so, check if it is an fmul or fdiv
+fix_stk:
+	move.b	#$fe,CU_SAVEPC(a6)
+	bclr.b	#E1,E_BYTE(a6)
+
+	clr.w	NMNEXC(a6)
+
+	move.l	USER_FPSR(a6),FPSR_SHADOW(a6)
+	bset.b	#SFLAG,E_BYTE(a6)
+	bset.b	#XFLAG,T_BYTE(a6)
+
+	st.b	RES_FLG(a6)	;indicate that a restore is needed
+	rts
+
+*local equates
+mulcode	equ	$23		;opmode field for an fmul
+divcode	equ	$20		;opmode field for an fdiv
+ck_muldiv:
+	cmp.w	#mulcode,d0
+	beq.b	pre_mul		;if a multiply branch out
+	cmp.w	#divcode,d0
+	beq.b	pre_div		;if  a divide, branch out
+	bra.b	fix_stk		;return
+*
+* PRE_MUL and PRE_DIV needs to check if an erroneous wrap-around 
+* condition will occur. 
+*
+* If no wrap-around occurs, allow 040 to continue the instruction
+* (goto fix_stk)
+* If a wrap-around occurs: 
+*	1) clear NMNEXC, E1; set unfl/inex in FPSR_EXCEPT
+*	2) xor FPTS and ETS, set WBTEMP_SGN accordingly
+*	3) point a0 to WBTEMP
+*	4) have d0 contain round precision
+*	5) call unf_sub
+*	6) convert WBTEMP to IEEE ext. format
+*	7) write WBTEMP to correct fp register
+*
+* Note that if the underflow exception is enabled, WBTEMP will yield
+* a value different from that of the 882.
+*
+pre_mul:
+	cmp.b	#$00,DNRM_FLG(a6)	;if none of the operands are denorms
+	beq.b	fix_stk			;no wrap_around occured
+
+	cmp.b	#$ff,DNRM_FLG(a6)	;if both src and dest were
+*					;denorms, then the wrap-around
+*					;condition will occur.
+	beq.b	force_unf
+*					;else, only one op is a denorm
+*					;add exponents to find if 
+*					;wrap-around condition exists
+	btst.b	#4,STAG(a6)
+	beq.b	gusxp
+	bfexts	ETEMP_EX(a6){1:15},d0
+	bra.b	get_dexp
+gusxp:
+	bfextu	ETEMP_EX(a6){1:15},d0
+
+get_dexp:
+	btst.b	#4,DTAG(a6)
+	beq.b	gudxp
+	bfexts	FPTEMP_EX(a6){1:15},d1
+	bra.b	prmulcont
+gudxp:
+	bfextu	FPTEMP_EX(a6){1:15},d1
+
+prmulcont:
+	add.l	d1,d0			;add biased exponents
+	sub.l	#$3fff,d0		;subtract one of the bias
+
+	cmp.w	#$c000,d0
+	ble.b	force_unf		;a wrap around condition exists 
+	bra.w	fix_stk			;let the 040 finish instruction
+
+pre_div:
+	cmp.b	#$0f,DNRM_FLG(a6)	;if destination is denorm,
+*					;check for wrap-around condition
+	bne.w	fix_stk
+	bfextu	ETEMP_EX(a6){1:15},d0	;source is norm
+	bfexts	FPTEMP_EX(a6){1:15},d1	;destination is denorm
+	sub.l	d0,d1
+	add.l	#$3fff,d1		;add bias
+	cmp.w	#$c000,d1		
+	ble.b	force_unf		;a wrap around condition exists
+	bra.w	fix_stk
+
+force_unf:
+	bclr.b	#E1,E_BYTE(a6)
+	or.l	#unfl_inx_mask,USER_FPSR(a6)
+	clr.w	NMNEXC(a6)
+
+	clr.b	WBTEMP_SGN(a6)
+	move.w	ETEMP_EX(a6),d0		;find the sign of the result
+	move.w	FPTEMP_EX(a6),d1
+	eor.w	d1,d0
+	andi.w	#$8000,d0
+	beq.b	frcunfcont
+	st.b	WBTEMP_SGN(a6)
+frcunfcont:
+
+	lea	WBTEMP(a6),a0		;point a0 to memory location
+	bfextu	FPCR_MODE(a6){0:2},d0	;get round precision
+	bsr	unf_sub			;get correct result based on
+*					;round precision/mode.  This 
+*					;sets FPSR_CC correctly
+
+	bfclr	WBTEMP_SGN(a6){0:8}	;convert back to IEEE ext format
+	beq.b	frcpos
+	bset.b	#sign_bit,WBTEMP_EX(a6)
+frcpos:
+	bfextu	CMDREG1B(a6){6:3},d0	;extract fp destination register
+	cmpi.b	#1,d0
+	ble.b	fp0_o_fp1		;check if dest is fp0 or fp1
+	move.l	#7,d1
+	sub.l	d0,d1
+	clr.l	d0
+	bset.l	d1,d0
+	fmovem.x WBTEMP(a6),d0
+	bra.b	frc_u_done
+fp0_o_fp1:
+	beq.b	fp1_dst 
+fp0_dst:
+	move.l	WBTEMP_EX(a6),USER_FP0(a6)
+	move.l	WBTEMP_HI(a6),USER_FP0+4(a6)
+	move.l	WBTEMP_LO(a6),USER_FP0+8(a6)
+	bra.b	frc_u_done
+fp1_dst:
+	move.l	WBTEMP_EX(a6),USER_FP1(a6)
+	move.l	WBTEMP_HI(a6),USER_FP1+4(a6)
+	move.l	WBTEMP_LO(a6),USER_FP1+8(a6)
+frc_u_done:
+	rts
+
+*
+* FMOVEIN performs the fmove to fp register.
+* Reason for this is to make fmoveins of unsupported data types
+* to be faster.
+*
+fmovein:
+	bfextu	FPCR_MODE(a6){0:2},d0	;get round precision
+	bne.w	fix_stk			;if other than extended,
+*					;let the 040 finish
+
+	clr.w	NMNEXC(a6)
+	bclr.b	#E1,E_BYTE(a6)
+
+	bfextu	CMDREG1B(a6){6:3},d0	;extract fp destination register
+	cmpi.b	#1,d0
+	ble.b	fp0_or_fp1		;check if dest is fp0 or fp1
+	move.l	#7,d1
+	sub.l	d0,d1
+	clr.l	d0
+	bset.l	d1,d0
+	fmovem.x ETEMP(a6),d0
+	bra.b	fmovein_done
+
+fp0_or_fp1:
+	beq.b	fp1_dest 
+fp0_dest:
+	move.l	ETEMP_EX(a6),USER_FP0(a6)
+	move.l	ETEMP_HI(a6),USER_FP0+4(a6)
+	move.l	ETEMP_LO(a6),USER_FP0+8(a6)
+	bra.b	fmovein_done
+fp1_dest:
+	move.l	ETEMP_EX(a6),USER_FP1(a6)
+	move.l	ETEMP_HI(a6),USER_FP1+4(a6)
+	move.l	ETEMP_LO(a6),USER_FP1+8(a6)
+fmovein_done:
+	rts
+	
+
+opclass3:
+	move.w	CMDREG1B(a6),d0	;check if packed moveout
+	andi.w	#$0c00,d0	;isolate last 2 bits of size field
+	cmpi.w	#$0c00,d0	;if size is 011 or 111, it is packed
+	beq.w	pack_out	;else it is norm or denorm
+	bra.w	mv_out
+
+	
+*
+*	MOVE OUT
+*
+
+mv_tbl:
+	dc.l	li
+	dc.l 	sgp
+	dc.l 	xp
+	dc.l 	mvout_end	;should never be taken
+	dc.l 	wi
+	dc.l 	dp
+	dc.l 	bi
+	dc.l 	mvout_end	;should never be taken
+mv_out:
+	bfextu	CMDREG1B(a6){3:3},d1	;put source specifier in d1
+	lea.l	mv_tbl,a0
+	move.l	(a0,d1*4),a0
+	jmp	(a0)
+
+*
+* This exit is for move-out to memory.  The aunfl bit is 
+* set if the result is inex.
+*
+mvout_end:
+	btst.b	#inex2_bit,FPSR_EXCEPT(a6)
+	beq.b	no_aufl
+	bset.b	#aunfl_bit,FPSR_AEXCEPT(a6)
+no_aufl:
+	clr.w	NMNEXC(a6)
+	bclr.b	#E1,E_BYTE(a6)
+	fmove.l	#0,FPSR			;clear any cc bits from res_func 
+	rts
+*
+* This exit is for move-out to int register.  The aunfl bit is 
+* not set in any case for this move.
+*
+mvouti_end:
+	clr.w	NMNEXC(a6)
+	bclr.b	#E1,E_BYTE(a6)
+	fmove.l	#0,FPSR			;clear any cc bits from res_func 
+	rts
+*
+* li is used to handle a long integer source specifier
+*
+
+li:
+	moveq.l	#4,d0		;set byte count
+
+	btst.b	#7,STAG(a6)	;check for extended denorm
+	bne.w	int_dnrm	;if so, branch
+
+	fmovem.x ETEMP(a6),fp0
+#if	NeXT
+	fcmp.d	nx_c1,fp0
+#else	NeXT
+	fcmp.d	#:41dfffffffc00000,fp0
+* 41dfffffffc00000 in dbl prec = 401d0000fffffffe00000000 in ext prec
+#endif	NeXT
+	fbge.w	lo_plrg	
+#if	NeXT
+	fcmp.d	nx_c2,fp0
+#else	NeXT
+	fcmp.d	#:c1e0000000000000,fp0
+* c1e0000000000000 in dbl prec = c01e00008000000000000000 in ext prec
+#endif	NeXT
+	fble.w	lo_nlrg
+*
+* at this point, the answer is between the largest pos and neg values
+*
+	fmove.l	fp0,L_SCR1(a6)	;let the 040 perform conversion
+	bra.w	int_wrt
+
+
+lo_plrg:
+	move.l	#$7fffffff,L_SCR1(a6)	;answer is largest positive int
+	fbeq.w	int_wrt			;exact answer
+#if	NeXT
+	fcmp.d	nx_c3,fp0
+#else	NeXT
+	fcmp.d	#:41dfffffffe00000,fp0
+* 41dfffffffe00000 in dbl prec = 401d0000ffffffff00000000 in ext prec
+#endif	NeXT
+	fbge.w	int_operr		;set operr
+	bra.w	int_inx			;set inexact
+
+lo_nlrg:
+	move.l	#$80000000,L_SCR1(a6)
+	fbeq.w	int_wrt			;exact answer
+#if	NeXT
+	fcmp.d	nx_c4,fp0
+#else	NeXT
+	fcmp.d	#:c1e0000000100000,fp0
+* c1e0000000100000 in dbl prec = c01e00008000000080000000 in ext prec
+#endif	NeXT
+	fblt.w	int_operr		;set operr
+	bra.w	int_inx			;set inexact
+
+*
+* wi is used to handle a word integer source specifier
+*
+
+wi:
+	moveq.l	#2,d0		;set byte count
+
+	btst.b	#7,STAG(a6)	;check for extended denorm
+	bne.w	int_dnrm	;branch if so
+
+	fmovem.x ETEMP(a6),fp0
+	fcmp.s	#:46fffe00,fp0
+* 46fffe00 in sgl prec = 400d0000fffe000000000000 in ext prec
+	fbge.w	wo_plrg	
+	fcmp.s	#:c7000000,fp0
+* c7000000 in sgl prec = c00e00008000000000000000 in ext prec
+	fble.w	wo_nlrg
+
+*
+* at this point, the answer is between the largest pos and neg values
+*
+	fmove.w	fp0,L_SCR1(a6)	;let the 040 perform conversion
+	bra.w	int_wrt
+
+wo_plrg:
+	move.w	#$7fff,L_SCR1(a6)	;answer is largest positive int
+	fbeq.w	int_wrt			;exact answer
+	fcmp.s	#:46ffff00,fp0
+* 46ffff00 in sgl prec = 400d0000ffff000000000000 in ext prec
+	fbge.w	int_operr		;set operr
+	bra.w	int_inx			;set inexact
+
+wo_nlrg:
+	move.w	#$8000,L_SCR1(a6)
+	fbeq.w	int_wrt			;exact answer
+	fcmp.s	#:c7000080,fp0
+* c7000080 in sgl prec = c00e00008000800000000000 in ext prec
+	fblt.w	int_operr		;set operr
+	bra.w	int_inx			;set inexact
+
+*
+* bi is used to handle a byte integer source specifier
+*
+
+bi:
+	moveq.l	#1,d0		;set byte count
+
+	btst.b	#7,STAG(a6)	;check for extended denorm
+	bne.w	int_dnrm	;branch if so
+
+	fmovem.x ETEMP(a6),fp0
+	fcmp.s	#:42fe0000,fp0
+* 42fe0000 in sgl prec = 40050000fe00000000000000 in ext prec
+	fbge.w	by_plrg	
+	fcmp.s	#:c3000000,fp0
+* c3000000 in sgl prec = c00600008000000000000000 in ext prec
+	fble.w	by_nlrg
+
+*
+* at this point, the answer is between the largest pos and neg values
+*
+	fmove.b	fp0,L_SCR1(a6)	;let the 040 perform conversion
+	bra.w	int_wrt
+
+by_plrg:
+	move.b	#$7f,L_SCR1(a6)		;answer is largest positive int
+	fbeq.w	int_wrt			;exact answer
+	fcmp.s	#:42ff0000,fp0
+* 42ff0000 in sgl prec = 40050000ff00000000000000 in ext prec
+	fbge.w	int_operr		;set operr
+	bra.w	int_inx			;set inexact
+
+by_nlrg:
+	move.b	#$80,L_SCR1(a6)
+	fbeq.w	int_wrt			;exact answer
+	fcmp.s	#:c3008000,fp0
+* c3008000 in sgl prec = c00600008080000000000000 in ext prec
+	fblt.w	int_operr		;set operr
+	bra.w	int_inx			;set inexact
+
+*
+* Common integer routines
+*
+
+int_dnrm:
+	move.l	#0,L_SCR1(a6)	;if extended denorm, answer is zero
+*				;fall through to  int_inx
+int_inx:
+	ori.l	#inx2a_mask,USER_FPSR(a6)
+	bra.b	int_wrt
+int_operr:
+	fmovem.x fp0,FPTEMP(a6)	;FPTEMP must contain the extended
+*				;precision source that needs to be
+*				;converted to integer this is required
+*				;if the operr exception is enabled.
+
+	ori.l	#inx2a_mask+opaop_mask,USER_FPSR(a6)
+*				;fall through to perform int_wrt
+
+int_wrt: 
+	move.l	EXC_EA(a6),a1	;load destination address
+	tst.l	a1		;check to see if it is a dest register
+	beq.b	wrt_dn		;write data register 
+
+	lea	L_SCR1(a6),a0	;point to supervisor source address
+	bsr	mem_write
+	bra.w	mvouti_end
+
+wrt_dn:
+	move.l	d0,-(sp)	;d0 currently contains the size to write
+	bsr	get_fline	;get fline returns in d1 lower word
+	andi.w	#$7,d0		;isolate register
+	move.l	d0,d1
+	lea.l	USER_D0(a6),a0	;point to data regs
+	move.l	(sp)+,d0
+
+	cmp.b	 #2,d0		
+	bhi.b	 lng_dn
+	beq.b	 wrd_dn
+byt_dn:
+	move.b	 L_SCR1(a6),(3,a0,d1.w*4) ;write byte to stored register
+	bra.w	 mvout_end	 
+wrd_dn:
+	move.w	 L_SCR1(a6),(2,a0,d1.w*4) ;write word to stored register
+	bra.w	 mvout_end	 
+lng_dn:
+	move.l	 L_SCR1(a6),(a0,d1.w*4) ;write long to stored register
+	bra.w	 mvout_end	 
+
+xp:
+	lea	ETEMP(a6),a0
+	bclr.b	#sign_bit,LOCAL_EX(a0)
+	sne	LOCAL_SGN(a0)
+	
+	btst.b	#7,STAG(a6)	;check for extended denorm
+	bne.w	xdnrm
+	
+	clr.l	d0
+	
+	bra.b	do_fp		;do normal case
+
+sgp:
+	lea	ETEMP(a6),a0
+	bclr.b	#sign_bit,LOCAL_EX(a0)
+	sne	LOCAL_SGN(a0)
+
+	btst.b	#7,STAG(a6)	;check for extended denorm
+	bne.w	sp_catas	;branch if so
+
+	move.w	LOCAL_EX(a0),d0
+	lea	sp_bnds,a1
+
+	cmp.w	(a1),d0
+	blt.w	sp_under
+	cmp.w	2(a1),d0
+	bgt.w	sp_over
+	
+	move.l	#1,d0		;set destination format to single
+	
+	bra.b	do_fp		;do normal case
+
+dp:
+	lea	ETEMP(a6),a0
+	bclr.b	#sign_bit,LOCAL_EX(a0)
+	sne	LOCAL_SGN(a0)
+
+	btst.b	#7,STAG(a6)	;check for extended denorm
+	bne.w	dp_catas	;branch if so
+
+	move.w	LOCAL_EX(a0),d0
+	lea	dp_bnds,a1
+
+	cmp.w	(a1),d0
+	blt.w	dp_under
+	cmp.w	2(a1),d0
+	bgt.w	dp_over
+	
+	move.l	#2,d0		;set destination format to double
+*				;fall through to do_fp
+*
+do_fp:
+	bfextu	FPCR_MODE(a6){2:2},d1	;rnd mode in d1
+	swap	d0			;rnd prec in upper word
+	add.l	d0,d1			;d1 has PREC/MODE info
+	
+	clr.l	d0			;clear g,r,s 
+
+	bsr	round			;round 
+
+	move.l	a0,a1
+	move.l	EXC_EA(a6),a0
+
+	bfextu	CMDREG1B(a6){3:3},d1	;extract destination format
+*					;at this point only the dest
+*					;formats sgl, dbl, ext are
+*					;possible
+	cmp.b	#2,d1
+	bgt.b	ddbl			;double=5, extended=2, single=1
+	bne.b	dsgl
+*					;fall through to dext
+dext:
+	bsr	dest_ext
+	bra.w	mvout_end
+dsgl:
+	bsr	dest_sgl
+	bra.w	mvout_end
+ddbl:
+	bsr	dest_dbl
+	bra.w	mvout_end
+
+*
+* Handle possible denorm or catastrophic underflow cases here
+*
+xdnrm:
+	bsr.w	set_xop		;initialize WBTEMP
+	bset.b	#wbtemp15_bit,WB_BYTE(a6) ;set wbtemp15
+
+	move.l	a0,a1
+	move.l	EXC_EA(a6),a0	;a0 has the destination pointer
+	bsr	dest_ext	;store to memory
+	bset.b	#unfl_bit,FPSR_EXCEPT(a6)
+	bra.w	mvout_end
+	
+sp_under:
+	bsr.w	set_xop		;initialize WBTEMP
+	bset.b	#wbtemp15_bit,WB_BYTE(a6) ;set wbtemp15
+
+	cmp.w	4(a1),d0
+	ble.b	sp_catas	;catastrophic underflow case	
+
+	move.l	#1,d0		;load in round precision
+	move.l	#sgl_thresh,d1	;load in single denorm threshold
+	bsr	dpspdnrm	;expects d1 to have the proper
+*				;denorm threshold
+	bsr	dest_sgl	;stores value to destination
+	bset.b	#unfl_bit,FPSR_EXCEPT(a6)
+	bra.w	mvout_end	;exit
+
+dp_under:
+	bsr.w	set_xop		;initialize WBTEMP
+	bset.b	#wbtemp15_bit,WB_BYTE(a6) ;set wbtemp15
+
+	cmp.w	4(a1),d0
+	ble.b	dp_catas	;catastrophic underflow case
+		
+	move.l	#dbl_thresh,d1	;load in double precision threshold
+	move.l	#2,d0		
+	bsr	dpspdnrm	;expects d1 to have proper
+*				;denorm threshold
+*				;expects d0 to have round precision
+	bsr	dest_dbl	;store value to destination
+	bset.b	#unfl_bit,FPSR_EXCEPT(a6)
+	bra.w	mvout_end	;exit
+
+*
+* Handle catastrophic underflow cases here
+*
+sp_catas:
+* Temp fix for z bit set in unf_sub
+	move.l	USER_FPSR(a6),-(a7)
+
+	move.l	#1,d0		;set round precision to sgl
+
+	bsr	unf_sub		;a0 points to result
+
+	move.l	(a7)+,USER_FPSR(a6)
+
+	move.l	#1,d0
+	sub.w	d0,LOCAL_EX(a0) ;account for difference between
+*				;denorm/norm bias
+
+	move.l	a0,a1		;a1 has the operand input
+	move.l	EXC_EA(a6),a0	;a0 has the destination pointer
+	
+	bsr	dest_sgl	;store the result
+	ori.l	#unfl_inx_mask,USER_FPSR(a6)
+	bra.w	mvout_end
+	
+dp_catas:
+* Temp fix for z bit set in unf_sub
+	move.l	USER_FPSR(a6),-(a7)
+
+	move.l	#2,d0		;set round precision to dbl
+	bsr	unf_sub		;a0 points to result
+
+	move.l	(a7)+,USER_FPSR(a6)
+
+	move.l	#1,d0
+	sub.w	d0,LOCAL_EX(a0) ;account for difference between 
+*				;denorm/norm bias
+
+	move.l	a0,a1		;a1 has the operand input
+	move.l	EXC_EA(a6),a0	;a0 has the destination pointer
+	
+	bsr	dest_dbl	;store the result
+	ori.l	#unfl_inx_mask,USER_FPSR(a6)
+	bra.w	mvout_end
+
+*
+* Handle catastrophic overflow cases here
+*
+sp_over:
+* Temp fix for z bit set in unf_sub
+	move.l	USER_FPSR(a6),-(a7)
+
+	bsr.w	set_xop		;initialize WBTEMP
+	bclr.b	#wbtemp15_bit,WB_BYTE(a6) ;clear wbtemp15
+
+	move.l	#1,d0
+	bsr	ovf_res
+
+	move.l	(a7)+,USER_FPSR(a6)
+
+	move.l	a0,a1
+	move.l	EXC_EA(a6),a0
+	bsr	dest_sgl
+	or.l	#ovfinx_mask,USER_FPSR(a6)
+	bra.w	mvout_end
+
+dp_over:
+* Temp fix for z bit set in unf_sub
+	move.l	USER_FPSR(a6),-(a7)
+
+	bsr.w	set_xop		;initialize WBTEMP
+	bclr.b	#wbtemp15_bit,WB_BYTE(a6) ;clear wbtemp15
+	move.l	#2,d0
+	bsr	ovf_res
+
+	move.l	(a7)+,USER_FPSR(a6)
+
+	move.l	a0,a1
+	move.l	EXC_EA(a6),a0
+	bsr	dest_dbl
+	or.l	#ovfinx_mask,USER_FPSR(a6)
+	bra.w	mvout_end
+
+*
+* 	DPSPDNRM
+*
+* This subroutine takes an extended normalized number and denormalizes
+* it to the given round precision. This subroutine also decrements
+* the input operand's exponent by 1 to account for the fact that
+* dest_sgl or dest_dbl expects a normalized number's bias.
+*
+* Input: a0  points to a normalized number in internal extended format
+*	 d0  is the round precision (=1 for sgl; =2 for dbl)
+*	 d1  is the the single precision or double precision
+*	     denorm threshold
+*
+* Output: (In the format for dest_sgl or dest_dbl)
+*	 a0   points to the destination
+*   	 a1   points to the operand
+*
+* Exceptions: Reports inexact 2 exception by setting USER_FPSR bits
+*
+dpspdnrm:
+	move.l	d0,-(a7)	;save round precision
+	clr.l	d0		;clear initial g,r,s
+	bsr	dnrm_lp		;careful with d0, it's needed by round
+
+	bfextu	FPCR_MODE(a6){2:2},d1 ;get rounding mode
+	swap	d1
+	move.w	2(a7),d1	;set rounding precision 
+	swap	d1		;at this point d1 has PREC/MODE info
+	bsr	round		;round result, sets the inex bit in
+*				;USER_FPSR if needed
+
+	move.w	#1,d0
+	sub.w	d0,LOCAL_EX(a0) ;account for difference in denorm
+*				;vs norm bias
+
+	move.l	a0,a1		;a1 has the operand input
+	move.l	EXC_EA(a6),a0	;a0 has the destination pointer
+	add.w	#4,a7		;pop stack
+	rts
+*
+* SET_XOP initialized WBTEMP with the value pointed to by a0
+* input: a0 points to input operand in the internal extended format
+*
+set_xop:
+	move.l	LOCAL_EX(a0),WBTEMP_EX(a6)
+	move.l	LOCAL_HI(a0),WBTEMP_HI(a6)
+	move.l	LOCAL_LO(a0),WBTEMP_LO(a6)
+	bfclr	WBTEMP_SGN(a6){0:8}
+	beq.b	sxop
+	bset.b	#sign_bit,WBTEMP_EX(a6)
+sxop:
+	bfclr	STAG(a6){5:4}	;clear wbtm66,wbtm1,wbtm0,sbit
+	rts
+*
+*	P_MOVE
+*
+p_movet:
+	dc.l	p_move
+	dc.l	p_movez
+	dc.l	p_movei
+	dc.l	p_moven
+	dc.l	p_move
+
+pack_out:
+ 	lea.l	p_movet,a0	;load jmp table address
+	move.w	STAG(a6),d0	;get source tag
+	bfextu	d0{16:3},d0	;isolate source bits
+	move.l	(a0,d0.w*4),a0	;load a0 with routine label for tag
+	jmp	(a0)		;go to the routine
+
+p_write:
+	move.l	#$0c,d0 	;get byte count
+	move.l	EXC_EA(a6),a1	;get the destination address
+	bsr 	mem_write	;write the user's destination
+	move.b	#0,CU_SAVEPC(a6) ;set the cu save pc to all 0's
+
+*
+* Also note that the dtag must be set to norm here - this is because 
+* the 040 uses the dtag to execute the correct microcode.
+*
+        bfclr    DTAG(a6){0:3}  ;set dtag to norm
+
+	rts
+
+* Notes on handling of special case (zero, inf, and nan) inputs:
+*	1. Operr is not signalled if the k-factor is greater than 18.
+*	2. Per the manual, status bits are not set.
+*
+
+p_move:
+	move.w	CMDREG1B(a6),d0
+	btst.l	#kfact_bit,d0	;test for dynamic k-factor
+	beq.b	statick		;if clear, k-factor is static
+	bfextu	d0{25:3},d0	;isolate register for dynamic k-factor
+	lea	USER_D0(a6),a0	;point to data registers
+	move.l	(a0,d0.w*4),d0	;load d0 with k-factor
+statick:
+	andi.w	#$007f,d0	;get k-factor
+	bfexts	d0{25:7},d0	;sign extend d0 for bindec
+	lea.l	ETEMP(a6),a0	;a0 will point to the packed decimal
+	clr.l	d4		;clr d4 for exception flags	
+	bsr	bindec		;perform the convert; data at a6
+	lea.l	FP_SCR1(a6),a0	;load a0 with result address
+	bra	p_write
+p_movez:
+	lea.l	ETEMP(a6),a0	;a0 will point to the packed decimal
+	clr.w	2(a0)		;clear lower word of exp
+	clr.l	4(a0)		;load second lword of ZERO
+	clr.l	8(a0)		;load third lword of ZERO
+	bra.w	p_write		;go write results
+p_movei:
+	fmove.l	#0,FPSR		;clear aiop
+	lea.l	ETEMP(a6),a0	;a0 will point to the packed decimal
+	clr.w	2(a0)		;clear lower word of exp
+	bra.w	p_write		;go write the result
+p_moven:
+	lea.l	ETEMP(a6),a0	;a0 will point to the packed decimal
+	clr.w	2(a0)		;clear lower word of exp
+ 	btst.b	#signan_bit,4(a0) ;test for snan 
+ 	bne.w	p_write		;branch if not snan
+	or.l	#snan_mask,USER_FPSR(a6) ;set snan bit in fpsr
+	bra.w	p_write		;go write the result
+
+	end

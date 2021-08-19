@@ -1,0 +1,24 @@
+ident		MACH
+options		GENERIC
+options		INET
+options 	CS_BUGFIX
+options 	CS_GENERIC
+options 	CS_ICHK
+options 	CS_INET
+options 	CS_LINT
+options 	CS_QUOTE
+options 	CS_RPAUSE
+options 	CS_SECURITY
+options 	CS_SOCKET
+options 	CS_SYSCALL
+options 	CS_TCP
+options 	CS_TTY
+options		MACH_NET
+options		STAT_TIME
+pseudo-device	cpus		1
+pseudo-device	cmupty
+pseudo-device	ether
+pseudo-device	inet
+pseudo-device	loop
+pseudo-device	pty	80
+options		SUN_NETFIX

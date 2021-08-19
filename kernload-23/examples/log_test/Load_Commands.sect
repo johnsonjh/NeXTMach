@@ -1,0 +1,7 @@
+# Associate ports with proc/arg
+
+CALL			log_init		0
+SMAP	log_test	log_server		0
+ADVERTISE		log_test
+WIRE
+START

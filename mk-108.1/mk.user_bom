@@ -1,0 +1,5 @@
+	./odmach
+	./sdmach
+	./private/etc
+	./usr/etc
+	./usr/standalone

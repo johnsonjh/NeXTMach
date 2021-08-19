@@ -1,0 +1,80 @@
+{\rtf0\ansi{\fonttbl\f0\fswiss Helvetica;\f1\fmodern Ohlfs;}
+\paperw9840
+\paperh8400
+\margl120
+\margr120
+{\colortbl\red0\green0\blue0;}
+\pard\tx960\tx1920\tx2880\tx3840\tx4800\tx5760\tx6720\tx7680\tx8640\tx9600\f0\b\i0\ul0\fs24 kernload-15 changes
+\b0 :\
+The kern_loader is now fully asynchronous.  It loads servers in parallel and can report on the status of any server at any time.  It is also set up to run from mach_init, rather than from /etc/rc.  Some performance improvements have been made, and more should follow when the kern_loader uses the rld package.\
+
+\b \
+kernload-16 changes
+\b0 :\
+The kern_loader uses the rld package now.  This makes startup and linkage of server files considerably faster.  The kern_loader no longer does it's own relocation.\
+\
+The startup protocol with the loaded server has been changed.  The old way used the bootstrap port to have the kern_loader send a port to the loaded server on which it sent messages back to continue startup.  The new mechanism uses the thread_reply port of the loaded server to have the kern_loader immediately start sending messages to the loaded server rather than waiting for the loaded server to come back.  This also allows loaded servers to run in just a separate thread of the target task, not just a separate task.  This can't be used within the kernel because of other complications.\
+\
+The kern_loader first tries to check itself in with the bootstrap server, rather than just registering a service.  This removes some startup race conditions, and allows the kern_loader port to be used exclusively by a task launched directly from mach_init (removing a security hole).\
+\
+Kern_loader status commands have been added.  
+\b Kern_loader_server_list()
+\b0  returns a list of all known servers (other than those deallocated).  
+\b Kern_loader_server_info()
+\b0  returns interesting information about a server (even for deallocated servers).  It can be used to find the status of a server as it's being allocated/loaded.  To find it's memory locations and the locations of it's relocatable and loadable files.  It can also be used as a name-server to retrieve ports that aren't advertised via the netname server.\
+\
+Loadable files are only created if requested in the 
+\b Loadable Name
+\b0  section.\
+\
+The 
+\i -n
+\i0  argument was added to kern_loader to prevent it from forking (used by mach_init).\
+\
+The kern_loader can be used to send port notification messages (in liu of the new MachIPC facility).\
+\
+The 
+\b kern_loader_status()
+\b0  routine has gone away.\
+\
+
+\b kernload-17 changes
+\b0 :\
+Added kl_ld shell-script to simplify the process of creating a kern_loader relocatable.  It is invoked as follows: 
+\i kl_ld -n <name> -i <instance var> -l <load commands> -u <unload commands> -d <loadable file> -o <output file> <input_files>
+\i0 \
+\
+Added a versioning mechanism whereby the kern_loader retrieves a version number from the relocatable and sends it to the kern_server as part of startup.\
+\
+
+\b kernload-18 changes
+\b0 :\
+
+\fc0 The -l option to kl_ld now distinguish between library requests and load-command specification.\
+\
+
+\b kernload-19 changes
+\b0 :\
+Removed -c option to kl_util.  Can't automatically convert old script-files anymore.\
+\
+Made kl_log and kern_server logging work.\
+\
+Properly reflect errors found at lower levels when trying to load/unload/add/delete servers.\
+\
+Install kernload.user_bom file.\
+
+\b \
+kernload-20 changes
+\b0 :\
+Bug Fixes.\
+\
+
+\b kernload-21 changes:
+\b0 \
+Make loadables MH_PRELOAD format instead of MH_OBJECT (allows use of segedit).\
+\
+Loadable servers must have a 
+\i version
+\i0  segment.\
+
+}

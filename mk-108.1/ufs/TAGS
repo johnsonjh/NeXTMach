@@ -1,0 +1,5663 @@
+
+../kern/sched_prim.c,1353
+void assert_wait(453,14479
+assert_wait(2273,57434
+checkrq(2335,58877
+thread_t choose_pset_thread(1747,45181
+thread_t choose_thread(1687,43664
+void clear_wait(510,15812
+compute_my_priority(1277,33526
+compute_priority(1246,32797
+wait_t create_wait(2238,56674
+#define do_priority_computation(1181,30637
+#define do_priority_computation(1189,30944
+#define do_priority_computation(1198,31279
+#define do_priority_computation(1208,31584
+#define do_priority_computation(1216,31893
+#define do_priority_computation(1225,32230
+do_runq_scan(2105,53635
+do_thread_scan(2161,54747
+void idle_thread(1847,47392
+recompute_priorities(1291,33773
+struct run_queue *rem_runq(1622,42188
+run_queue_enqueue(1401,36469
+void sched_init(381,13076
+void sched_thread(2038,51833
+set_pri(1165,30411
+#define switch_task_context(762,21446
+#define switch_task_context(772,21678
+#define switch_thread_context(783,21959
+thread_bind(739,21102
+void thread_block(798,22333
+thread_check(2362,59332
+void thread_continue(1001,26974
+void thread_run(1087,28592
+void thread_set_timeout(431,14032
+void thread_setrun(1443,37395
+void thread_sleep(718,20469
+thread_timeout(409,13610
+int thread_wait_result(989,26720
+void		thread_wakeup(2220,56210
+void thread_wakeup_prim(617,18082
+update_priority(1339,34945
+#define wait_hash(378,12987
+wait_queue_init(395,13383
+
+../kern/mach_loader.c,304
+kern_return_t load_fvmlib(423,9379
+kern_return_t load_idfvmlib(477,10424
+kern_return_t load_machfile(43,1002
+kern_return_t load_segment(210,4637
+kern_return_t load_thread(366,8162
+kern_return_t load_threadstate(396,8840
+kern_return_t load_unixthread(346,7719
+kern_return_t parse_machfile(78,1787
+
+../kern/slave.c,47
+slave_hardclock(185,5588
+slave_main(173,5411
+
+../kern/xpr.c,73
+xpr(78,2258
+xpr_save(135,3398
+xprbootstrap(111,2896
+xprinit(126,3286
+
+../kern/queue.c,233
+INLINE queue_entry_t dequeue_head(69,1511
+INLINE queue_entry_t dequeue_tail(86,1794
+INLINE void enqueue_head(43,1063
+INLINE void enqueue_tail(56,1282
+INLINE insque(119,2389
+INLINE remque(128,2556
+INLINE void remqueue(107,2174
+
+../kern/task.c,829
+vm_map_t current_map_EXTERNAL(1262,30953
+task_t current_task_EXTERNAL(1254,30826
+task_assign(1054,26551
+task_assign(1172,29243
+task_assign_default(1191,29572
+kern_return_t task_create(191,6708
+void task_deallocate(277,8867
+kern_return_t task_dowait(539,14820
+kern_return_t task_get_assignment(1203,29813
+kern_return_t task_get_special_port(960,24841
+kern_return_t task_halt(629,17205
+kern_return_t task_hold(498,13888
+kern_return_t task_info(850,22254
+void task_init(163,6051
+task_priority(1221,30145
+void task_reference(309,9421
+kern_return_t task_release(593,16492
+kern_return_t task_resume(821,21783
+kern_return_t task_set_special_port(1001,25601
+kern_return_t task_suspend(778,20918
+kern_return_t task_suspend_nowait(921,24117
+kern_return_t task_terminate(326,9735
+kern_return_t task_threads(676,18548
+
+../kern/ipc_netport.c,753
+#define Debugger(127,3559
+#define EXTERNAL_ENTRY(233,6189
+#define KERNEL_NET_ABLE(203,5307
+#define NPORT_EQUAL(246,6635
+#define RPC_REQUEST(208,5478
+#define entry_lock(211,5564
+#define entry_unlock(213,5619
+ipc_set_external(1166,31540
+netport_abort_client(353,9274
+netport_abort_request(334,8714
+netport_abort_response(321,8406
+netport_changed(631,17474
+netport_done(604,16799
+netport_enter(1040,28094
+netport_handle_rp(807,22364
+netport_handle_rq(667,18402
+#define netport_hash(191,5040
+netport_init(250,6767
+netport_lookup(290,7695
+netport_queue(396,10509
+#define netport_reference(215,5678
+#define netport_release(221,5840
+netport_remove(1115,30163
+#define transport_sendreply(151,4097
+#define transport_sendrequest(147,3946
+
+../kern/ipc_globals.c,103
+ipc_bootstrap(334,9096
+ipc_init(429,11974
+object_copyin_init(260,7120
+object_copyout_init(184,4836
+
+../kern/ipc_basics.c,574
+#define adjust_timeout(574,22963
+kern_msg_t kern_msg_allocate(1930,54888
+void kern_msg_free(1949,55285
+mach_msg(768,28021
+memory_object_terminate_hack(696,26116
+msg_dequeue(1189,38330
+msg_queue(863,30625
+msg_receive(1496,45151
+msg_receive_old(1526,45708
+msg_receive_trap(1557,46313
+msg_rpc(1743,50341
+msg_rpc_old(1789,51339
+msg_rpc_trap(1816,51956
+msg_send(1390,42888
+msg_send_from_kernel(1464,44321
+msg_send_old(1420,43421
+msg_send_trap(1444,43897
+send_complex_notification(653,24983
+send_notification(593,23510
+#define wakeup_waiting_sender(1150,37050
+
+../kern/ipc_ptraps.c,323
+#define	HOST_PRIV_TRAP(222,5769
+#define	HOST_PRIV_TRAP(251,6529
+HOST_PRIV_TRAP(277,7168
+#define	HOST_TRAP(172,4498
+#define	HOST_TRAP(197,5174
+HOST_TRAP(219,5727
+#define TASK_TRAP(63,1639
+#define TASK_TRAP(90,2367
+TASK_TRAP(114,2978
+#define THREAD_TRAP(118,3057
+#define THREAD_TRAP(144,3792
+THREAD_TRAP(168,4409
+
+../kern/mach_init.c,28
+thread_t setup_main(44,965
+
+../kern/ast.c,37
+ast_check(89,2294
+ast_init(79,2189
+
+../kern/clock_prim.c,20
+clock_tick(96,2775
+
+../kern/kalloc.c,282
+void *calloc(351,8162
+void free(370,8529
+void *getpc 185,4681
+void *kalloc(200,4975
+void kallocinit(126,3618
+void kdbg_add(156,4170
+void kdbg_rm(171,4441
+void kfree(295,6887
+void *kget(249,5974
+void *malloc(338,7965
+void malloc_good_size(376,8646
+void *realloc(356,8243
+
+../kern/syscall_sw.c,105
+kern_return_t	kern_invalid(140,4370
+port_t		null_port(135,4325
+int	mach_trap_count = (sizeof(272,8165
+
+../kern/thread.c,1229
+thread_t kernel_thread(2003,51808
+void kernel_thread_noblock(2027,52429
+void reaper_thread(2063,53375
+vm_offset_t stack_alloc(442,15764
+void stack_free(503,17305
+kern_return_t	thread_abort(1879,49312
+thread_assign(2138,55076
+thread_assign(2351,59620
+thread_assign_default(2369,59924
+kern_return_t thread_create(655,21139
+void thread_deallocate(804,24758
+void thread_deallocate_interrupt(971,28446
+thread_doassign(2209,56438
+thread_dowait(1494,40311
+thread_force_terminate(1168,33068
+thread_freeze(2159,55486
+kern_return_t thread_get_assignment(2380,60110
+kern_return_t thread_get_special_port(1913,50018
+kern_return_t thread_get_state(1695,44739
+kern_return_t thread_halt(1210,33848
+void	thread_halt_self(1411,38601
+void thread_hold(1472,39878
+kern_return_t thread_info(1740,45771
+void thread_init(529,17840
+thread_max_priority(2446,61331
+thread_policy(2509,62527
+thread_priority(2394,60360
+void thread_reference(1019,29683
+void thread_release(1601,43106
+kern_return_t thread_resume(1659,44133
+kern_return_t thread_set_special_port(1952,50812
+kern_return_t thread_set_state(1719,45300
+kern_return_t thread_suspend(1632,43649
+kern_return_t thread_terminate(1053,30759
+thread_unfreeze(2184,55969
+
+../kern/zalloc.c,434
+kern_return_t host_zone_info(599,14739
+#define lock_zone(170,5621
+#define lock_zone(180,5846
+#define lock_zone_init(211,6460
+#define unlock_zone(191,6050
+#define unlock_zone(201,6262
+vm_offset_t zalloc(456,11759
+void zchange(580,14333
+void zcram(304,8574
+void zfree(561,14006
+vm_offset_t zget(540,13622
+static vm_offset_t zget_space(335,9203
+zone_t zinit(239,7125
+void zone_bootstrap(421,11039
+void zone_init(438,11407
+
+../kern/exception.c,81
+void thread_doexception(108,3344
+kern_return_t thread_exception_abort(276,7707
+
+../kern/host.c,211
+kern_return_t	host_info(148,3786
+kern_return_t host_kernel_version(231,5556
+host_processor_set_priv(387,9033
+host_processor_sets(258,6045
+host_processor_sets(353,8353
+kern_return_t host_processors(95,2555
+
+../kern/ipc_tt.c,321
+exc_port_secure(579,14023
+ipc_task_disable(262,6855
+ipc_task_enable(242,6503
+ipc_task_init(131,3650
+ipc_task_terminate(290,7394
+ipc_thread_disable(443,10963
+ipc_thread_enable(422,10568
+ipc_thread_init(386,9648
+ipc_thread_terminate(469,11514
+obj_cache_init(115,3405
+port_secure(534,12909
+task_secure(618,14870
+
+../kern/ipc_copyout.c,318
+msg_copyout(539,13404
+msg_destroy(753,18672
+object_copyout(363,9137
+object_copyout_to_kernel(446,11118
+object_destroy(328,8340
+port_copyout_own(259,6848
+port_copyout_receive(223,6053
+port_copyout_receive_own(292,7539
+port_destroy_own(158,4432
+port_destroy_receive(130,3751
+port_destroy_receive_own(187,5151
+
+../kern/ipc_kport.c,166
+port_alloc(148,3796
+port_dealloc(334,8464
+port_destroy(206,5394
+port_lookup(487,12147
+void		port_print(519,12651
+port_reference(119,3244
+port_release(132,3438
+
+../kern/ipc_kset.c,139
+set_add_member(212,5286
+set_alloc(101,2405
+set_destroy(138,3267
+set_reference(72,1880
+set_release(85,2066
+set_remove_member(294,7525
+
+../kern/ipc_pobj.c,539
+convert_host_to_port(326,6488
+convert_port_to_host(217,4447
+convert_port_to_host_priv(239,4848
+convert_port_to_map(158,3507
+convert_port_to_processor(260,5207
+convert_port_to_pset(281,5606
+convert_port_to_pset_name(303,6019
+convert_port_to_task(114,2761
+convert_port_to_thread(136,3132
+convert_processor_to_port(339,6708
+convert_pset_name_to_port(376,7384
+convert_pset_to_port(358,7058
+convert_task_to_port(177,3772
+convert_thread_to_port(195,4101
+port_object_get(92,2360
+port_object_set(76,2007
+port_object_type(101,2529
+
+../kern/ipc_port.c,773
+#define PORT_RESERVED(127,3794
+#define PORT_RESERVED(133,3910
+port_allocate(864,20892
+port_deallocate(893,21436
+port_extract_receive(1643,38989
+port_extract_send(1551,36688
+port_insert_receive(1575,37225
+port_insert_send(1485,35023
+port_names(546,12904
+port_rename(770,18778
+port_set_add(1162,27337
+port_set_allocate(1092,25870
+port_set_backlog(928,22186
+port_set_backup(984,23460
+port_set_deallocate(1119,26461
+port_set_remove(1296,30286
+port_set_status(1343,31186
+port_status(1035,24620
+port_translate(150,4445
+port_type(720,17781
+set_translate(191,5386
+xxx_port_allocate(233,6278
+xxx_port_deallocate(263,6873
+xxx_port_disable(366,8980
+xxx_port_enable(286,7499
+xxx_port_select(525,12408
+xxx_port_set_backlog(415,9961
+xxx_port_status(473,11276
+
+../kern/ipc_prims.c,347
+ipc_obj_print(699,18413
+msg_queue_changed(675,18018
+obj_alloc(504,13005
+obj_destroy_rights(598,16189
+obj_entry_change(178,4980
+obj_entry_create(351,9235
+obj_entry_dealloc(259,6979
+obj_entry_destroy(279,7418
+obj_entry_find(125,3837
+obj_entry_insert(310,8183
+obj_entry_lookup(160,4620
+obj_entry_make(438,11454
+obj_entry_remove(212,5834
+
+../kern/iprintf.c,16
+iprintf(15,342
+
+../kern/thread_swap.c,369
+void swapin_thread(351,10012
+void swapout_scan(414,11292
+void swapout_thread(479,13087
+void swapout_threads(395,10859
+void swapper_init(164,5763
+#define swapper_lock(156,5575
+#define swapper_unlock(157,5631
+void swapping_thread(535,14231
+void thread_doswapin(237,7408
+void thread_swapin(179,6123
+void thread_swapout(287,8555
+void thread_swappable(494,13370
+
+../kern/ipc_host.c,333
+void ipc_host_init(74,1851
+ipc_processor_disable(148,3469
+ipc_processor_enable(131,3132
+ipc_processor_init(113,2766
+ipc_processor_terminate(168,3832
+ipc_pset_disable(253,5761
+ipc_pset_enable(225,5087
+ipc_pset_init(201,4574
+ipc_pset_terminate(280,6375
+processor_set_default(297,6838
+xxx_processor_set_default_priv(310,7033
+
+../kern/ipc_mports.c,57
+mach_ports_lookup(103,2745
+mach_ports_register(52,1362
+
+../kern/ipc_statistics.c,121
+host_ipc_bucket_info(169,4221
+host_ipc_statistics(118,3103
+host_ipc_statistics_reset(138,3482
+ipc_stats_init(87,2346
+
+../kern/mach_net.c,348
+#define FOR_EACH_BUCKET(280,7385
+#define FOR_EACH_LISTENER(281,7461
+#define LOCK_BUCKET(282,7541
+#define UNLOCK_BUCKET(283,7614
+port_t		find_listener(384,9931
+void		mach_net_init(439,11173
+boolean_t	mach_net_server(123,3598
+kern_return_t	netipc_ignore(343,9041
+kern_return_t	netipc_listen(291,7818
+boolean_t	receive_ip_datagram(486,12800
+
+../kern/server_loop.c,27
+void		SERVER_LOOP(80,2147
+
+../kern/mach_net_tcp.c,222
+mach_tcp_accept(129,2379
+mach_tcp_bind(87,1682
+mach_tcp_close(71,1401
+mach_tcp_connect(199,4191
+mach_tcp_init(44,1021
+mach_tcp_listen(113,2132
+mach_tcp_recv(299,6338
+mach_tcp_send(265,5698
+mach_tcp_socket(56,1163
+
+../kern/netport_tcp.c,1728
+#define BEGIN(78,1875
+#define DEBUG0(83,1966
+#define DEBUG1(84,2019
+#define DEBUG2(85,2075
+#define DEBUG3(86,2135
+#define DEBUG4(87,2199
+#define DEBUG5(88,2266
+#define DEBUG6(89,2337
+#define	Debugger(65,1572
+#define	Debugger(68,1655
+#define ERROR(94,2483
+#define INCSTAT(91,2412
+#define RETURN(80,1912
+#define SET_TCPID(126,3153
+#define SET_TRID(127,3208
+#define TRID_GET_CLIENT(226,6173
+#define TRID_GET_SERVER(229,6330
+#define TRID_SET_CLIENT(225,6104
+#define TRID_SET_SERVER(227,6234
+#define condition_init(109,2806
+#define condition_signal(115,2944
+#define condition_wait(110,2837
+#define cptoix(223,5987
+	for 368,9493
+	for 1223,29236
+	for 1421,33468
+	if 374,9602
+	if 441,10947
+	if 519,12602
+	if 596,14486
+	if 604,14693
+	if 608,14790
+	if 683,16418
+	if 693,16616
+	if 705,16887
+	if 721,17233
+	if 783,18634
+	if 788,18750
+	if 793,18887
+	if 1149,27508
+	if 1177,28334
+	if 1235,29461
+	if 1313,30872
+	if 1321,31160
+	if 1326,31308
+#define ixtocp(224,6047
+	ret = mach_tcp_bind(1320,31091
+	ret = mach_tcp_connect(792,18814
+#define mutex_init(106,2735
+#define mutex_lock(104,2655
+#define mutex_unlock(105,2693
+EXPORT boolean_t netport_tcp_init(1413,33307
+EXPORT int netport_tcp_sendreply(663,15925
+EXPORT int netport_tcp_sendrequest(491,11953
+np_printf(318,8616
+PRIVATE void np_tcp_close_conn(419,10431
+PRIVATE void np_tcp_conn_handler(1212,29045
+PRIVATE void np_tcp_conn_handler_active(847,20071
+PRIVATE void np_tcp_conn_handler_close(1134,27057
+PRIVATE boolean_t np_tcp_conn_handler_open(760,18058
+PRIVATE tcp_conn_ptr_t np_tcp_init_conn(354,9127
+PRIVATE void np_tcp_listener(1298,30546
+#define tcp_xmit_control(260,7027
+#define tcp_xmit_data(281,7602
+	while 430,10704
+
+../kern/exception_dummy.c,190
+kern_return_t task_get_exception_port(40,950
+kern_return_t task_set_exception_port(28,719
+kern_return_t thread_get_exception_port(66,1431
+kern_return_t thread_set_exception_port(53,1185
+
+../kern/mach_factor.c,29
+compute_mach_factor(67,1819
+
+../kern/lock.c,767
+lock_t lock_alloc(261,5676
+void lock_clear_recursive(656,13179
+void lock_done(373,7951
+void lock_free(271,5830
+void lock_init(286,6134
+void lock_read(396,8318
+boolean_t lock_read_to_write(442,9279
+void lock_set_recursive(642,12906
+void lock_sleepable(300,6426
+boolean_t lock_try_read(569,11412
+boolean_t lock_try_read_to_write(603,12087
+boolean_t lock_try_write(529,10801
+void lock_write(316,6779
+void lock_write_to_read(498,10321
+void simple_lock(109,2964
+void simple_lock(176,4186
+simple_lock_t simple_lock_alloc(147,3576
+void simple_lock_free(156,3738
+void simple_lock_init(103,2890
+void simple_lock_init(170,4119
+boolean_t simple_lock_try(122,3128
+boolean_t simple_lock_try(224,4970
+void simple_unlock(116,3057
+void simple_unlock(204,4642
+
+../kern/machine.c,397
+void action_thread(474,11171
+cpu_down(252,5884
+cpu_up(218,5128
+processor_assign(363,8721
+processor_assign(427,10156
+processor_assign(777,18672
+processor_doaction(503,11941
+void processor_doshutdown(731,17828
+processor_request_action(285,6786
+processor_shutdown(446,10578
+kern_return_t xxx_cpu_control(154,4081
+kern_return_t xxx_host_info(114,3277
+kern_return_t xxx_slot_info(131,3572
+
+../kern/mach_user_internal.c,0
+
+../kern/ipc_copyin.c,233
+msg_copyin(501,12297
+object_copyin(272,7285
+object_copyin_cache(444,11063
+object_copyin_from_kernel(353,8956
+port_clear_receiver(160,4869
+port_copyin_own(223,6173
+port_copyin_receive(206,5863
+port_copyin_receive_own(241,6508
+
+../kern/parallel.c,78
+void unix_master(51,1421
+void unix_release(67,1695
+void unix_reset(82,1977
+
+../kern/timer.c,324
+init_timers(100,3320
+start_timer(138,4069
+void	thread_read_times(448,10744
+time_int_entry(241,6248
+time_int_exit(282,7077
+time_trap_uentry(152,4407
+time_trap_uexit(190,5144
+timer_delta(483,11642
+#define timer_grab(396,9286
+timer_init(121,3736
+timer_normalize(373,8734
+timer_read(423,10179
+timer_switch(329,7967
+
+../kern/mig_support.c,72
+void mig_dealloc_reply_port(56,1452
+port_t mig_get_reply_port(47,1275
+
+../kern/time_stamp.c,61
+kern_return_t kern_timestamp(32,796
+timestamp_init(47,1054
+
+../kern/mfs_prim.c,871
+map_vnode(196,5032
+#define mfs_alloc_lock(74,1923
+#define mfs_alloc_unlock(75,1981
+mfs_cache_clear(697,16295
+mfs_cache_trim(668,15751
+mfs_fsync(960,22071
+mfs_get(513,12998
+mfs_init(113,3223
+mfs_invalidate(978,22331
+boolean_t mfs_io(789,18166
+mfs_map_remove(738,17277
+mfs_memfree(623,14838
+mfs_put(544,13540
+mfs_sync(915,21001
+mfs_trunc(410,10185
+void mfs_uncache(608,14557
+remap_vnode(329,8329
+unmap_vnode(265,6622
+vm_size_t vm_get_vnode_size(1180,26866
+vm_info_dequeue(180,4690
+vm_info_enqueue(169,4471
+void vm_info_free(1174,26759
+vm_info_init(142,3872
+#define	vm_info_lock(66,1701
+#define	vm_info_unlock(67,1757
+void vm_set_close_flush(1190,27060
+void vm_set_error(1195,27179
+void vm_set_vnode_size(1185,26952
+vmp_get(555,13690
+vmp_invalidate(1046,23706
+vmp_push(1084,24588
+vmp_put(579,14062
+vno_flush(1004,22813
+vnode_size(777,18003
+
+../kern/syscall_subr.c,571
+mach_sctimes_0(744,19406
+mach_sctimes_1(750,19464
+mach_sctimes_10(849,21034
+mach_sctimes_11(866,21307
+mach_sctimes_2(759,19559
+mach_sctimes_3(768,19668
+mach_sctimes_4(777,19791
+mach_sctimes_5(786,19928
+mach_sctimes_6(795,20079
+mach_sctimes_7(804,20244
+mach_sctimes_8(810,20302
+mach_sctimes_9(822,20541
+mach_sctimes_port_alloc_dealloc(883,21581
+map_fd(637,17128
+boolean_t swtch(214,7247
+boolean_t  swtch_pri(232,7621
+thread_depress_abort(569,15722
+thread_depress_priority(445,12918
+thread_depress_timeout(532,14898
+kern_return_t thread_switch(267,8364
+
+../kern/processor.c,1115
+do_pset_scan(762,19025
+kern_return_t processor_control(546,13949
+kern_return_t processor_exit(533,13703
+kern_return_t processor_get_assignment(857,21066
+kern_return_t processor_info(483,12441
+void processor_init(254,7026
+kern_return_t	processor_set_create(597,15082
+kern_return_t	processor_set_create(836,20729
+kern_return_t processor_set_destroy(632,15906
+kern_return_t processor_set_destroy(846,20923
+kern_return_t processor_set_info(871,21365
+processor_set_max_priority(935,22992
+processor_set_policy_disable(1001,24355
+processor_set_policy_enable(972,23804
+processor_set_tasks(1184,28402
+processor_set_things(1049,25371
+processor_set_threads(1198,28681
+kern_return_t processor_start(521,13452
+pset_add_processor(311,8519
+pset_add_task(345,9330
+pset_add_thread(376,10085
+pset_deallocate(410,10965
+void pset_init(196,5699
+boolean_t pset_is_garbage(716,17777
+pset_reference(475,12335
+pset_remove_processor(291,7917
+pset_remove_task(327,8950
+pset_remove_thread(361,9722
+void pset_sys_bootstrap(148,4581
+void pset_sys_init(185,5496
+quantum_set(568,14492
+thread_change_psets(392,10478
+
+../kern/ipc_notify.c,317
+kern_return_t get_kern_port(344,9332
+void notify_server_loop(120,3055
+#define pn_debug(23,426
+#define pn_debug(25,470
+static void pn_notify(237,6398
+static void pn_panic(192,5077
+static void pn_register(202,5290
+#define pn_remove(114,2908
+void pnotify_start(325,8902
+void port_request_notification(301,8210
+
+../kern/kernel_stack.c,219
+allocStack(253,6944
+canSwap(326,8706
+checkFreeList(120,3752
+doSwapout(353,9188
+enterFreeList(103,3392
+freeStack(174,5062
+initKernelStacks(89,3058
+newStack(209,5880
+swapinStack(434,11216
+swapoutStack(398,10500
+
+../vm/vm_unix.c,546
+chgprot(361,10311
+boolean_t device_dealloc(589,15270
+boolean_t device_pagein(576,15072
+boolean_t device_pageout(581,15135
+fake_u(625,15954
+int fubyte(252,7911
+int fuibyte(262,8051
+int fuiword(298,8633
+int fuword(279,8311
+thread_t procdup(313,8806
+subyte(238,7668
+suibyte(245,7789
+suiword(291,8513
+suword(272,8192
+swapon(309,8792
+port_t		task_by_pid(434,11628
+kern_return_t	task_by_unix_pid(404,11077
+kern_return_t	unix_pid(373,10540
+useracc(189,6704
+vm_object_t vm_object_special(487,13013
+vslock(200,6925
+vsunlock(208,7063
+
+../vm/vnode_pager.c,740
+#define INDIRECT_PAGEMAP(149,4134
+#define	INDIRECT_PAGEMAP_ENTRIES(145,3969
+#define INDIRECT_PAGEMAP_SIZE(147,4044
+#define	PAGEMAP_SIZE(143,3921
+#define RMAPSIZE(152,4210
+mach_swapon(985,23186
+pagerfile_bmap(441,10264
+pagerfile_pager_create(370,8721
+vnode_alloc(1126,26067
+vnode_dealloc(1156,26545
+vnode_has_page(840,20049
+vnode_pagein(685,16224
+vnode_pageout(741,17607
+vnode_pager_allocpage(223,5513
+vnode_pager_create(611,14761
+vnode_pager_deallocpage(299,7172
+vnode_pager_file_init(881,21033
+vnode_pager_findpage(268,6500
+vnode_pager_init(1272,29385
+vnode_pager_setup(647,15387
+vnode_pager_shutdown(966,22860
+vnode_pager_vget(206,5256
+vnode_pager_vput(187,4895
+vnode_uncache(1211,27827
+vswap_allocate(1081,25098
+
+../vm/vm_pageout.c,118
+void vm_pageout(695,16765
+void		vm_pageout_page(100,3204
+void		vm_pageout_scan(230,6502
+vm_pageout_scan(420,10590
+
+../vm/vm_object.c,1216
+_vm_object_allocate(198,5912
+vm_object_t vm_object_allocate(186,5719
+void vm_object_cache_clear(1377,32459
+vm_object_cache_trim(554,13602
+boolean_t vm_object_coalesce(1730,41536
+void vm_object_collapse(1417,33487
+void vm_object_copy(708,17438
+vm_object_deactivate_pages(534,13197
+void vm_object_deallocate(239,6824
+void vm_object_destroy(468,11820
+vm_object_t	vm_object_enter(1082,26074
+void vm_object_enter(1314,30978
+#define vm_object_hash(976,23654
+void vm_object_init(126,4180
+vm_object_t vm_object_lookup(984,23840
+vm_object_t	vm_object_lookup(1019,24666
+port_t		vm_object_name(1840,43706
+void vm_object_page_remove(1685,40363
+void		vm_object_pager_associate(1059,25527
+void		vm_object_pager_create(1241,29476
+#define		vm_object_pager_terminate(303,7980
+void vm_object_pmap_copy(644,15900
+void vm_object_pmap_remove(676,16622
+void vm_object_print(1869,44181
+void vm_object_reference(217,6352
+void		vm_object_remove(1298,30591
+vm_object_remove(1349,31788
+vm_object_t	vm_object_request_object(1814,43188
+port_t		vm_object_request_port(1799,42936
+void vm_object_setpager(955,23235
+void vm_object_shadow(909,22279
+void vm_object_shutdown(585,14438
+void vm_object_terminate(324,8632
+
+../vm/vm_kern.c,336
+copy_user_to_physical_page(376,9818
+vm_offset_t kmem_alloc(115,3030
+vm_offset_t kmem_alloc_pageable(87,2507
+vm_offset_t kmem_alloc_wait(593,14907
+void kmem_free(214,5682
+void	kmem_free_wakeup(642,15863
+void kmem_init(659,16227
+vm_offset_t kmem_mb_alloc(440,11456
+vm_map_t kmem_suballoc(240,6276
+kern_return_t vm_move(286,7607
+
+../vm/vm_map.c,1364
+#define	SAVE_HINT(441,12118
+#define	VM_MAP_RANGE_CHECK(803,19848
+void _vm_map_clip_end(771,19112
+void _vm_map_clip_start(716,17907
+boolean_t vm_map_check_protection(1378,33361
+#define vm_map_clip_end(761,18898
+#define vm_map_clip_start(706,17681
+kern_return_t vm_map_copy(1565,37688
+void vm_map_copy_entry(1428,34232
+vm_map_t vm_map_create(171,6187
+void vm_map_deallocate(282,8593
+kern_return_t vm_map_delete(1259,30802
+vm_map_entry_t vm_map_entry_create(206,7080
+void vm_map_entry_delete(1232,30170
+void vm_map_entry_dispose(228,7502
+#define	vm_map_entry_link(243,7789
+#define	vm_map_entry_unlink(251,8021
+void vm_map_entry_unwire(1219,29916
+kern_return_t vm_map_find(534,14181
+vm_map_t vm_map_fork(1860,44515
+kern_return_t vm_map_inherit(1003,24550
+void vm_map_init(144,5388
+kern_return_t vm_map_insert(321,9302
+kern_return_t vm_map_lookup(2036,48659
+kern_return_t vm_map_lookup(2039,48796
+void vm_map_lookup_done(2339,54948
+boolean_t vm_map_lookup_entry(456,12553
+kern_return_t vm_map_pageable(1055,25678
+void vm_map_print(2361,55299
+kern_return_t vm_map_protect(875,21687
+void vm_map_reference(264,8266
+kern_return_t vm_map_remove(1356,32882
+void vm_map_simplify_entry(642,16301
+kern_return_t vm_map_submap(831,20653
+boolean_t	vm_map_verify(2289,53985
+void		vm_map_verify_done(2321,54588
+kern_return_t	vm_region(2419,56926
+
+../vm/vm_resident.c,654
+void vm_page_activate(1049,25103
+void vm_page_addfree(904,22227
+vm_page_t vm_page_alloc(814,20161
+void vm_page_copy(1101,25988
+void vm_page_deactivate(1014,24395
+void vm_page_free(894,22097
+#define vm_page_hash(610,15927
+void		vm_page_init(789,19633
+void vm_page_insert(622,16210
+vm_page_t vm_page_lookup(724,18133
+void vm_page_remove(677,17262
+void vm_page_rename(764,18983
+vm_offset_t vm_page_startup(231,7403
+vm_offset_t vm_page_startup(235,7529
+void vm_page_unwire(992,23927
+void vm_page_wire(953,23170
+boolean_t vm_page_zero_fill(1086,25810
+vm_region_to_vm_page 586,15430
+void vm_set_page_size(208,6907
+vm_which_region 566,15084
+
+../vm/vm_pager.c,538
+#define	DUMMY(457,10946
+DUMMY(458,11039
+DUMMY(460,11100
+DUMMY(462,11153
+DUMMY(464,11207
+kern_return_t pager_cache(95,2760
+kern_return_t pager_data_provided(115,3134
+kern_return_t pager_data_provided_inline(200,5393
+kern_return_t pager_data_unavailable(259,6811
+kern_return_t	pager_lock_request(295,7520
+vm_pager_t vm_pager_allocate(442,10639
+boolean_t vm_pager_deallocate(432,10418
+pager_return_t vm_pager_get(408,9954
+boolean_t vm_pager_has_page(448,10736
+void vm_pager_init(84,2543
+pager_return_t vm_pager_put(421,10197
+
+../vm/device_pager.c,386
+#define	SERVER_DISPATCH(448,11124
+void		device_pager(455,11338
+vm_pager_t	device_pager_create(136,3293
+void		device_pager_init(104,2490
+void		device_pager_terminate(398,10154
+kern_return_t pager_data_request(211,5160
+kern_return_t pager_data_unlock(231,5703
+kern_return_t pager_data_write(245,6155
+kern_return_t	pager_init(272,6989
+kern_return_t pager_lock_completed(259,6591
+
+../vm/vm_init.c,26
+void vm_mem_init(56,1604
+
+../vm/memory_object.c,312
+kern_return_t memory_object_data_error(246,6768
+kern_return_t memory_object_data_provided(124,3345
+kern_return_t memory_object_data_unavailable(292,7711
+kern_return_t	memory_object_lock_request(338,8774
+kern_return_t	memory_object_set_attributes(465,11531
+kern_return_t pager_data_provided_inline(229,6352
+
+../vm/vm_fault.c,458
+#define	FREE_PAGE(126,3529
+#define	RELEASE_PAGE(134,3680
+	if 189,4893
+	if 604,15109
+	if 622,15566
+	if 710,17642
+	if 718,17874
+	if 993,24531
+	if 1134,28313
+	if 1142,28492
+	if 1164,29095
+	if 1504,36592
+	if 1521,36906
+kern_return_t vm_fault(85,2570
+void vm_fault_copy_entry(1281,31450
+void vm_fault_unwire(1231,30287
+void vm_fault_wire(1195,29541
+kern_return_t vm_fault_wire_fast(1394,34336
+	while (!vm_map_verify(1003,24758
+	while 254,6706
+
+../vm/vm_synchronize.c,237
+map_push_range(84,1497
+object_push(192,3775
+#define pages_hash_fn(44,871
+static boolean_t seen_page(251,5102
+static void seen_pages_free(284,5766
+static void seen_pages_init(267,5391
+vmPageoutPage(139,2676
+vm_synchronize(55,1038
+
+../next/clock.c,526
+bcd_to_byte 400,9389
+byte_to_bcd 406,9469
+#define	dysize(272,6500
+inittodr(183,4587
+nvram_check 418,9626
+nvram_set 436,10045
+resettodr(242,5854
+resynctime(230,5631
+rtc_alarm 108,2688
+rtc_blkread 642,13937
+rtc_blkwrite 511,11563
+rtc_get(361,8456
+rtc_intr(80,2022
+rtc_power_down(139,3568
+rtc_read 574,12723
+rtc_real_blkread 652,14142
+rtc_real_read 586,12913
+rtc_set 322,7318
+rtc_set_auto_poweron 71,1827
+rtc_set_clr 65,1713
+rtc_write 452,10493
+sec_to_tm 274,6550
+startrtclock(158,3927
+tm_to_sec 249,5968
+
+../next/ipl_meas.c,448
+#define	NELEM(394,8276
+static inline int Rspl7(37,810
+static inline int Rsplx(46,1003
+intr_call(237,5370
+static inline struct intr_times *intr_find(206,4739
+ipl_change(67,1468
+ipl_intr(195,4495
+ipl_ioctl(308,6757
+ipl_open(271,6130
+ipl_read(281,6218
+ipl_rte(156,3430
+static inline ipl_seenit(397,8332
+ipl_spld(136,2991
+ipl_splu(116,2551
+ipl_traceback(427,8846
+ipl_urte(168,3719
+#define meas_debug(34,697
+#define meas_debug1(35,741
+
+../next/locore.s,4841
+#define	INTRARG(1151,22689
+#define	INTRARG(1267,25783
+	INTRARG(1348,28247
+#define	INTRPOLL(1203,24249
+#define	INTRPOLL(1307,27097
+#define	INTRSCAN(1169,23173
+#define	INTRSCAN(1279,26146
+	INTRSCAN(1350,28358
+	INTRSCAN(1352,28451
+#define	INTR_CALL_LIT(1072,21134
+#define	INTR_CALL_LIT(1092,21483
+#define	INTR_CALL_REG(1078,21249
+#define	INTR_CALL_REG(1097,21571
+#define	INTR_CALL_REG0(1084,21362
+#define	INTR_CALL_REG0(1102,21660
+#define	IPL_INTR(1111,21809
+#define	IPL_INTR(1118,21953
+#define	IPL_INTR(1231,25020
+#define	IPL_INTR(1238,25163
+PROCENTRY 323,7318
+PROCENTRY 341,7502
+PROCENTRY 360,7780
+PROCENTRY 379,8058
+PROCENTRY 396,8275
+PROCENTRY 419,8593
+PROCENTRY 442,8968
+PROCENTRY 458,9178
+PROCENTRY 476,9417
+PROCENTRY 488,9579
+PROCENTRY 503,9782
+PROCENTRY 507,9826
+PROCENTRY 519,9993
+PROCENTRY 536,10190
+PROCENTRY 563,10565
+PROCENTRY 585,11039
+PROCENTRY 607,11507
+PROCENTRY(629,11933
+PROCENTRY(668,12726
+PROCENTRY(712,13636
+PROCENTRY(1058,20878
+#define	TRAP(1121,21989
+#define	TRAP(1241,25199
+	TRAP(1329,27711
+	TRAP(1331,27769
+	TRAP(1333,27819
+	TRAP(1335,27877
+	TRAP(1337,27935
+	TRAP(1339,27990
+	TRAP(1341,28050
+	TRAP(1343,28101
+	TRAP(1345,28165
+#define	TRAPVEC(1135,22313
+#define	TRAPVEC(1253,25465
+	TRAPVEC(1326,27676
+	movl	a1,a0@(191,4266
+	bclr	#AST_SCHED_BIT,a0@(251,5745
+	bset	#TRACE_AST_BIT,a0@(253,5806
+	bset	#TRACE_USER_BIT,a0@(257,5970
+	tstb	a0@(995,19343
+	frestore a0@(1007,19703
+7:	bset	#AST_SCHED_BIT,a0@(1468,31773
+	bclr	#AST_SCHED_BIT,a0@(1471,31866
+	bset	#TRACE_AST_BIT,a0@(1473,31927
+	bset	#TRACE_USER_BIT,a0@(1477,32091
+	bset	#AST_SCHED_BIT,a0@(1532,33322
+	bclr	#AST_SCHED_BIT,a0@(1535,33413
+	bset	#TRACE_AST_BIT,a0@(1537,33474
+	bset	#TRACE_USER_BIT,a0@(1541,33638
+	bclr	#AST_SCHED_BIT,a0@(1612,35490
+	bset	#TRACE_AST_BIT,a0@(1614,35551
+	bset	#TRACE_USER_BIT,a0@(1618,35715
+	bclr	#AST_SCHED_BIT,a0@(1832,40791
+	bset	#TRACE_AST_BIT,a0@(1834,40852
+	bset	#TRACE_USER_BIT,a0@(1838,41016
+	movl	sp@(R_PC),a0@(1864,41738
+	movw	sp@(R_SR),a0@(1865,41775
+	clrw	a0@(1866,41812
+	bclr	#AST_SCHED_BIT,a0@(1894,42493
+	bset	#TRACE_AST_BIT,a0@(1896,42554
+	bset	#TRACE_USER_BIT,a0@(1900,42718
+	movl	sp,a1@(229,5128
+	movl	sp,a1@(231,5215
+	tstl	a1@(1466,31710
+	cmpl	#AST_ZILCH,a1@(1530,33246
+	movl	#syscall_fault,a2@(1592,35030
+	clrl	a2@(1598,35182
+	moveml	sp@,#0x7fff		// restore all 282,6467
+	moveml	sp@,#0x7fff		// restore all 1630,36000
+	moveml	sp@,#0x7fff		// restore all 1852,41333
+1:	movw	sp@(SSW_040),d1		// function code 1713,37856
+	movl	a1,d1		// compute 767,14808
+	lea	_active_threads,a0	// current_thread(224,4984
+//	lea	_active_threads,a1	// current_thread(1033,20217
+	rte				// rerun failing bus cycle(1854,41439
+					// other fields set by exec(233,5294
+	jsr	_ipl_rte		// ipl_rte(202,4617
+	jsr	_ipl_rte		// ipl_rte(278,6361
+	jsr	_ipl_rte		// ipl_rte(1849,41270
+	jsr	_ipl_rte		// ipl_rte(1872,41958
+	jsr	_ipl_rte		// ipl_rte(1908,42858
+	jsr	_ipl_urte		// ipl_urte(1483,32220
+	jsr	_ipl_urte		// ipl_urte(1547,33767
+	jsr	_ipl_urte		// ipl_urte(1627,35935
+	calls	$0,_set_cpu_number		# set the cpu number 313,7057
+	moveml	sp@,#0x7fff		// restore registers 1552,33880
+	moveml	sp@,#0x7fff		// restore regsiters 1488,32333
+//	All registers are saved and restored 1381,29057
+	clrl	d0			// return 0 to caller of save_context(987,19108
+	movl	#1,d0			// return 1 to caller of save_context(1054,20745
+//	Execute return sequence 1522,33065
+	clrw	sp@(232,5257
+	bset	#SR_TSINGLE_BIT-8,sp@(255,5894
+	clrw	sp@(259,6044
+	movl	a0,sp@(1396,29517
+	bset	#SR_TSINGLE_BIT-8,sp@(1475,32015
+	movl	a0,sp@(1516,32936
+	bset	#SR_TSINGLE_BIT-8,sp@(1539,33562
+	movl	a0,sp@(1588,34915
+	bset	#SR_TSINGLE_BIT-8,sp@(1616,35639
+	movl	a0,sp@(1644,36341
+	bfextu	sp@(1647,36408
+	movw	#SIZEOF_NORMAL6,sp@(1650,36500
+	movw	#SIZEOF_SHORTBUS,sp@(1655,36623
+	movw	#SIZEOF_LONGBUS,sp@(1660,36746
+	movl	a0,sp@(1678,37111
+	bfextu	sp@(1681,37178
+	movw	#SIZEOF_ACCESS,sp@(1704,37559
+	btst	#RW_BIT,sp@(1708,37763
+	btst	#LK_BIT,sp@(1710,37798
+	btst	#ATC_BIT,sp@(1715,37930
+	btst	#MA_BIT,sp@(1718,38034
+	movw	#SIZEOF_SHORTBUS,sp@(1728,38267
+	btst	#FAULTD_BIT-8,sp@(1729,38337
+	btst	#FAULTB_BIT-8,sp@(1731,38397
+1:	btst	#FAULTC_BIT-8,sp@(1736,38535
+	movw	#SIZEOF_LONGBUS,sp@(1743,38692
+	btst	#FAULTD_BIT-8,sp@(1744,38761
+	btst	#FAULTB_BIT-8,sp@(1746,38821
+1:	btst	#FAULTC_BIT-8,sp@(1750,38948
+	btst	#SR_SUPER_BIT-8,sp@(1759,39165
+	bfextu	sp@(1768,39386
+	btst	#SR_SUPER_BIT-8,sp@(1824,40557
+	bset	#SR_TSINGLE_BIT-8,sp@(1836,40940
+	movl	a0,sp@(1867,41849
+	btst	#SR_SUPER_BIT-8,sp@(1886,42260
+	bset	#SR_TSINGLE_BIT-8,sp@(1898,42642
+_spld_measured:					// old_ipl=spld_measured(1934,43432
+_splu_measured:					// old_ipl=splu_measured(1927,43238
+	splx(532,10157
+	splx(549,10354
+	splx(1044,20511
+//	d0	contains return value 1379,29008
+
+../next/us_timer.c,656
+static inline void bumptime(77,1934
+void delay(501,12123
+static int load_timer(406,9855
+void microboot(480,11740
+void microtime(449,11043
+static void sec_flash(537,12798
+static inline int timer_get(100,2426
+static inline void timer_set(110,2583
+#define	timerdebug(38,722
+#define	timerdebug(41,835
+#define	timerdebug2(39,762
+void us_abstimeout(309,7527
+us_delay(510,12236
+static void us_gatherstats(142,3271
+static void us_hardclock(121,2779
+void us_timeout(300,7348
+void us_timer_init(170,3986
+static int us_timer_int(226,5252
+static inline int us_timevalsub(89,2154
+boolean_t us_untimeout(373,9006
+unsigned int usec_elapsed(424,10245
+
+../next/trap.c,223
+do_writeback 1152,31197
+dotrace 1083,29409
+fp_trace 1263,33915
+mach_syscall_trace(597,16191
+nosys(1072,29184
+old_syscall(632,16975
+syscall_trace(566,15517
+traceback 1113,30130
+trap 197,6353
+unix_syscall(865,23485
+
+../next/dkbad.c,14
+isbad(33,766
+
+../next/in_cksum.c,42
+#define ADDCARRY(25,809
+in_cksum(28,941
+
+../next/next_exception.c,36
+boolean_t machine_exception(22,502
+
+../next/ufs_machdep.c,33
+allocbuf(35,735
+bfree(102,2411
+
+../next/vm_machdep.c,17
+pagemove(23,485
+
+../next/swapgeneric.c,75
+getfsname(257,5140
+gets(213,4538
+initrootnet(278,5468
+setconf(113,2241
+
+../next/pmap.c,2133
+#define	LOCK_PMAP(188,6481
+#define	LOCK_PMAP_U(186,6426
+#define NeXT_protection(387,12081
+int NeXT_protection_init(361,11448
+#define	PT1(113,3586
+#define	PT1_INDEX(104,3333
+#define	PT2_INDEX(106,3401
+#define	PTE(115,3666
+#define	PTE_INDEX(108,3469
+#define READ_LOCK(171,5864
+#define READ_LOCK(176,6122
+#define READ_UNLOCK(172,5922
+#define READ_UNLOCK(177,6157
+#define	TBIA(210,6970
+#define UNLOCK_PMAP(194,6630
+#define	UNLOCK_PMAP_U(192,6571
+#define	VA_INDEX(110,3537
+#define WRITE_LOCK(173,5983
+#define WRITE_LOCK(178,6190
+#define WRITE_UNLOCK(174,6043
+#define WRITE_UNLOCK(179,6226
+check_pv_list(321,10568
+copy_from_phys(2287,57752
+copy_from_phys(2332,58595
+copy_to_phys(2303,58081
+copy_to_phys(2340,58714
+#define	current_pmap(217,7105
+void pmap_bootstrap(679,20479
+void pmap_change_wiring(1626,43313
+void pmap_clear_modify(1984,51931
+void pmap_clear_reference(2040,52956
+pmap_collapse(1250,34909
+void pmap_collect(1884,49875
+void pmap_copy(1845,48957
+void pmap_copy_on_write(1287,35828
+void pmap_copy_page(2268,57468
+void pmap_copy_page(2319,58420
+pmap_t pmap_create(907,27771
+void pmap_destroy(940,28554
+void pmap_enter(1410,38239
+void pmap_enter_mapping(1422,38449
+pmap_expand(1788,47654
+pmap_expand_kernel(1733,46000
+vm_offset_t pmap_extract(1658,43987
+pmap_free_maps(968,28965
+void pmap_init(859,26387
+boolean_t pmap_is_modified(2159,55208
+boolean_t pmap_is_referenced(2097,54017
+pmap_t pmap_kernel(1954,51300
+vm_offset_t pmap_map(649,19676
+void	pmap_page_protect(2247,57116
+pmap_pageable(1973,51746
+pmap_phys_to_index(2222,56605
+void pmap_protect(1350,36974
+pte_t *pmap_pte(287,9628
+pte_t *pmap_pte_valid(307,10227
+void pmap_reference(995,29586
+void pmap_remove(1152,32992
+void pmap_remove_all(1178,33468
+void pmap_remove_range(1014,29920
+vm_offset_t pmap_resident_extract(1701,45170
+void pmap_set_page_size(557,16761
+vm_size_t pmap_size(633,19299
+void pmap_tt 2354,59058
+void pmap_update(1865,49459
+void pmap_zero_page(2278,57623
+void pmap_zero_page(2326,58520
+static vm_offset_t pt_alloc(429,13506
+static void pt_free(480,14758
+static pt_init 419,13306
+
+../next/shutdown.c,44
+fd_shutdown(135,2666
+proc_shutdown(23,382
+
+../next/event_meter.c,241
+#define	FIX_MUL(33,629
+event_chirp(298,6283
+event_disk 155,3227
+event_fixlog10 261,5619
+event_graph 198,4339
+event_hline 226,4849
+event_intr(176,3770
+event_pt 215,4628
+event_run 62,1203
+event_timeout(181,3812
+event_vline 248,5307
+
+../next/cons.c,142
+cngetc(101,1761
+cnioctl(74,1344
+cnopen(23,367
+cnputc(110,1881
+cnread(52,1016
+cnselect(91,1612
+cnwrite(63,1179
+slave_cnenable(120,2015
+
+../next/genassym.c,30
+bitnum 161,5720
+main 41,868
+
+../next/mem.c,80
+mmmmap 166,3175
+mmopen 54,1134
+mmread(70,1301
+mmrw(84,1479
+mmwrite(77,1389
+
+../next/nextdbg.c,566
+#define ERROR(63,1371
+#define	GETPKT(408,7471
+#define	PUTPKT(409,7523
+ack(827,15421
+btoh(338,6602
+dbg_exit(211,3961
+dbg_kresume(748,14123
+dbg_trap(219,4038
+getnib(843,15647
+getpkt(857,15813
+gfunc(911,16663
+hookbuserr(725,13692
+htob(385,7197
+htobs(361,6913
+#define isdigit(52,1122
+#define	isupper(54,1169
+#define	isxdigit(48,1001
+kdbg(419,7747
+kdbg_connect(766,14490
+kdebug_send(896,16449
+nextdbginit(189,3474
+pfunc(961,17643
+putnib(790,14899
+putpkt(801,15016
+rdmem(652,12527
+#define	tolower(56,1216
+unhookbuserr(738,13959
+wrmem(688,13092
+
+../next/pcb.c,209
+void initial_context(114,3225
+void pcb_init 61,1759
+void pcb_terminate(101,2937
+thread_dup(328,8999
+kern_return_t thread_getstatus(235,6165
+kern_return_t thread_setstatus(152,4027
+thread_start(131,3595
+
+../next/libc.s,294
+PROCENTRY(19,328
+PROCENTRY(28,412
+PROCENTRY(85,1593
+PROCENTRY(90,1712
+PROCENTRY(183,3677
+PROCENTRY(194,3884
+PROCENTRY(240,4787
+PROCENTRY(279,6623
+PROCENTRY(320,7149
+PROCENTRY(350,7642
+PROCENTRY(375,8067
+PROCENTRY(397,8365
+PROCENTRY(423,8663
+PROCENTRY(444,8954
+PROCENTRY(471,9262
+
+../next/scb.s,19
+#define	KS(21,427
+
+../next/nextdbgasm.s,99
+	movl	sp@+,a0		// The return PC 9,190
+	// d0, restore the state and push d0 on the stack 40,1071
+
+../next/autoconf.c,356
+static void bus_find 102,2723
+void configure(55,1557
+int dev_find 357,9183
+int install_polled_intr 226,6065
+int install_scanned_intr 252,6735
+int intr_spurious(217,5880
+caddr_t ioaccess 379,9702
+caddr_t map_addr(338,8599
+void slave_config(397,10119
+void swapconf(409,10275
+int uninstall_polled_intr(277,7336
+int uninstall_scanned_intr(308,7980
+
+../next/next_table.c,62
+int machine_table(40,893
+int machine_table_setokay(150,3096
+
+../next/sys_machdep.c,34
+vdoualarm(81,1673
+vtrace(36,731
+
+../next/machargs.c,94
+argstrcpy(350,7617
+getargs(237,5389
+getval(362,7741
+isargsep(341,7507
+machparam(424,8730
+
+../next/machdep.c,574
+addupc(1535,36210
+as_tune 1000,24134
+boot(1200,29305
+cpu_number(1488,35566
+decl_simple_lock_data(540,12525
+dumpsys(1411,34182
+halt_cpu(1191,29168
+halt_thread(214,5323
+kill_tasks(1357,32793
+light_off(1517,35936
+light_on(1500,35695
+mini_mon(253,6205
+mon_boot 183,4761
+mon_call 204,5194
+nmi(234,5700
+nmi_prf(520,12060
+physstrat(1467,35137
+reboot_mach 218,5371
+sendsig(1072,25972
+setregs(1035,24838
+sigreturn(1162,28438
+softint_run 624,14264
+void softint_th(606,13929
+startup(796,18195
+startup_early(732,16260
+unmount_all(1323,31880
+vmtime(1023,24644
+
+../next/next_init.c,20
+NeXT_init 117,3346
+
+../next/conf.c,63
+int	nblkdev = sizeof 161,3559
+int	nchrdev = sizeof 491,10960
+
+../next/checksum_16.c,50
+#define	ADDCARRY(3,23
+u_short checksum_16 6,155
+
+../next/clockmmap.c,44
+clockmmap(73,2066
+init_eventclock(52,1449
+
+../next/kernel_pmon.c,24
+void kpmon_null(22,460
+
+../next/kern_machdep.c,26
+check_cpu_subtype 18,274
+
+../next/malloc_debug.c,151
+void malloc_debug 46,980
+static void malloc_debug_syncbufs 72,1599
+#define	malloc_lock(37,783
+#define	malloc_unlock(38,836
+mallocdebuginit(40,897
+
+../next/fptrace.c,16
+fptrace 18,237
+
+../nextdev/ev_mouse.c,730
+void ClearMouseRect(358,10582
+void HideCursor(267,8730
+void InitMouse(473,14125
+void InitMouseVars(434,12790
+void ObscureCursor(281,8890
+void ResetMouse(519,15636
+void RevealCursor(288,8976
+void SetCursor(238,7850
+void SetMouseMoved(353,10502
+void SetMouseRect(363,10638
+void ShieldCursor(295,9060
+void ShowCursor(274,8810
+int StartCursor(534,15905
+void TermMouse(513,15577
+void UnShieldCursor(305,9233
+void animateWaitCursor(344,10280
+void boundBounds(547,16167
+int ev_register_screen(377,11075
+int ev_unregister_screen(405,12093
+void hideWaitCursor(333,10070
+void mouse_motion(186,6083
+void offsetBounds(562,16699
+void process_mouse_event(123,4216
+void showWaitCursor(321,9750
+int touchBounds(556,16526
+
+../nextdev/monitor.s,218
+PROCENTRY(21,395
+	movl	d2,a0@(4)		// send the data 135,3209
+	// wait for 1 DMA packet to be sent 184,4168
+	// wait for 1 DMA packet to be sent 238,5288
+	splx(141,3366
+//	2. This code was lifteed verbatim 48,1034
+
+../nextdev/snd_reply.c,941
+#define dspdbug(42,867
+#define dspdbug(44,953
+kern_return_t snd_reply_aborted 287,7279
+kern_return_t snd_reply_completed 277,7022
+kern_return_t snd_reply_dsp_cmd_port(442,11305
+kern_return_t snd_reply_dsp_cond_true 491,12616
+kern_return_t snd_reply_dsp_err 405,10235
+kern_return_t snd_reply_dsp_msg 364,9073
+kern_return_t snd_reply_dsp_regs 459,11745
+kern_return_t snd_reply_illegal_msg 153,3659
+kern_return_t snd_reply_overflow 257,6522
+kern_return_t snd_reply_paused 297,7531
+kern_return_t snd_reply_recorded_data 181,4408
+kern_return_t snd_reply_resumed 307,7782
+kern_return_t snd_reply_ret_device 105,2410
+kern_return_t snd_reply_ret_parms 320,8067
+kern_return_t snd_reply_ret_samples 237,5989
+kern_return_t snd_reply_ret_stream 122,2834
+kern_return_t snd_reply_ret_volume 340,8525
+kern_return_t snd_reply_started 267,6767
+kern_return_t snd_reply_timed_out 227,5715
+static kern_return_t snd_reply_with_tag(136,3215
+
+../nextdev/st.c,513
+st_fixed(1106,31405
+st_mtop(1014,29026
+st_rw(517,14221
+stattach(240,6553
+stattach2(246,6621
+stclose(347,9516
+stclosefile(406,11122
+stcmd(1183,33483
+static int stcmd_int(1145,32522
+stdone(840,23857
+stgetsdp(185,5147
+stinit(264,6970
+stinquiry(366,9930
+stintr(680,18862
+stioctl(879,25096
+stmodesel(466,12832
+stmodesen(485,13420
+stopen(281,7528
+stread(505,14061
+streqsense(443,12127
+strewind(424,11631
+stslave(191,5209
+ststart(613,16734
+sttestrdy(388,10616
+stwake(257,6899
+stwrite(511,14142
+
+../nextdev/ev_kbd.c,647
+void AllKeysUp(754,25520
+void AlphaLockFeedback(116,4026
+void CalcModBit(510,18556
+void DoAutoDim(152,5276
+void DoBrightnessChange(184,6118
+void DoCharGen(579,20575
+void DoKbdEvent(667,22984
+void DoKbdRepeat(700,24157
+void DoModCalc(552,19694
+void DoSoundKey(201,6516
+void DoSpecialKey(248,8236
+int InitKbd(725,24744
+#define NEXTNUM(499,17992
+static unsigned int NextNum(383,14132
+void RecordBrightness(174,5972
+void ResetKbd(718,24628
+void SetAttenuation(193,6284
+int SetCurBrightness(126,4461
+unsigned char *SetKeyMapping(400,14765
+void UndoAutoDim(162,5602
+void process_device_mods(102,3741
+void process_kbd_event(84,3186
+
+../nextdev/dma.c,377
+#define	ADDR(844,23209
+#define	dbug(60,1592
+#define	dbug(66,1742
+dma_abort(474,12804
+dma_cleanup(388,10242
+dma_close(121,3229
+dma_dequeue(171,4621
+dma_enqueue(138,3642
+dma_init(87,2151
+dma_intr(529,14304
+dma_list(203,5458
+dma_start(411,10905
+dma_sync_cache 847,23321
+dma_va_list(331,9003
+static inline int get_dma_state(69,1776
+pcopy(732,20420
+pfill(791,21949
+
+../nextdev/sg.c,253
+sgattach(154,4110
+sgattach2(162,4271
+sgclose(212,5378
+sgcmd(531,14583
+sgdone(419,11606
+sggetsdp(132,3654
+sginit(179,4565
+sgintr(293,7746
+sgioctl(461,12803
+sgopen(195,4985
+sgsettl(513,14099
+sgslave(138,3716
+sgstart(231,5808
+sgwake(172,4491
+
+../nextdev/snd_dspcmd.c,642
+#define dspdbug(64,1615
+#define dspdbug(69,1809
+#define dspdbug2(65,1685
+static kern_return_t dspq_check_param(103,2709
+static void dspq_setup_user_chan(122,3094
+int snd_dsp_cmd_port_msg(76,1906
+static int snd_dspcmd_abortdma(831,21727
+static int snd_dspcmd_chandata(516,13554
+int snd_dspcmd_def_dmasize(554,14576
+int snd_dspcmd_def_high_water(562,14733
+int snd_dspcmd_def_low_water(574,14946
+static int snd_dspcmd_dma_in(714,18610
+static int snd_dspcmd_dma_out(589,15206
+static int snd_dspcmd_event(485,12782
+static int snd_dspcmd_msg(146,3683
+static int snd_dspcmd_req_err(874,22582
+static int snd_dspcmd_req_msg(839,21866
+
+../nextdev/snd_unix.c,23
+snd_unix_ioctl(31,522
+
+../nextdev/video.c,1130
+vidConfigureFB(385,11560
+vidGetConsoleInfo(406,12094
+vidInterruptDisable(478,13694
+vidInterruptEnable(460,13265
+ void vidMoveCursor(497,14121
+vidProbeForFB(366,11139
+vidResumeAnimation(434,12640
+vidSetBrightness(447,12865
+vidStopAnimation(417,12337
+vidSuspendAnimation(428,12538
+void vid_BW2_DisplayCursor(640,18212
+vid_BW2_MapFB(617,17469
+void vid_BW2_RemoveCursor(709,20413
+vid_BW2_ResumeAnim(823,23800
+vid_BW2_SetBrightness(769,22215
+void vid_BW2_SetCursor(741,21622
+vid_BW2_SuspendAnim(812,23583
+vid_BW2_config(570,15786
+vid_BW2_init(597,16634
+vid_BW2_installIntr(790,23016
+vid_BW2_intr(802,23369
+vid_BW2_present(555,15588
+void vid_C16_DisplayCursor(1042,31005
+vid_C16_MapFB(1016,30165
+void vid_C16_RemoveCursor(1119,33757
+vid_C16_ResumeAnim(1261,38052
+vid_C16_SetBrightness(1199,36291
+void vid_C16_SetCursor(1152,34882
+vid_C16_SuspendAnim(1252,37868
+vid_C16_config(887,26428
+vid_C16_init(919,27495
+vid_C16_installIntr(1226,37116
+vid_C16_intr(1238,37476
+vid_C16_present(872,26230
+vid_early_probe(517,14664
+vid_probe_faulted(511,14602
+vidclose(228,7426
+vidioctl(234,7521
+vidopen(216,7273
+
+../nextdev/km.c,1051
+#define	KYBD(100,2696
+#define	MOUSE(101,2735
+#define	WIN_SIZE(119,3340
+alert 1500,37885
+alert_done(1536,38903
+alert_lock_screen 1551,39208
+km_autorepeat(784,20955
+km_begin_access(1865,48805
+km_big(633,17096
+km_clear_eol(1477,37243
+km_clear_screen(1212,31833
+km_clear_win(1192,31337
+km_convert_addr(1909,49728
+km_drawrect(1040,27174
+km_end_access(1877,49064
+km_eraserect(1153,30125
+km_flip_cursor(1448,36521
+km_input 777,20863
+km_power_down(1584,39842
+km_read_pcode(1702,43797
+km_run_pcode(1947,51320
+km_select_console(1743,44763
+km_send 1014,26422
+km_switch_to_vm(1628,41190
+km_try_slot(1788,45988
+kmclose(277,7161
+kmgetc 896,23554
+kminit(130,3696
+kminit2(170,4469
+kmintr(805,21397
+kmintr_process(855,22665
+kmioctl 706,19182
+kmopen 183,4672
+kmoutput 350,8371
+kmpaint 1225,32084
+kmpopup 390,9328
+kmputc 882,23294
+kmread(290,7342
+kmrestore(646,17323
+kmselect(310,7629
+kmstart(320,7755
+kmtrygetc(926,24243
+kmwrite(300,7485
+kybd_process 961,25286
+reconpoll(796,21207
+static void special_key_process(943,24556
+
+../nextdev/np.c,1012
+#define XDBG(230,8006
+np_attach(2789,64675
+np_cleargpout(453,13066
+np_clearmask(426,12554
+np_close(1766,42258
+np_dev_intr(1445,34782
+np_dma_intr(1594,38682
+np_getgpi(479,13716
+np_gpinwait(397,11980
+np_gpiwait_timeout(383,11611
+np_init_printer(1131,27973
+np_ioctl(1779,42472
+np_ioctl_common(1862,44401
+np_ioctl_common_top(1797,42812
+np_nap(368,11320
+np_open(1642,39813
+np_open_common(1665,40192
+np_power_off(1097,27124
+np_power_on(994,24970
+np_printing_shutdown(1307,31847
+np_printing_timeout(1274,31162
+np_probe(2759,64129
+np_recv(310,10110
+np_select(2253,52782
+np_select_common(2274,53071
+np_send(288,9630
+np_serial_cmd(596,16444
+np_serial_timeout(571,15648
+np_setgpout(442,12863
+np_setmask(415,12347
+np_setstate(904,23152
+np_setstate_rdyerr(965,24423
+np_startdata(1344,32698
+np_wait_printer_ready(1402,34003
+np_write(2327,54117
+#define	npdebug(229,7929
+#define	npdebug(268,9023
+nps_ioctl(1788,42623
+nps_open(1651,39927
+nps_select(2262,52900
+#define	splprinter(155,4973
+
+../nextdev/ev_cursor.c,354
+void CheckShield(229,6320
+void DisplayCursor(162,4850
+void InvalidateMouseRect(128,3892
+void MoveCursor(52,1477
+int PointToScreen(254,7140
+void RemoveCursor(183,5553
+void RepositionCursor(136,4048
+void SysHideCursor(194,5821
+void SysObscureCursor(207,5990
+void SysRevealCursor(215,6101
+void SysShowCursor(200,5892
+short UniqueEventNum(35,898
+
+../nextdev/ev_ioctl.c,36
+evioctl(68,2064
+evsioctl(166,4662
+
+../nextdev/od.c,2785
+#define	ALIGN(471,17407
+#define	OD_DEV(184,6343
+#define OD_PART(183,6304
+#define	OD_VOL(182,6265
+#define	SET_BITMAP(473,17506
+static busdone(1472,44467
+#define	dbug_bitmap(543,19859
+#define	dbug_cmd(547,20042
+#define	dbug_cmd(642,23106
+#define	dbug_dma(539,19649
+#define	dbug_ecc(562,20823
+#define	dbug_ecc(657,23444
+#define	dbug_expire(557,20538
+#define	dbug_flags(545,19966
+#define	dbug_fsm(535,19460
+#define	dbug_fsm(630,22840
+#define	dbug_intr(540,19700
+#define	dbug_intr(635,22950
+#define	dbug_label(561,20767
+#define	dbug_lock(552,20288
+#define	dbug_lock(647,23219
+#define	dbug_q(553,20341
+#define	dbug_remap(550,20176
+#define	dbug_remap(645,23175
+#define	dbug_runout(559,20654
+#define	dbug_spiral(542,19805
+#define	dbug_spiral(637,22993
+#define	dbug_starve(548,20096
+#define	dbug_state(560,20711
+#define	dbug_state(655,23400
+#define	dbug_stats(551,20234
+#define	dbug_status(538,19589
+#define	dbug_status(633,22907
+#define	dbug_timeout(556,20476
+#define	dbug_timeout(651,23310
+#define	dbug_timer(541,19752
+#define	dbug_update(554,20391
+#define	dbug_update(649,23258
+#define	dbug_vol(558,20601
+#define	dbug_vol(653,23357
+#define	dbug_where(544,19913
+#define	dbug_where(639,23039
+#define	dbug_xfer(536,19511
+		if 3362,94630
+		if 3403,95634
+od_alert 5292,143941
+od_async_attn 3449,96634
+od_attn 3592,100255
+od_block_async 2723,77593
+od_buf_alloc(5056,138355
+od_canon_label 4879,133742
+od_canon_remap 4808,131667
+od_cmd 3663,101854
+od_creq_timeout 4555,125438
+od_ctrl_start 1246,38486
+od_daemon(4464,123044
+static void od_dma_init(5350,145412
+od_dma_intr 2834,80498
+od_dmaintr 2853,80925
+od_done 1479,44589
+od_drive_cmd 2742,77991
+od_drive_start 1205,37694
+od_eject(5318,144618
+od_fsm 1579,47094
+od_go 1348,41208
+od_issue_cmd 2529,72054
+od_label_alloc(5071,138767
+od_locate_alt 2628,75023
+od_lock 4912,134759
+od_make_empty(5106,139441
+od_make_free_pages(4995,137024
+od_note 3526,98604
+void od_panel_abort(5341,145171
+od_perror 3477,97220
+od_read_label 3760,104297
+od_remap 2676,76294
+od_request(5182,141226
+od_request_vol(5208,141822
+od_reset 3415,95830
+od_run_out 1233,38283
+od_sect_to 2470,70359
+od_setup 1374,41856
+od_spiral(4534,124892
+od_status 3631,101147
+od_sync 5145,140375
+od_timer(860,28802
+od_try_attach(5080,138875
+od_unlock_check 5006,137374
+od_update(4360,120212
+od_update_thread(4409,121387
+od_validate_label 4431,122035
+od_write_label 4248,117427
+od_xpr(678,24013
+od_xpr_alert(691,24228
+od_zero_fill 5029,137858
+odattach 807,27259
+odclose 998,32623
+oddump(5052,138329
+odintr 2866,81280
+odioctl 4562,125542
+odminphys 5013,137467
+odopen 919,30445
+odprobe 704,24433
+odread 1061,34352
+odsize(5054,138342
+odslave 799,27122
+odstrategy 1087,34874
+odwrite 1074,34612
+
+../nextdev/scsiconf.c,0
+
+../nextdev/snd_rcv.c,46
+msg_header_t *snd_rcv_alloc_msg_frame(27,405
+
+../nextdev/scsi.c,544
+#define EPRINTF(65,1962
+scsi_attach(310,8555
+scsi_cintr(448,12274
+scsi_cstart(394,10700
+scsi_docmd(416,11401
+scsi_dstart(370,10112
+scsi_expectintr(604,16826
+scsi_expectreselect(617,17015
+scsi_gotintr(611,16944
+scsi_gotreselect(624,17135
+scsi_init(188,5364
+scsi_ioctl(585,16473
+scsi_msg(735,20034
+scsi_pollcmd(327,8949
+scsi_probe(197,5466
+scsi_rejectcmd(435,11951
+scsi_reselect(540,15242
+scsi_restart(564,15925
+scsi_sensemsg(754,20641
+scsi_slave(228,6282
+scsi_timeout(723,19768
+scsi_timer(633,17276
+#define	streq(185,5324
+
+../nextdev/snd_link.c,406
+#define snd_dbug(55,1336
+#define snd_dbug(58,1510
+#define snd_dbug2(56,1407
+static int snd_link_dsp_complete(445,11850
+void snd_link_init(93,2406
+static void snd_link_init_buf 66,1654
+static void snd_link_init_buf 206,5637
+void snd_link_pause(376,9880
+static void snd_link_reset(236,6258
+void snd_link_resume(388,10132
+void snd_link_shutdown(325,8637
+static int snd_link_snd_complete(565,15008
+
+../nextdev/ev.c,402
+void LLEventPost(597,17226
+void add_queued_event(308,9600
+static void evMsgThreadProc(548,16196
+int evclose(222,7475
+void evinit(133,4539
+void evintr(338,10270
+int evmmap(271,8560
+void evnewevents(575,16767
+int evopen(159,5444
+int evselect(246,8040
+int evvert(430,13207
+static int myAbs(588,16998
+void power_check(527,15820
+void power_intr(486,14862
+void process_queued_events(327,10028
+
+../nextdev/sc.c,408
+#define EPRINTF(89,2616
+#define	EPRINTF(92,2726
+sc_dostart(600,17449
+scattach(475,14042
+scdmaintr(683,19697
+scdmastart(1467,43046
+scfsm(1343,39437
+scgo(665,19255
+scinit(289,9204
+scintr(714,20493
+scioctl(1706,49942
+scminphys(1519,44765
+scmsgin(1529,44891
+scmsgout(1632,47864
+scprobe(325,9998
+screset(1649,48314
+scsetup(440,13125
+scshowstatus(1724,50215
+scslave(463,13813
+scstart(487,14249
+
+../nextdev/zs.c,726
+#define	XDBG(85,2108
+#define	XXDBG(87,2155
+#define	XXDBG(89,2194
+#define	ZS_TIME(91,2218
+dmtozs(1556,37590
+zs_tc(981,24333
+zsbufget(287,8389
+zsbufput(316,8933
+zschan_init(1585,38062
+zscharcnt(336,9348
+zschartype(307,8765
+zsclose(476,12956
+zsgetc 1680,40187
+zsgettype(693,17331
+zsinit(727,17825
+zsioctl(561,14836
+zsmaprr0(1386,34115
+zsmapwr5(1410,34630
+zsmctl(1429,34946
+zsopen(345,9523
+zsparam(825,20342
+zsputc 1631,39311
+zsread(525,14110
+zsrint(1016,25281
+zsselect(681,17152
+zssint(1339,32914
+zssoftrint(1072,26825
+zssoftxint(1304,32307
+zssrintdelay(955,23818
+zsstart(1193,29776
+zsstop(651,16575
+zstimer(1493,36051
+zstodm(1569,37808
+zswr5set(1469,35521
+zswrite(552,14688
+zsxint(1260,31344
+
+../nextdev/snd_dspdev.c,612
+static int dsp_attach(1389,37887
+void dsp_dev_init(148,4297
+static void dsp_dev_intr(546,13861
+void dsp_dev_loop(665,16824
+void dsp_dev_new_proto(212,5475
+void dsp_dev_reset(181,4919
+void dsp_dev_reset_chip(521,13319
+void dsp_dev_reset_hard(512,13204
+static void dsp_dma(1157,31843
+static void dsp_dma_cleanup(1235,33845
+static void dsp_dma_init(1093,30233
+static void dsp_dma_intr(629,15883
+static void dsp_interrupt(1402,38127
+static int dsp_probe(1342,36963
+#define dspdbug(132,3823
+#define dspdbug(140,4177
+#define dspdbug2(133,3893
+#define dspdmadbug(136,4000
+#define dspdmadbug(142,4216
+
+../nextdev/snd_dspqueue.c,1075
+#define dspdbug(81,1952
+#define dspdbug(90,2364
+#define dspdbug2(82,2024
+#define dspdmadbug(85,2132
+#define dspdmadbug(92,2403
+static inline dsp_msg_t *dspq_alloc_lmsg(202,4781
+int dspq_awaited_conditions(1293,30559
+boolean_t dspq_check(559,13149
+static dsp_msg_t *dspq_condition(282,6413
+static dsp_msg_t *dspq_data(268,6122
+void dspq_enqueue(448,10009
+void dspq_enqueue_cond(408,9222
+void dspq_enqueue_hc(315,7164
+void dspq_enqueue_hf(391,8888
+void dspq_enqueue_hm(332,7514
+void dspq_enqueue_state(425,9536
+void dspq_enqueue_syscall(361,8211
+void dspq_execute(728,16805
+static inline void dspq_free_lmsg(212,5007
+void dspq_free_msg(1181,28094
+static dsp_msg_t *dspq_hc(255,5877
+static dsp_msg_t *dspq_hf(297,6754
+void dspq_init_lmsg(218,5155
+static void dspq_msg_send(1275,30009
+static void dspq_output_stream(1460,34578
+static kern_return_t dspq_reply_rdata(1135,26921
+void dspq_reset_lmsg(236,5529
+boolean_t dspq_start_complex(1379,32486
+boolean_t dspq_start_simple(1345,31672
+static inline int recv(118,2971
+static inline int xmit(96,2501
+
+../nextdev/snd_device.c,927
+static void mon_send_nodma(693,17426
+#define snd_dbug(81,1977
+#define snd_dbug(84,2151
+#define snd_dbug2(82,2048
+static void snd_dev_intr(391,9185
+int snd_device_attach(817,19845
+int snd_device_def_dmasize(912,22172
+int snd_device_def_high_water(916,22272
+int snd_device_def_low_water(923,22412
+u_int snd_device_get_parms(220,5101
+u_int snd_device_get_volume(250,5876
+void snd_device_init(95,2357
+int snd_device_probe(807,19687
+void snd_device_reset(157,3807
+void snd_device_set_parms(178,4309
+void snd_device_set_ramp(212,4990
+void snd_device_set_volume(236,5565
+boolean_t snd_device_start(450,10893
+void snd_device_vol_save(799,19527
+void snd_device_vol_set(779,19190
+static void snd_dma_intr(261,6117
+static void snd_ovr(431,10396
+static void snd_ramp(886,21617
+static void snd_shutdown(642,16131
+static int snd_start(475,11490
+static void snd_vol_save(787,19324
+static void snd_vol_set(713,17771
+
+../nextdev/sd.c,1191
+static void delay_biodone(1750,47885
+static void sd_alert_panel(2916,80969
+static void sd_assign_sv(2308,61921
+static int sd_compare_vol(2827,78254
+static void sd_copy_vol(2857,79118
+static int sd_eject(597,15948
+sd_err_info(1572,43323
+static void sd_free_sv(2294,61429
+sd_volume_t sd_new_sv(2257,60413
+void sd_thread_timer(2995,83088
+static void sd_vc_assign(2873,79691
+static int sd_vc_timeout(2822,78174
+static void sd_vol_check(2321,62207
+static void sd_vol_panel_abort(2946,81656
+static void sd_volume_done(3008,83362
+static void sd_volume_notify(2964,82203
+static int sd_vstart(958,24861
+sdattach(327,9182
+sdattach2(336,9349
+sdchecklabel(2113,56797
+int sdclose(753,20121
+sdcmd_srq(2151,57778
+static void sdd_init(3025,83724
+sddone(1619,44569
+sdgetlabel(1990,53562
+static scsi_device_t sdgetsdp(208,6030
+sdinquiry(518,14006
+sdintr(1225,32907
+sdioctl(1769,48274
+sdmodesen(538,14525
+sdopen(633,16832
+sdread(791,21007
+sdreadcapacity(2089,56254
+sdsetbratio(453,12362
+sdslave(214,6113
+sdspinup(557,15016
+sdstart(1009,26323
+sdstrategy(831,21954
+sdtestrdy(575,15484
+sdwake(512,13951
+sdwrite(811,21472
+sdwritelabel(2053,55327
+#define	sizeofA(205,5962
+
+../nextdev/bus.c,31
+busdone 54,1027
+busgo 19,333
+
+../nextdev/zscom.c,135
+#define	XDBG(19,304
+#define	XDBG(21,342
+zsacquire(33,543
+zsint(59,1052
+zsintsetup(123,2324
+zsnullintr(114,2158
+zsrelease(45,785
+
+../nextdev/vmdisk.c,159
+#define VMDISK_UNIT(28,452
+vmdisk_init(30,491
+vmdisk_ioctl(133,2420
+vmdisk_open(45,769
+vmdisk_read(56,887
+vmdisk_strategy 104,1891
+vmdisk_write(80,1388
+
+../nextdev/rd.c,192
+#define DKBLOCK(28,684
+#define DKUNIT(26,604
+#define DRIVE(27,649
+rdattach 72,1460
+rdopen(80,1629
+rdprobe 48,1071
+rdread(124,2536
+rdslave 65,1368
+rdstrategy(90,1751
+rdwrite(136,2761
+
+../nextdev/nbic.c,23
+nbic_configure(14,195
+
+../nextdev/slot.c,35
+slotioctl(43,944
+slotopen(32,726
+
+../nextdev/snd_stream.c,770
+#define snd_dbug(85,2595
+#define snd_dbug(88,2769
+#define snd_dbug2(86,2666
+static void snd_deactivate_pages 967,24102
+static boolean_t snd_desc_completion(752,18599
+static snd_region_t *snd_reg_complete(1052,25950
+static snd_region_t *snd_split_region(1116,27583
+void snd_stream_abort(233,6199
+kern_return_t snd_stream_await 364,8642
+void snd_stream_enqueue_region(160,4332
+void snd_stream_init(111,3435
+void snd_stream_pause(271,7062
+void snd_stream_queue_init(126,3632
+void snd_stream_queue_reset(143,4019
+void snd_stream_reset(122,3599
+void snd_stream_resume(314,7825
+static boolean_t snd_stream_start(882,21828
+static void snd_stream_thread(423,9859
+snd_stream_thread1(430,9948
+snd_stream_thread2(436,10012
+static void snd_wire_page(1023,25275
+
+../nextdev/sf_access.c,80
+void sfa_abort(183,4600
+int sfa_arbitrate(20,446
+void sfa_relinquish(89,2101
+
+../nextdev/fd_cmds.c,427
+static int dma_bytes_moved(803,20199
+void fc_cmd_xfr(48,1185
+static void fc_dma_init(771,19410
+void fc_eject(129,3078
+static void fc_enable_interrupt(889,22779
+static void fc_log_bad_phase(971,24740
+void fc_motor_off(198,4768
+void fc_motor_on(182,4349
+fd_return_t fc_send_cmd(215,5060
+void fc_start_timer(993,25128
+void fc_stop_timer(1029,26011
+void fc_timeout(1021,25805
+static fd_return_t fc_wait_intr(902,23036
+
+../nextdev/fd_driver.c,275
+void fd_attach(126,3062
+int fd_attach_com(199,4865
+int fd_command(1052,25827
+int fd_slave(48,1038
+int fdclose(497,12937
+int fdioctl(756,18873
+static u_int fdminphys(588,15087
+int fdopen(409,10599
+int fdread(537,13815
+int fdstrategy(601,15469
+int fdwrite(563,14450
+
+../nextdev/fd_global.c,0
+
+../nextdev/fd_io.c,754
+#define HULT(1014,25799
+fd_return_t fc_82077_reset(773,19890
+fd_return_t fc_configure(986,25021
+static void fc_dmaintr(1113,28497
+void fc_flags_bclr(1296,32943
+void fc_flags_bset(1282,32717
+void fc_flpctl_bclr(935,23809
+void fc_flpctl_bset(924,23562
+fd_return_t fc_get_byte(845,21856
+void fc_go(213,5716
+static void fc_grant_sf_access(1267,32312
+void fc_init(218,5809
+static void fc_intr(674,17323
+static fd_return_t fc_perpend(1247,31758
+int fc_probe(56,1384
+fd_return_t fc_send_byte(831,21464
+int fc_slave(201,5414
+fd_return_t fc_specify 1022,26077
+fd_return_t fc_start(229,6082
+void fc_thread(304,8423
+static void fc_update_stat(949,24116
+static fd_return_t fc_wait_pio(860,22231
+static fd_return_t fc_wait_sf_access(1147,29399
+
+../nextdev/fd_subr.c,1388
+static int dens_to_capacity(2049,57044
+void fc_thread_timer(1457,39492
+static void fd_alert_panel(2185,60521
+void fd_assign_dv(1258,33789
+int fd_basic_cmd(1124,29861
+static void fd_copy_vol(2076,57497
+void fd_disk_eject(2098,58286
+void fd_done(485,13436
+void fd_free_fv(1243,33292
+static void fd_gen_recal(1145,30334
+static void fd_gen_rw_cmd(815,21947
+void fd_gen_seek(1165,30940
+int fd_get_label(867,23461
+struct fd_sectsize_info *fd_get_sectsize_info(1558,42118
+int fd_get_status(1071,28519
+void fd_intr(228,6228
+fd_return_t fd_live_rw(947,25202
+static void fd_log_2_phys(1195,31808
+static void fd_log_error(475,13107
+fd_volume_t fd_new_fv(1215,32490
+int fd_raw_rw(1014,26957
+fd_return_t fd_readid(1038,27530
+int fd_recal(1089,28962
+static u_int fd_sectsize_max(2236,61805
+int fd_seek(1104,29258
+void fd_set_density_info(1499,40528
+int fd_set_sector_size(1530,41414
+void fd_setbratio(1571,42415
+static boolean_t fd_setup_rw_req(547,14791
+fd_return_t fd_start(75,2075
+void fd_thread_block(1477,40019
+static void fd_vol_panel_abort(2216,61160
+int fd_write_label(909,24380
+void ts_add(1441,39136
+void ts_diff(1415,38530
+boolean_t ts_greater(1433,38946
+void v2d_map(1276,34245
+static int vc_compare_vol(1970,54942
+static void vol_check_assign(1942,54176
+void vol_check_timeout(2062,57282
+void volume_check(1629,44295
+void volume_notify(2003,55985
+
+../nextdev/vol.c,596
+#define vol_debug(33,653
+#define vol_debug(35,699
+void vol_notify_cancel(433,11034
+static kern_return_t vol_notify_com(321,7494
+kern_return_t vol_notify_dev(289,6984
+kern_return_t vol_notify_port(306,7258
+kern_return_t vol_panel_disk_label(652,16582
+kern_return_t vol_panel_disk_num(631,16210
+static vpe_t vol_panel_get_entry(747,18943
+kern_return_t vol_panel_remove(592,15134
+kern_return_t vol_panel_request(466,11739
+static void vol_port_death(774,19476
+void vol_start_thread(818,20564
+void vol_thread(673,16951
+int volclose(199,4954
+int volioctl(205,5014
+int volopen(189,4847
+
+../nextif/in_bootp.c,437
+in_bootp(711,15969
+in_bootp_bptombuf(191,4654
+in_bootp_buildpacket(143,3184
+in_bootp_closeconsole(476,10880
+in_bootp_echo(535,12070
+in_bootp_getpacket(269,6182
+in_bootp_initnet(60,1401
+in_bootp_makeifreq(682,15297
+in_bootp_noecho(518,11807
+in_bootp_openconsole(453,10390
+in_bootp_processreply(558,12498
+in_bootp_promisctimeout(256,5992
+in_bootp_sendrequest(294,6654
+in_bootp_setaddress(640,14310
+in_bootp_timeout(241,5712
+
+../nextif/if_en.c,483
+en_antijam 545,13892
+en_arp_input(908,22784
+en_down 535,13762
+en_jam 563,14197
+en_recv(828,20627
+en_rx_dmaintr 313,8547
+en_rx_grabbufs(274,7638
+int en_send(932,23621
+en_setaddr(722,18066
+en_tx_dmaintr 611,15393
+int en_xmit(958,24520
+enattach 167,4636
+encontrol(684,17192
+eninit(191,5317
+enoutput(416,10972
+enprobe 160,4547
+enstart(471,12182
+	if 367,9861
+	if 378,10077
+	if 384,10181
+	if 514,13090
+		if_ierrors_set(360,9728
+#define ntohs(95,2505
+ppkt 742,18442
+
+../nextif/if_bus.c,139
+enbuf_alloc(53,937
+enbuf_get(79,1402
+enbuf_put(41,788
+engetbuf(96,1616
+if_busalloc(119,1944
+if_busfree(143,2346
+if_rbusget(153,2464
+
+../net/raw_cb.c,107
+raw_attach(54,1374
+raw_bind(115,2585
+raw_connaddr(155,3353
+raw_detach(88,2134
+raw_disconnect(106,2449
+
+../net/if.c,314
+address_known(440,9049
+if_attach(96,1890
+if_detach(115,2155
+if_down(241,4862
+if_slowtimo(258,5254
+ifa_ifwithaddr(135,2430
+ifa_ifwithaf(208,4216
+ifa_ifwithdstaddr(160,3093
+ifa_ifwithnet(182,3610
+ifb_ifwithaf(229,4690
+ifconf(403,8004
+ifinit(62,1355
+ifioctl(309,6258
+ifubareset(79,1625
+ifunit(277,5617
+
+../net/dli.c,101
+dli_control(193,4666
+dli_init(263,6129
+dli_input(98,2607
+dli_output(60,1395
+dli_usrreq(143,3673
+
+../net/if_loop.c,71
+loattach(91,1625
+locontrol(72,1339
+logetbuf(38,877
+looutput(46,941
+
+../net/raw_usrreq.c,97
+raw_ctlinput(156,3529
+raw_init(40,964
+raw_input(50,1093
+raw_usrreq(167,3665
+rawintr(95,2080
+
+../net/route.c,110
+rtalloc(45,1268
+rtfree(105,2601
+rtinit(341,8091
+rtioctl(204,5000
+rtredirect(127,3040
+rtrequest(221,5390
+
+../net/netisr.c,27
+void netisr_thread(36,804
+
+../net/af.c,61
+null_hash(67,1523
+null_init(55,1310
+null_netmatch(76,1647
+
+../net/if_venip.c,245
+VENIP_ENADDRP(51,1026
+VENIP_IPADDR(57,1138
+VENIP_PRIVATE(45,932
+VENIP_RIF(63,1226
+trailer_fix(203,4021
+venip_attach(337,6710
+venip_config(370,7407
+venip_control(117,2342
+venip_getbuf(253,4968
+venip_input(269,5181
+venip_output(70,1302
+
+../net/netbuf.c,244
+nb_alloc(34,622
+nb_alloc_free(24,489
+nb_free(84,1470
+nb_free_wrapper(93,1588
+nb_grow_bot(168,2836
+nb_grow_top(148,2516
+nb_map(78,1395
+nb_read(110,1837
+nb_shrink_bot(158,2684
+nb_shrink_top(138,2346
+nb_size(104,1769
+nb_write(124,2091
+
+../net/netif.c,612
+if_attach(304,4867
+if_collisions(229,3825
+if_collisions_set(282,4512
+if_control(61,1298
+if_flags(189,3340
+if_flags_set(237,3930
+if_getbuf(135,2673
+if_handle_input(382,6559
+if_ierrors(221,3728
+if_ierrors_set(273,4398
+if_init(121,2495
+if_ioctl(77,1544
+if_ipackets(205,3530
+if_ipackets_set(255,4166
+if_mtu(181,3245
+if_name(165,3071
+if_oerrors(213,3631
+if_oerrors_set(264,4284
+if_opackets(197,3429
+if_opackets_set(246,4048
+if_output(45,1063
+if_output_mbuf(440,7579
+if_private(149,2885
+if_registervirtual(353,5956
+if_type(173,3160
+if_unit(157,2982
+mbuf_read(404,6932
+pingvirtuals(291,4645
+
+../netimp/if_imp.c,296
+imp_addr_to_leader(792,19161
+imp_leader_to_addr(764,18450
+impattach(134,4167
+impdown(424,11007
+impinit(168,4963
+impinput(199,5655
+impintr(457,11666
+impioctl(685,16676
+impmsg(437,11236
+impnoops(660,16055
+impoutput(502,12722
+impsnd(584,14462
+printbyte(733,17690
+printleader(712,17104
+
+../netimp/if_imphost.c,143
+hostdeque(213,4940
+hostenter(92,2647
+hostfree(141,3680
+hostlookup(69,2140
+hostrelease(180,4371
+hostreset(153,3875
+hostslowtimo(234,5329
+
+../netimp/raw_imp.c,21
+rimp_output(66,2130
+
+../netinet/if_ether.c,488
+#define	ARPTAB_HASH(129,3877
+#define	ARPTAB_LOOK(135,4004
+arpinput(513,13667
+arpinput(520,13781
+arpioctl(941,23742
+#define arpisen(153,4495
+#define arpisen(156,4579
+arpresolve(356,10028
+arpresolve(366,10242
+arptfree(880,22455
+arptimer(190,5292
+arptnew(902,22981
+arpwhohas(212,5759
+arpwhohas(219,5885
+ether_sprintf(1221,31189
+in_arpinput(609,15549
+in_arpinput(616,15678
+localetheraddr(1199,30788
+revarp_myaddr(1023,25540
+revarp_start(1056,26497
+revarpinput(1113,28149
+
+../netinet/in_pcb.c,253
+in_losing(348,9194
+in_pcballoc(66,1976
+in_pcbbind(94,2485
+in_pcbconnect(157,4254
+in_pcbdetach(266,7354
+in_pcbdisconnect(256,7182
+in_pcblookup(383,9843
+in_pcbnotify(318,8485
+in_rtchange(369,9600
+in_setpeeraddr(299,8006
+in_setsockaddr(285,7691
+
+../netinet/in_proto.c,0
+
+../netinet/ip_output.c,112
+ip_ctloutput(417,9997
+ip_insertoptions(344,8205
+ip_optcopy(384,9288
+ip_output(56,1480
+ip_pcbopts(469,11029
+
+../netinet/raw_ip.c,63
+rip_ctloutput(124,2994
+rip_input(43,1152
+rip_output(59,1534
+
+../netinet/udp_usrreq.c,215
+int	udp_recvspace = 2*(9000+sizeof(314,7586
+int	udp_recvspace = 4 * (1024+sizeof(317,7730
+udp_ctlinput(218,5351
+udp_init(69,1879
+udp_input(84,2077
+udp_notify(210,5242
+udp_output(255,6066
+udp_usrreq(321,7836
+
+../netinet/ip_input.c,290
+ip_deq(541,12875
+ip_dooptions(595,13683
+ip_drain(578,13410
+ip_enq(528,12668
+ip_forward(913,21724
+ip_freef(510,12338
+ip_init(101,3060
+ip_reass(378,9423
+ip_rtaddr(765,17976
+ip_slowtimo(554,13088
+ip_srcroute(822,19327
+ip_stripoptions(863,20345
+ipintr(131,3896
+save_rte(798,18751
+
+../netinet/ip_icmp.c,150
+icmp_error(51,1303
+icmp_input(138,3457
+icmp_maskrequest(479,11703
+icmp_reflect(375,9446
+icmp_send(437,10899
+ifptoia(422,10627
+iptime(462,11427
+
+../netinet/in.c,280
+in_broadcast(509,11521
+in_canforward(192,4390
+in_control(219,4893
+in_iaonnetof(495,11261
+in_ifinit(401,8702
+in_lnaof(130,2867
+in_localaddr(169,3844
+in_makeaddr(74,1781
+in_netof(100,2301
+inet_hash(49,1326
+inet_netmatch(63,1575
+inet_ntoa(542,12344
+inet_queue(573,12765
+
+../netinet/tcp_subr.c,229
+tcp_abort(348,8342
+tcp_close(243,6222
+tcp_ctlinput(306,7507
+tcp_drain(272,6823
+tcp_drop(220,5762
+tcp_init(53,1375
+tcp_newtcpcb(175,4595
+tcp_notify(281,6948
+tcp_quench(359,8533
+tcp_respond(114,3062
+tcp_template(67,1714
+
+../netinet/if_loop.c,54
+loattach(56,1069
+loioctl(140,2557
+looutput(67,1238
+
+../netinet/in_cksum.c,44
+#define ADDCARRY(25,809
+in_cksum_c(28,941
+
+../netinet/tcp_debug.c,19
+tcp_trace(55,1432
+
+../netinet/tcp_input.c,167
+#define	TCP_REASS(64,1854
+in_localaddr(1307,34739
+tcp_dooptions(1177,31608
+tcp_input(186,4824
+tcp_mss(1266,33823
+tcp_pulloutofband(1223,32481
+tcp_reass(78,2277
+
+../netinet/tcp_output.c,46
+tcp_output(55,1487
+tcp_setpersist(432,11850
+
+../netinet/tcp_timer.c,92
+tcp_canceltimers(124,2928
+tcp_fasttimo(53,1466
+tcp_slowtimo(77,2005
+tcp_timers(140,3192
+
+../netinet/tcp_usrreq.c,115
+tcp_attach(396,8963
+tcp_ctloutput(330,7704
+tcp_disconnect(432,9820
+tcp_usrclosed(462,10761
+tcp_usrreq(60,1701
+
+../netns/idp_usrreq.c,148
+idp_abort(83,2009
+idp_ctloutput(246,5508
+idp_drop(96,2210
+idp_input(44,1102
+idp_output(117,2632
+idp_raw_usrreq(520,10151
+idp_usrreq(360,7579
+
+../netns/ns.c,100
+ns_control(66,1476
+ns_hash(37,920
+ns_iaonnetof(272,6356
+ns_ifinit(174,3830
+ns_netmatch(55,1288
+
+../netns/ns_error.c,117
+ns_echo(275,5776
+ns_err_input(162,3652
+ns_err_x(42,1070
+ns_error(67,1469
+ns_printhost(145,3383
+nstime(264,5630
+
+../netns/ns_input.c,152
+idp_ctlinput(230,5125
+idp_do_route(407,9340
+idp_forward(289,6430
+idp_undo_route(428,9704
+ns_init(57,1353
+ns_watch_output(436,9824
+nsintr(74,1736
+
+../netns/ns_ip.c,171
+idpip_input(125,2507
+nsip_ctlinput(378,8024
+nsip_free(364,7789
+nsip_route(287,5889
+nsip_rtchange(406,8550
+nsipattach(62,1443
+nsipioctl(89,1972
+nsipoutput(219,4450
+
+../netns/ns_output.c,18
+ns_output(37,968
+
+../netns/ns_pcb.c,231
+ns_pcballoc(32,896
+ns_pcbbind(49,1199
+ns_pcbconnect(98,2399
+ns_pcbdetach(188,4869
+ns_pcbdisconnect(179,4724
+ns_pcblookup(281,6865
+ns_pcbnotify(234,5964
+ns_rtchange(265,6580
+ns_setpeeraddr(214,5395
+ns_setsockaddr(201,5081
+
+../netns/ns_proto.c,0
+
+../netns/spp_debug.c,19
+spp_trace(43,1116
+
+../netns/spp_usrreq.c,465
+spp_abort(1533,36304
+spp_close(1467,34996
+spp_ctlinput(520,13672
+spp_ctloutput(1060,26362
+spp_disconnect(1502,35705
+spp_drop(1512,35857
+spp_fasttimo(1545,36546
+spp_fixmtu(595,15106
+spp_init(43,1138
+spp_input(55,1339
+spp_output(642,16319
+spp_quench(584,14979
+spp_reass(270,6931
+spp_setpersist(1042,25912
+spp_slowtimo(1569,37107
+spp_template(1439,34182
+spp_timers(1611,37916
+spp_usrclosed(1496,35615
+spp_usrreq(1176,28532
+spp_usrreq_sp(1418,33611
+
+../bsd/init_sysent.c,476
+#define	compat(126,3438
+int	nsysent = sizeof 411,13370
+#define sysp(46,1246
+#define syss(45,1214
+#define	syss_async_daemon(140,3819
+#define	syss_async_daemon(142,3885
+#define	syss_exportfs(152,4169
+#define	syss_exportfs(156,4305
+#define	syss_getdirentries(122,3306
+#define	syss_getdomainname(123,3349
+#define	syss_nfs_getfh(151,4126
+#define	syss_nfs_getfh(155,4266
+#define	syss_nfs_svc(150,4086
+#define	syss_nfs_svc(154,4228
+#define	syss_setdomainname(124,3393
+
+../bsd/kern_clock.c,218
+#define BUMPTIME(150,4568
+gatherstats(393,10460
+hardclock(174,5083
+hzto(606,14944
+profil(648,15935
+softclock(447,11851
+ticks_to_timeval(638,15752
+timeout(499,12765
+untimeout(536,13494
+untimeout_try(570,14225
+
+../bsd/kern_synch.c,167
+rpcont(280,7648
+rpsleep(243,6721
+rqinit(366,9084
+schedcpu(98,2640
+slave_start(375,9235
+int sleep(140,3672
+tsleep(295,7988
+wakeup(336,8664
+wakeup_one(352,8903
+
+../bsd/kern_time.c,250
+adjtime(128,3172
+getitimer(187,5072
+gettimeofday(59,1763
+itimerdecr(339,8806
+itimerfix(317,8119
+realitexpire(271,7086
+setitimer(221,5886
+setthetime(111,2768
+settimeofday(83,2223
+timevaladd(378,9740
+timevalfix(396,9988
+timevalsub(387,9864
+
+../bsd/kern_xxx.c,408
+getdomainname(133,3630
+gethostid(85,2891
+gethostname(101,3046
+getvtimes(402,8474
+oalarm(298,6319
+oftime(280,5986
+onice(323,6963
+osetgid(202,4837
+osetpgrp(225,5255
+osetuid(185,4560
+ossig(425,8986
+ostime(260,5722
+otime(254,5679
+otimes(335,7150
+ovlimit(419,8949
+ovtimes(358,7636
+owait(385,8117
+reboot(166,4240
+scale60(349,7511
+setdomainname(148,3903
+sethostid(91,2933
+sethostname(115,3309
+
+../bsd/uipc_mbuf.c,317
+buffree(529,10159
+m_adj(333,6230
+m_cat(313,5818
+m_clalloc(81,1979
+m_copy(262,4932
+m_expand(145,2945
+m_free(200,3891
+m_freem(237,4506
+m_get(177,3579
+m_getclr(187,3704
+m_more(215,4106
+m_pgfree(132,2822
+m_pullup(401,7772
+mbinit(46,1306
+mcldup(544,10550
+mclget(451,8732
+mclgetx(478,9268
+mclput(501,9730
+
+../bsd/vfs_bio.c,521
+baddr(460,11273
+bawrite(379,9515
+bdwrite(352,8906
+bflush(799,18491
+bflush(803,18561
+binval(893,20796
+binvalfree(836,19266
+biodone(731,17206
+biowait(712,16836
+blkflush(754,17593
+bread(65,1523
+breadDirect(260,6513
+breada(96,2157
+brealloc(565,13503
+brelse(390,9648
+brelvp(921,21263
+bsetvp(910,21143
+bwrite(318,7939
+getblk(481,11759
+geteblk(539,13055
+geterror(870,20030
+getnewbuf(656,15855
+getnewbuf_count(690,16486
+incore(444,10961
+vnCleanBuffer(199,4780
+vnReadAhead(213,5054
+vnStartRead(164,3938
+
+../bsd/vfs_io.c,192
+#define sigmask(27,574
+vno_bsd_lock(335,7324
+vno_bsd_unlock(421,9253
+vno_close(233,4376
+vno_ioctl(87,1730
+vno_lockrelease(269,5545
+vno_rw(42,758
+vno_select(165,2994
+vno_stat(189,3273
+
+../bsd/kern_acct.c,51
+acct(112,2512
+compress(188,4404
+sysacct(46,1140
+
+../bsd/kern_descrip.c,408
+close(414,8596
+closef(573,11384
+dup(76,1462
+dup2(93,1720
+dupit(132,2695
+expand_fdlist(684,13307
+falloc(529,10567
+fcntl(151,3008
+fgetown(367,7841
+file_init(512,10264
+fioctl(405,8473
+flock(656,12799
+free_file(600,11826
+fset(354,7630
+fsetown(386,8130
+fstat(439,9114
+getdopt(66,1430
+getdtablesize(60,1384
+getf(557,11128
+rewhence(611,11999
+setdopt(71,1446
+ufalloc(472,9666
+ufavail(495,9994
+
+../bsd/kern_exec.c,136
+check_exec_access(569,12512
+kern_return_t create_unix_stack(446,9985
+execv(78,1724
+execve(84,1800
+void load_init_program(468,10465
+
+../bsd/kern_exit.c,151
+do_exit(126,3308
+exit(120,3260
+kern_return_t	init_process(568,13334
+rexit(103,2988
+wait(385,9279
+wait1(438,10352
+wait3(405,9715
+wait4(368,8848
+
+../bsd/init_main.c,118
+bhinit(547,13080
+binit(560,13351
+cinit(605,14423
+void init_task(538,12978
+main(236,6368
+void task_name(218,5916
+
+../bsd/kern_proc.c,139
+struct proc *getproc(135,2809
+inferior(100,2303
+pfind(111,2450
+pidhash_enter(123,2650
+pqinit(143,2952
+pqinit(165,3295
+spgrp(63,1651
+
+../bsd/kern_resource.c,136
+donice(189,4280
+getpriority(86,2612
+getrlimit(317,7442
+getrusage(332,7722
+ruadd(370,8507
+setpriority(138,3466
+setrlimit(262,6211
+
+../bsd/kern_subr.c,50
+uiomove(25,634
+ureadc(79,1624
+uwritec(120,2301
+
+../bsd/mach_process.c,16
+ptrace(69,1935
+
+../bsd/subr_log.c,153
+log_wakeup(214,4547
+logclose(99,2366
+logioctl(239,4989
+logopen(62,1588
+logread(109,2501
+logselect(177,4026
+logwakeup(205,4429
+logwakeup(216,4571
+
+../bsd/subr_mcount.c,67
+#define calloc(107,3161
+kmstartup(118,3385
+mmax_mcount(193,5310
+
+../bsd/subr_xxx.c,215
+bcmp(184,3771
+caddr_t calloc(150,3282
+cfreemem(161,3471
+errsys(104,2752
+ffs(171,3626
+imax(123,2973
+imin(117,2931
+max(138,3087
+min(130,3024
+nodev(85,2536
+nulldev(95,2660
+nullsys(109,2787
+strlen(195,3904
+
+../bsd/sys_socket.c,95
+soo_close(166,3371
+soo_ioctl(60,1431
+soo_rw(48,1221
+soo_select(116,2584
+soo_stat(155,3138
+
+../bsd/tty.c,790
+nullmodem(809,17763
+ttbreakc(1912,41480
+ttcooked(950,20503
+ttioctl(306,8083
+ttnread(633,14526
+ttread(1369,29558
+ttrstrt(272,7406
+ttselect(646,14723
+ttselwakeup(2062,44813
+ttstart(290,7828
+ttwakeup(1933,41799
+ttwrite(1550,33380
+tty_ld_install(1950,42055
+void tty_ld_remove(1997,43653
+ttyblkin(904,19609
+ttychars(203,6229
+ttycheckoutq(1524,32916
+ttyclose(733,16253
+ttydevstart(2021,44180
+ttydevstop(2028,44258
+ttyecho(1874,40630
+ttyflowctl(845,18336
+ttyflush(238,6741
+ttyinput(869,18965
+ttylclose(722,16141
+ttymodem(760,16726
+ttyopen(690,15547
+ttyout(1923,41668
+ttyoutput(1203,26098
+ttypend(825,17996
+ttyretype(1850,40134
+ttyrub(1751,38239
+ttyrubo(1836,39886
+ttyselwait(2034,44339
+ttysetspec(171,5569
+ttyspec(195,6125
+ttywait(221,6453
+ttywflush(213,6371
+
+../bsd/tty_pty.c,325
+ptcclose(289,6605
+ptcopen(266,6175
+ptcread(305,6920
+ptcselect(412,9518
+ptcwakeup(242,5679
+ptcwrite(476,10860
+static void pts_process_putc(738,16634
+ptsclose(141,3556
+ptsopen(104,2623
+ptsputc 770,17298
+ptsread(157,3831
+ptsselect(214,5156
+ptsstart(228,5416
+ptsstop(389,9066
+ptswrite(202,4959
+ptyioctl(574,12988
+
+../bsd/tty_subr.c,142
+b_to_q(272,4862
+catq(386,7263
+getc(30,655
+ndflush(178,3199
+ndqb(140,2712
+nextc(328,6079
+putc(232,4135
+q_to_b(76,1502
+unputc(344,6359
+
+../bsd/tty_tty.c,82
+syioctl(64,1276
+syopen(32,779
+syread(42,940
+syselect(83,1583
+sywrite(53,1107
+
+../bsd/uipc_domain.c,149
+#define	ADDDOMAIN(27,699
+domaininit(33,796
+pfctlinput(108,2282
+pffasttimo(133,2840
+pffindproto(83,1689
+pffindtype(65,1318
+pfslowtimo(121,2564
+
+../bsd/uipc_pipe.c,18
+piconnect(22,459
+
+../bsd/uipc_proto.c,0
+
+../bsd/uipc_socket.c,334
+soabort(207,4532
+soaccept(216,4685
+sobind(99,2409
+soclose(159,3504
+soconnect(232,5014
+soconnect2(259,5680
+socreate(61,1612
+sodisconnect(272,5934
+sofree(138,3077
+sogetopt(731,16323
+sohasoutofband(809,17814
+solisten(113,2627
+soreceive(429,9927
+sorflush(623,14163
+sosend(302,6640
+sosetopt(643,14581
+soshutdown(608,13863
+
+../bsd/uipc_socket2.c,528
+sbappend(441,12258
+sbappendaddr(492,13115
+sbappendrecord(462,12555
+sbappendrights(540,14138
+sbcompress(574,14788
+sbdrop(629,15882
+sbdroprecord(672,16575
+sbflush(614,15615
+sbrelease(402,10674
+sbreserve(387,10401
+sbselqueue(264,6819
+sbwait(277,7084
+sbwakeup(288,7241
+socantrcvmore(249,6625
+socantsendmore(241,6530
+soisconnected(94,3053
+soisconnecting(85,2877
+soisdisconnected(124,3685
+soisdisconnecting(113,3458
+sonewconn(143,4255
+soqinsque(186,5340
+soqremque(203,5592
+soreserve(366,9995
+sowakeup(312,7719
+
+../bsd/uipc_usrreq.c,398
+uipc_usrreq(61,1677
+unp_abort(508,11159
+unp_attach(313,7111
+unp_bind(370,8166
+unp_connect(399,8940
+unp_connect2(440,9902
+unp_detach(349,7755
+unp_discard(701,14789
+unp_disconnect(471,10450
+unp_dispose(660,14146
+unp_drain(540,11558
+unp_drop(523,11283
+unp_externalize(546,11583
+unp_gc(603,12658
+unp_internalize(576,12122
+unp_mark(691,14672
+unp_scan(669,14240
+unp_usrclosed(517,11238
+
+../bsd/vfs_syscalls.c,686
+access(658,14681
+chdir(94,3415
+chdirec(135,4133
+chmod(796,17081
+chown(828,17626
+chroot(111,3672
+copen(190,4990
+creat(177,4790
+fchmod(812,17365
+fchown(846,17938
+fdsetattr(964,20096
+forceclose(1031,21220
+fsync(985,20463
+ftruncate(905,18977
+getdents(1085,22276
+getdents(1221,25503
+getdirentries(426,9776
+getfakedirentries(490,11211
+getvnodefp(1069,22049
+link(323,7504
+lseek(605,13815
+lstat(726,15804
+mkdir(302,7142
+mknod(249,6184
+namesetattr(939,19610
+open(163,4590
+readlink(760,16387
+rename(336,7693
+rmdir(403,8917
+stat(719,15721
+stat1(733,15886
+symlink(352,7996
+truncate(885,18639
+umask(1006,20821
+unlink(391,8756
+utimes(864,18220
+vhangup(1020,21094
+
+../bsd/vm_swp.c,84
+minphys(332,8936
+physio(246,7072
+swap(100,3515
+swdone(191,5705
+swkill(213,6128
+
+../bsd/syscalls.c,0
+
+../bsd/subr_prf.c,389
+void harderr(558,13462
+int log(225,6824
+void logchar(576,13856
+static void logpri(239,7110
+void panic(481,11966
+void panic_init(470,11694
+int prf(247,7234
+int printf(166,5413
+static void printn(444,11179
+int putchar(570,13787
+static void puts(432,10947
+int sprintf(636,15188
+void tablefull(547,13247
+int tprintf(205,6337
+static void tputchar(581,13919
+int uprintf(180,5738
+
+../bsd/vfs.c,419
+cstatfs(455,10223
+dounmount(533,11656
+fstatfs(442,9996
+getvfs(885,19376
+smount(79,1853
+statfs(426,9718
+sync(404,9255
+unmount(474,10604
+vafsidtovfs(909,20078
+vfs_add(703,15357
+vfs_fixedmajor(992,22891
+vfs_getmajor(967,22316
+vfs_getnum(1025,23471
+vfs_lock(853,18857
+vfs_mountroot(611,12997
+vfs_putmajor(1009,23196
+vfs_putnum(1049,23864
+vfs_remove(792,17445
+vfs_unlock(868,19067
+vfssw_lookup(594,12726
+
+../bsd/vfs_vnode.c,231
+isrofile(673,14155
+prvattr(712,14863
+prvnode(701,14567
+vattr_null(687,14398
+vn_close(418,9233
+vn_create(281,5901
+vn_link(452,9899
+vn_open(111,2451
+vn_rdwr(45,1189
+vn_rele(92,2101
+vn_remove(580,12287
+vn_rename(501,10838
+
+../bsd/sys_generic.c,186
+ioctl(211,4603
+read(69,1871
+readv(86,2152
+rwuio(152,3376
+select(313,6543
+selscan(427,8950
+seltrue(478,9786
+selwakeup(486,9847
+unselect(418,8781
+write(112,2640
+writev(129,2914
+
+../bsd/kern_mman.c,210
+getpagesize(97,2461
+madvise(433,9443
+mincore(438,9459
+mprotect(428,9426
+mremap(381,8616
+munmap(386,8631
+munmapfd(410,9099
+obreak(444,9495
+ovadvise(487,10369
+sbrk(87,2435
+smmap(103,2512
+sstk(92,2448
+
+../bsd/kern_sig.c,269
+core(1162,26829
+gsignal(393,9361
+issig(733,17195
+kill(302,7578
+killpg(341,8335
+killpg1(357,8612
+psig(1032,23672
+psignal(409,9612
+setsigvec(174,4994
+sigblock(231,6236
+sigpause(257,6665
+sigsetmask(244,6450
+sigstack(280,7156
+sigvec(125,3949
+stop(1008,23156
+
+../bsd/cmu_syscalls.c,33
+rpause(208,7461
+table(292,9888
+
+../bsd/kern_fork.c,196
+cloneproc(155,3319
+fork(66,1739
+fork1(77,1787
+thread_t newproc(145,3167
+uarea_init(333,7355
+uarea_zero(339,7461
+utask_free(320,7096
+utask_zero(345,7560
+uzone_init(311,6950
+vfork(71,1762
+
+../bsd/tty_conf.c,48
+nullioctl(67,1662
+int	nldisp = sizeof 60,1513
+
+../bsd/vfs_pathname.c,179
+pn_alloc(47,1209
+pn_append(148,3299
+pn_combine(128,2806
+pn_free(215,4538
+pn_get(69,1614
+pn_getchar(95,2118
+pn_getcomponent(168,3759
+pn_set(109,2320
+pn_skipslash(202,4342
+
+../bsd/vfs_lookup.c,58
+getsymlink(370,9206
+lookupname(39,890
+lookuppn(69,1960
+
+../bsd/uipc_syscalls.c,403
+accept(101,2040
+bind(67,1452
+connect(187,3775
+getpeername(770,15488
+getsock(834,16757
+getsockname(730,14653
+getsockopt(640,12912
+listen(87,1810
+pipe(681,13729
+recv(463,9270
+recvfrom(434,8689
+recvit(519,10467
+recvmsg(485,9669
+send(325,6519
+sendit(373,7436
+sendmsg(347,6894
+sendto(301,6100
+setsockopt(603,12283
+shutdown(589,12075
+sockargs(811,16356
+socket(42,992
+socketpair(237,4764
+
+../bsd/vfs_dnlc.c,283
+dnlc_enter(71,1902
+dnlc_enterSymLink(194,4314
+dnlc_init(46,1409
+dnlc_lookup(237,5301
+dnlc_lookupSymLink(175,3876
+dnlc_purge(303,6584
+dnlc_purge1(348,7407
+dnlc_purge_vp(325,6987
+dnlc_remove(282,6238
+dnlc_rm(366,7660
+dnlc_search(413,8492
+insque2(446,9411
+remque2(461,9669
+
+../bsd/vfs_conf.c,0
+
+../bsd/mach_signal.c,23
+thread_psignal(35,871
+
+../bsd/kern_prot.c,306
+crcopy(371,6682
+crdup(387,6882
+crfree(353,6434
+crget(337,6190
+entergroup(280,5366
+getgid(88,1828
+getgroups(95,1906
+getpgrp(64,1497
+getpid(55,1314
+getuid(81,1750
+groupmember(299,5639
+leavegroup(262,5094
+setgroups(217,4157
+setpgrp(122,2531
+setregid(181,3535
+setreuid(145,2938
+suser(315,5904
+
+../bsd/vfs_xxx.c,14
+ustat(35,932
+
+../rpc/bootparam_clnt.c,57
+bootparams_getclient(49,911
+bootparams_getfile(77,1528
+
+../rpc/mount_clnt.c,43
+mount_getclient(46,908
+mount_mnt(70,1353
+
+../rpc/clnt_kudp.c,478
+#define backoff(313,7052
+bindresvport(765,17534
+buffree(183,3994
+ckuwakeup(688,16212
+clntkudp_abort(727,16886
+clntkudp_callit(672,15827
+clntkudp_callit_addr(326,7633
+clntkudp_control(732,16915
+clntkudp_create(199,4371
+clntkudp_destroy(744,17113
+clntkudp_error(704,16466
+clntkudp_freeres(714,16612
+clntkudp_init(295,6709
+clntkudp_interruptable(146,3368
+clntkudp_once(133,3154
+clntkudp_realloc(164,3739
+#define	htop(114,2746
+noop(178,3975
+#define	ptoh(113,2708
+
+../rpc/auth_kern.c,160
+authkern_create(59,1230
+authkern_destroy(193,3930
+authkern_marshal(91,1725
+authkern_nextverf(83,1648
+authkern_refresh(186,3867
+authkern_validate(176,3756
+
+../rpc/authunix_prot.c,48
+xdr_authkern(50,945
+xdr_authunix_parms(29,435
+
+../rpc/bootparam_xdr.c,235
+xdr_bp_address(79,1042
+xdr_bp_fileid_t(42,573
+xdr_bp_getfile_arg(132,1864
+xdr_bp_getfile_res(149,2105
+xdr_bp_machine_name_t(14,249
+xdr_bp_path_t(28,421
+xdr_bp_whoami_arg(98,1374
+xdr_bp_whoami_res(112,1541
+xdr_ip_addr_t(56,727
+
+../rpc/clnt_perror.c,180
+_buf(33,450
+auth_errmsg(273,5164
+clnt_pcreateerror(240,4527
+clnt_perrno(198,3648
+clnt_perror(128,2190
+clnt_spcreateerror(206,3747
+clnt_sperrno(183,3381
+clnt_sperror(45,562
+
+../rpc/kudp_fastsend.c,85
+fragbuf_alloc(85,1650
+fragbuf_free(70,1474
+ku_fastsend(104,1952
+pr_mbuf(370,9423
+
+../rpc/mountxdr.c,172
+xdr_exportbody(147,3057
+xdr_exports(185,3734
+xdr_fhandle(40,777
+xdr_fhstatus(26,529
+xdr_groups(119,2415
+xdr_mountbody(66,1099
+xdr_mountlist(78,1293
+xdr_path(52,934
+
+../rpc/pmap_kgetport.c,46
+getport_loop(124,3188
+pmap_kgetport(57,1320
+
+../rpc/pmap_prot.c,17
+xdr_pmap(35,640
+
+../rpc/rpc_callmsg.c,20
+xdr_callmsg(28,396
+
+../rpc/rpc_prot.c,210
+_seterr_reply(338,8063
+accepted(275,6870
+rejected(313,7584
+xdr_accepted_reply(68,1400
+xdr_callhdr(255,6313
+xdr_des_block(55,1111
+xdr_opaque_auth(40,858
+xdr_rejected_reply(95,2055
+xdr_replymsg(125,2729
+
+../rpc/subr_kudp.c,65
+ku_recvfrom(48,845
+ku_sendto_mbuf(114,2149
+rpc_debug(171,3175
+
+../rpc/svc.c,397
+svc_find(190,3900
+svc_getreq(364,7660
+svc_getreq(377,7815
+svc_getreqset(380,7863
+svc_register(123,2438
+svc_run(503,10876
+svc_sendreply(214,4318
+svc_unregister(163,3306
+svcerr_auth(284,5701
+svcerr_decode(250,5087
+svcerr_noproc(234,4792
+svcerr_noprog(312,6118
+svcerr_progvers(328,6431
+svcerr_systemerr(267,5389
+svcerr_weakauth(301,5992
+xprt_register(77,1616
+xprt_unregister(99,1962
+
+../rpc/svc_auth.c,47
+_authenticate(84,2240
+_svcauth_null(102,2705
+
+../rpc/svc_auth_unix.c,48
+_svcauth_short(127,3272
+_svcauth_unix(45,1130
+
+../rpc/xdr.c,362
+xdr_bool(272,4101
+xdr_bytes(397,6375
+xdr_char(234,3707
+xdr_enum(307,4624
+xdr_free(53,1108
+xdr_int(80,1368
+xdr_long(123,2074
+xdr_netobj(463,7579
+xdr_opaque(336,5270
+xdr_short(169,2841
+xdr_string(535,9638
+xdr_u_char(253,3902
+xdr_u_int(101,1687
+xdr_u_long(148,2477
+xdr_u_short(198,3212
+xdr_union(483,8232
+xdr_void(68,1250
+xdr_wrapstring(608,10956
+
+../rpc/xdr_array.c,40
+xdr_array(43,1086
+xdr_vector(127,3003
+
+../rpc/xdr_mbuf.c,277
+xdrmbuf_destroy(67,1154
+xdrmbuf_getbytes(128,2383
+xdrmbuf_getlong(74,1218
+xdrmbuf_getmbuf(164,3164
+xdrmbuf_getpos(263,5127
+xdrmbuf_init(51,866
+xdrmbuf_inline(289,5637
+xdrmbuf_putbuf(234,4518
+xdrmbuf_putbytes(198,3711
+xdrmbuf_putlong(101,1798
+xdrmbuf_setpos(272,5267
+
+../rpc/xdr_mem.c,218
+xdrmem_create(53,1041
+xdrmem_destroy(67,1270
+xdrmem_getbytes(99,1820
+xdrmem_getlong(73,1330
+xdrmem_getpos(127,2295
+xdrmem_inline(150,2746
+xdrmem_putbytes(113,2058
+xdrmem_putlong(86,1577
+xdrmem_setpos(135,2412
+
+../rpc/xdr_reference.c,45
+xdr_pointer(102,2400
+xdr_reference(43,1165
+
+../rpc/pmap_krmt.c,73
+pmap_krmtcall(37,784
+xdr_rmtcall_args(78,1736
+xdr_rmtcallres(109,2522
+
+../rpc/svc_kudp.c,383
+#define	DRHASH(361,7884
+#define	REQTOXID(362,7925
+#define	XIDHASH(360,7840
+buffree(216,4696
+#define rpc_buffer(39,677
+svckudp_create(107,2167
+svckudp_destroy(142,3110
+svckudp_dup(415,8949
+svckudp_dupsave(375,8205
+svckudp_freeargs(314,6735
+svckudp_getargs(304,6539
+svckudp_recv(170,3842
+svckudp_send(233,5023
+svckudp_stat(293,6436
+svckudp_xid(409,8870
+unhash(443,9489
+
+../rpc/authdes_prot.c,74
+#define ATTEMPT(15,225
+xdr_authdes_cred(18,287
+xdr_authdes_verf(42,928
+
+../rpc/authdes_subr.c,109
+atoa(163,2856
+#define debug(34,713
+getnetname(178,3119
+rtime(48,988
+rtime_wakeup(40,893
+sitoa(128,2487
+
+../rpc/key_call.c,182
+#define debug(28,675
+key_call(167,3381
+key_call(212,4370
+key_decryptsession(78,1603
+key_encryptsession(55,1165
+key_gendes(100,2041
+key_setsecret(36,882
+netname2user(139,2832
+
+../rpc/key_prot.c,161
+xdr_cryptkeyarg(67,785
+xdr_cryptkeyres(84,1011
+xdr_getcredres(125,1641
+xdr_keybuf(38,475
+xdr_keystatus(23,312
+xdr_netnamestr(53,628
+xdr_unixcred(105,1305
+
+../rpc/pmap_rmt.c,155
+clnt_broadcast(364,10092
+clnt_broadcast_exp(190,4926
+getbroadcastnets(148,3561
+pmap_rmtcall(50,1222
+xdr_rmtcall_args(93,2198
+xdr_rmtcallres(124,2984
+
+../rpc/svcauth_des.c,237
+#define BEFORE(64,1463
+_svcauth_des(99,2506
+authdes_getucred(481,12088
+cache_init(376,9760
+cache_ref(408,10305
+cache_spot(431,10732
+cache_victim(399,10192
+#define debug(59,1339
+#define gettimeofday(54,1255
+invalidate(557,13867
+
+../specfs/spec_subr.c,200
+bdevvp(52,1168
+isclosing(265,6089
+makespecvp(150,3741
+other_specvp(285,6558
+sfind(334,7425
+slookup(309,7035
+smark(358,7927
+specvp(71,1709
+ssave(205,4881
+stillopen(245,5651
+sunsave(218,5143
+
+../specfs/bdev_vnodeops.c,144
+bdev_badop(45,862
+bdev_close(64,1096
+bdev_getattr(89,1574
+bdev_inactive(106,1878
+bdev_open(53,920
+bdev_strategy(115,1971
+bdevvp(161,2651
+
+../specfs/fifo_vnodeops.c,266
+fifo_badop(656,15021
+fifo_bufalloc(667,15162
+fifo_buffree(725,16470
+fifo_close(170,3504
+fifo_cmp(643,14890
+fifo_getattr(545,12793
+fifo_inactive(618,14351
+fifo_invalop(650,14972
+fifo_open(117,2424
+fifo_rdwr(235,4779
+fifo_select(573,13383
+fifosp(700,15937
+
+../specfs/spec_vnodeops.c,398
+spec_access(622,13345
+spec_close(253,5985
+spec_cmp(767,16334
+spec_dump(714,15453
+spec_fid(754,16106
+spec_fsync(656,14075
+spec_getattr(520,11239
+spec_inactive(490,10683
+spec_ioctl(450,9939
+spec_link(636,13596
+spec_lockctl(737,15768
+spec_noop(726,15638
+spec_open(152,3725
+spec_rdwr(327,7295
+spec_realvp(775,16411
+spec_select(472,10341
+spec_setattr(582,12526
+spec_strategy(794,16736
+
+../specfs/spec_clone.c,18
+cloneopen(33,756
+
+../specfs/spec_vfsops.c,85
+spec_badop(51,1010
+spec_mountroot(99,1859
+spec_swapvp(111,2002
+spec_sync(63,1176
+
+../krpc/klm_kprot.c,198
+xdr_klm_holder(62,952
+xdr_klm_lock(36,549
+xdr_klm_lockargs(124,1773
+xdr_klm_stat(85,1284
+xdr_klm_stats(22,401
+xdr_klm_testargs(144,2051
+xdr_klm_testrply(103,1480
+xdr_klm_unlockargs(165,2318
+
+../krpc/klm_lockmgr.c,47
+klm_lockctl(66,1692
+talk_to_lockmgr(253,6622
+
+../nfs/nfs_bootsubr.c,88
+getclientname(34,671
+getfilekey(58,1088
+inet_aton(155,3192
+nfs_getremotevfs(80,1458
+
+../nfs/nfs_xdr.c,694
+#define MINDIRSIZ(520,11785
+#define	nextdp(519,11718
+#define	reclen(598,13626
+#define	roundtoint(597,13555
+rrokfree(226,5599
+rrokwakeup(249,5943
+xdr_attrstat(395,9152
+xdr_creatargs(790,17376
+xdr_diropargs(678,15378
+xdr_diropres(725,16250
+xdr_drok(701,15834
+xdr_fattr(108,2313
+xdr_fhandle(50,1031
+xdr_fsok(866,18634
+xdr_getrddirres(605,13752
+xdr_linkargs(809,17673
+xdr_putrddirres(526,11890
+xdr_rddirargs(467,10565
+xdr_rdlnres(444,10112
+xdr_rdresult(337,7895
+xdr_readargs(190,4862
+xdr_rnmargs(828,17973
+xdr_rrok(261,6083
+xdr_saargs(767,16975
+xdr_sattr(360,8360
+xdr_slargs(847,18275
+xdr_srok(419,9660
+xdr_statfs(899,19452
+xdr_timeval(748,16695
+xdr_writeargs(74,1448
+
+../nfs/nfs_subr.c,555
+add_free(863,19516
+authfree(266,5894
+authget(175,3996
+#define backoff(466,10325
+clfree(436,9634
+clget(304,6652
+makenfsnode(710,16092
+newname(1065,23516
+nfs_netboot_prealloc(394,8838
+rfind(939,20872
+rflush(1037,22901
+rfree(927,20671
+rfscall(469,10403
+rinactive(911,20307
+rinval(986,22006
+rlock(1092,23990
+rm_free(889,19946
+rp_addhash(825,18907
+rp_rmhash(837,19085
+#define rtablehash(808,18346
+#define	rtablehash(815,18712
+runlock(1099,24046
+setdirgid(659,14798
+setdirmode(678,15309
+setdiropargs(648,14614
+vattr_to_sattr(628,14121
+
+../nfs/nfs_vfsops.c,384
+addr_to_str(1235,28948
+callrpc(607,14702
+getfile(627,15165
+hostpath(1218,28681
+itoa(1200,28465
+mountnfs(702,17385
+nfs_badop(1193,28419
+nfs_mount(746,18406
+nfs_mountroot(119,2405
+nfs_root(1110,26787
+nfs_statfs(1128,27123
+nfs_swapvp(298,6547
+nfs_sync(1176,28213
+nfs_unmount(1068,25891
+nfsrootvp(933,22450
+pmap_rmtcall(395,9072
+#define	satosin(73,1689
+whoami(438,10194
+
+../nfs/nfs_export.c,279
+#define eqfid(66,1947
+#define eqfsid(63,1851
+exportfree(533,11431
+exportfs(84,2359
+#define exportmatch(71,2108
+findexivp(309,6907
+findexport(412,9025
+freenames(515,11065
+loadaddrs(429,9326
+loadrootnames(466,10020
+makefh(371,7995
+nfs_getfh(220,5124
+unexport(189,4402
+
+../nfs/nfs_vnodeops.c,858
+#define ISVDEV(110,2875
+async_daemon(1736,39932
+do_bio(1819,41582
+flush_vp(2003,45744
+nfs_access(819,18390
+nfs_bmap(2027,46237
+nfs_close(250,6048
+nfs_cmp(1970,45339
+nfs_create(1083,24244
+nfs_fsync(914,20378
+nfs_getattr(701,15345
+nfs_inactive(936,20803
+nfs_ioctl(678,15075
+nfs_link(1319,29821
+nfs_lockctl(1930,44324
+nfs_lockctl(1963,45283
+nfs_lookup(992,22009
+nfs_mkdir(1407,31936
+nfs_nlinks(2412,54867
+nfs_noop(1920,44193
+nfs_open(211,5114
+nfs_pagein(2050,46731
+nfs_pageout(2248,51012
+nfs_rdwr(284,6898
+nfs_readdir(1565,35861
+nfs_readlink(870,19434
+nfs_realvp(1979,45428
+nfs_remove(1221,27689
+nfs_rename(1358,30740
+nfs_rmdir(1491,33916
+nfs_select(691,15233
+nfs_setattr(727,15812
+nfs_strategy(1644,37851
+nfs_symlink(1522,34590
+nfsread(616,13752
+nfswrite(511,11608
+printfhandle(600,13450
+rwvp(352,8200
+sync_vp(1986,45511
+
+../nfs/nfs_client.c,292
+nattr_to_vattr(311,7042
+nfs_attrcache(132,2910
+nfs_attrcache_va(147,3186
+nfs_cache_check(120,2709
+nfs_getattr_cache(196,4351
+nfs_getattr_otw(240,5386
+nfs_invalidate_caches(77,2023
+nfs_purge_caches(94,2326
+nfs_validate_caches(68,1892
+nfsgetattr(290,6688
+set_attrcache_time(160,3399
+
+../nfs/nfs_common.c,58
+dprint(121,2737
+nfstsize(39,640
+vattr_to_nattr(61,1036
+
+../nfs/nfs_meas.c,272
+#define meas_debug(29,522
+#define meas_debug1(30,566
+static inline struct nfstimestat *nfs_find(39,844
+void nfsmeas_begin 76,1750
+void nfsmeas_end 88,1967
+int nfsmeas_ioctl 174,4035
+int nfsmeas_open(120,2860
+int nfsmeas_read(129,2952
+void nfsmeas_remove 114,2709
+
+../ufs/ufs_dir.c,388
+#define LDIRSIZ(69,1509
+blkatoff(1352,34285
+diraddentry(841,22084
+dirbad(1414,35709
+dirbadname(1425,35894
+dircheckforname(490,12490
+dircheckpath(1501,37569
+dirempty(1450,36348
+direnter(291,7900
+dirfixdotdot(746,19736
+dirlook(80,1760
+dirmakedirect(1128,29044
+dirmakeinode(1034,27096
+dirmangled(1395,35233
+dirprepareentry(917,23733
+dirremove(1178,30317
+dirrename(631,16281
+
+../ufs/ufs_vnodeops.c,832
+#define ISVDEV(82,2227
+chown1(608,13544
+old_ufs_readdir(1191,26180
+rdwri(1269,27866
+rwip(258,5550
+ufs_access(660,14777
+ufs_badop(1397,30075
+ufs_bmap(1304,28466
+ufs_bread(1326,28850
+ufs_brelse(1366,29625
+ufs_close(175,3888
+ufs_cmp(1377,29796
+ufs_create(780,16890
+ufs_fid(1444,31077
+ufs_fsync(705,15589
+ufs_getattr(435,9818
+ufs_inactive(723,15851
+ufs_ioctl(409,9440
+ufs_link(882,18931
+ufs_lockctl(1407,30216
+ufs_lockctl(1437,31011
+ufs_lookup(739,16107
+ufs_mkdir(1015,22110
+ufs_nlinks(1769,38255
+ufs_open(163,3719
+ufs_pagein(1493,32176
+ufs_pageout(1678,36263
+ufs_rdwr(208,4594
+ufs_readdir(1064,22954
+ufs_readlink(679,15058
+ufs_realvp(1387,29935
+ufs_remove(860,18549
+ufs_rename(923,19968
+ufs_rmdir(1046,22659
+ufs_select(423,9645
+ufs_setattr(499,11091
+ufs_strategy(1466,31602
+ufs_symlink(1220,26780
+
+../ufs/ufs_bmap.c,14
+bmap(67,2022
+
+../ufs/ufs_inode.c,359
+#define	INOHASH(87,2345
+#define	INOHASH(89,2403
+iaccess(1061,25266
+idrop(491,11486
+ifind(200,4702
+iflush(976,23549
+iflush(980,23608
+iget(231,5453
+ihinit(145,3501
+iinactive(520,12029
+ilock(1031,24759
+indirtrunc(888,21272
+iput(464,11062
+irele(478,11274
+int itrunc(636,14903
+iunlock(1041,24870
+iupdat(579,13479
+struct inode *new_inode(117,2914
+
+../ufs/ufs_subr.c,229
+badblock(277,6977
+bufstats(402,9025
+clrblock(324,7723
+fragacct(243,6288
+getmp(378,8489
+isblock(296,7232
+locc(471,10442
+scanc(443,10013
+setblock(351,8105
+skpc(459,10261
+syncip(194,5325
+update(100,3058
+update(103,3105
+
+../ufs/ufs_vfsops.c,268
+getmdev(706,15611
+mountfs(202,4330
+sbupdate(661,14330
+ufs_badvfsop(765,16701
+ufs_mount(111,2606
+ufs_mountroot(155,3387
+ufs_root(584,12782
+ufs_statfs(607,13184
+ufs_sync(649,14210
+ufs_unmount(498,11050
+ufs_vget(735,16112
+umount(463,10541
+unmount1(506,11133
+
+../ufs/ufs_alloc.c,332
+alloc(133,4320
+alloccg(812,23678
+alloccgblk(902,26065
+blkpref(622,18929
+dirpref(578,17009
+fragextend(747,22066
+free_block(1120,31817
+fserr(1344,37600
+fsfull(208,6480
+fspause(309,9719
+fssleep(261,7844
+hashalloc(694,20985
+ialloc(506,15304
+ialloccg(1045,30050
+ifree(1221,34557
+mapsearch(1280,35963
+realloccg(342,10525
+
+../ufs/quota_syscalls.c,143
+closedq(158,3064
+fdevtomp(348,7376
+getquota(295,6295
+oldquota(94,1659
+opendq(104,1815
+qsync(327,6931
+quotactl(45,927
+setquota(228,4613
+
+../ufs/ufs_dsort.c,632
+static void add_buf 288,6795
+static ds_bucket_t *add_new(330,7689
+static inline ds_bucket_t *bucket_alloc(191,4789
+static inline void bucket_free(211,5060
+disksort(57,1771
+static void disksort_check_default(152,4005
+void disksort_enter(526,12759
+void disksort_enter_head(546,13253
+void disksort_enter_tail(563,13690
+struct buf *disksort_first(575,13911
+void disksort_free(705,16478
+void disksort_init(691,16235
+struct buf *disksort_remove(607,14462
+#define ds_dbg(141,3753
+#define ds_dbg(143,3801
+static void ds_enter_common(385,9156
+static struct buf *insertion_point(222,5357
+static void reorder_bucket(361,8580
+
+../ufs/quota_ufs.c,69
+chkdq(83,1786
+chkiq(159,3660
+dqrele(245,5700
+getinoquota(48,1106
+
+../ufs/quota.c,205
+#define	DQHASH(49,1129
+#define dqinsheadfree(67,1447
+#define dqinstailfree(74,1631
+dqinval(245,5440
+dqput(211,4689
+#define dqremfree(81,1815
+dqupdate(226,4917
+getdiskquota(115,2558
+qtinit(92,2011
+
+../ufs/ufs_tables.c,0
+
+../uxkern/ux_exception.c,86
+catch_exception_raise(188,5307
+void ux_exception(269,7172
+void	ux_handler(101,2944
+
+../kern/mach_types.h,0
+
+../kern/ipc_statistics.h,200
+decl_simple_lock_data(78,1876
+#define ipc_event(97,2408
+#define ipc_event_count(87,2165
+#define ipc_event_count(94,2347
+#define ipc_statistics_lock(83,2003
+#define ipc_statistics_unlock(84,2072
+
+../kern/syscall_sw.h,269
+#define	FN(105,3664
+#define	MACH_TRAP(104,3605
+kernel_trap(126,4120
+kernel_trap(128,4181
+kernel_trap(130,4243
+kernel_trap(132,4310
+kernel_trap(135,4375
+kernel_trap(138,4444
+kernel_trap(142,4508
+kernel_trap(146,4567
+kernel_trap(149,4632
+kernel_trap(152,4696
+
+../kern/mach_redefines.h,154
+kern_return_t pager_cache(92,2479
+kern_return_t task_create(42,1264
+kern_return_t task_terminate(53,1547
+kern_return_t vm_allocate_with_pager(72,2015
+
+../kern/assert.h,152
+#define	ASSERT(24,448
+#define	ASSERT(31,624
+#define	ASSERT(39,814
+#define assert(45,919
+#define assert_static(47,959
+#define assert_static(49,995
+
+../kern/mach_interface.h,0
+
+../kern/ast.h,242
+#define	ast_context(117,3079
+#define	ast_needed(119,3212
+#define	ast_propagate(118,3144
+#define astoff(87,2262
+#define	aston(86,2218
+#define thread_ast_clear(94,2408
+#define thread_ast_clear_all(95,2476
+#define	thread_ast_set(93,2343
+
+../kern/ipc_cache.h,311
+#define obj_cache_clear(162,5162
+#define obj_cache_copyin(203,6153
+#define obj_cache_flush(179,5521
+#define obj_cache_flush(244,7100
+#define obj_cache_index(129,4498
+#define obj_cache_set(143,4771
+#define obj_cache_set(242,7021
+#define obj_cache_terminate(236,6912
+#define obj_cache_terminate(246,7165
+
+../kern/ipc_copyin.h,0
+
+../kern/ipc_copyout.h,0
+
+../kern/ipc_globals.h,0
+
+../kern/ipc_hash.h,293
+#define BUCKET_ENTER(121,3477
+#define BUCKET_REMOVE(128,3679
+#define PORT_TYPE_IS_PORT(135,3882
+#define PORT_TYPE_IS_SET(136,3940
+#define bucket_lock(118,3356
+#define bucket_lock_init(117,3289
+#define bucket_unlock(119,3414
+#define port_hash_TL(111,3113
+#define port_hash_TP(109,3008
+
+../kern/exc.h,0
+
+../kern/ipc_basics.h,0
+
+../kern/ipc_mports.h,0
+
+../kern/ipc_netport.h,30
+#define NPORT_EQUAL(198,5287
+
+../kern/ipc_pobj.h,0
+
+../kern/ipc_ptraps.h,0
+
+../kern/ipc_signal.h,50
+#define PSIGNAL(57,1507
+#define PSIGNAL(66,1701
+
+../kern/ipc_tt.h,0
+
+../kern/macro_help.h,0
+
+../kern/ipc_prims.h,108
+#define obj_entry_lookup_macro(95,2712
+#define task_check_name(73,2077
+#define task_check_rights(76,2171
+
+../kern/mach_debug.h,0
+
+../kern/mach_host.h,0
+
+../kern/host.h,0
+
+../kern/mach_ipc_defs.h,0
+
+../kern/mach_traps.h,407
+port_t		host_priv_self(68,2032
+host_priv_t	host_priv_self(86,2585
+port_t		host_self(67,1988
+host_t		host_self(85,2541
+port_t		task_data(63,1805
+port_t		task_data(81,2357
+port_t		task_notify(64,1849
+port_t		task_notify(82,2401
+port_t		task_self(62,1761
+task_t		task_self(80,2313
+port_t		thread_reply(66,1941
+port_t		thread_reply(84,2494
+port_t		thread_self(65,1895
+thread_t	thread_self(83,2447
+
+../kern/mach_param.h,0
+
+../kern/ipc_kmesg.h,217
+#define fast_pager_data(168,4810
+#define kern_msg_allocate_large(114,3303
+#define kern_msg_allocate_small(106,3086
+#define kern_msg_destroy(129,3686
+#define kern_msg_free(122,3529
+#define move_msg_data(173,4940
+
+../kern/mach_user_internal.h,0
+
+../kern/pager.h,0
+
+../kern/parallel.h,144
+#define unix_master(39,1008
+#define unix_master(46,1200
+#define unix_release(40,1046
+#define unix_reset(41,1085
+#define unix_reset(48,1245
+
+../kern/queue.h,612
+#define	dequeue(112,3205
+#define enqueue(111,3153
+#define mpdequeue_head(312,7958
+#define mpenqueue_tail(305,7789
+#define mpqueue_init(299,7660
+#define	queue_assign(222,5884
+#define	queue_empty(163,4368
+#define	queue_end(161,4328
+#define queue_enter(174,4620
+#define queue_enter_first(250,6570
+#define	queue_field(199,5310
+#define	queue_first(144,4056
+#define	queue_init(134,3850
+#define	queue_last(277,7254
+#define	queue_next(152,4182
+#define	queue_prev(285,7379
+#define	queue_remove(208,5537
+#define	queue_remove_first(229,6078
+#define queue_remove_last(235,6221
+#define round_mpq(297,7627
+
+../kern/kalloc.h,0
+
+../kern/kern_msg.h,0
+
+../kern/mach_host_internal.h,0
+
+../kern/pager_default.h,0
+
+../kern/std_types.h,0
+
+../kern/ipc_host.h,0
+
+../kern/kern_obj.h,206
+#define obj_check_unlock(91,2433
+#define obj_free(99,2619
+#define obj_lock(77,2080
+#define obj_lock_try(83,2222
+#define obj_reference(108,2904
+#define obj_release(115,3048
+#define obj_unlock(85,2288
+
+../kern/kern_port.h,230
+#define port_check_unlock(149,4594
+#define port_free(150,4662
+#define port_lock(146,4425
+#define port_lock_try(147,4478
+#define port_reference_macro(152,4716
+#define port_release_macro(153,4784
+#define port_unlock(148,4538
+
+../kern/kern_set.h,216
+#define set_check_unlock(74,2062
+#define set_free(75,2126
+#define set_lock(71,1904
+#define set_lock_try(72,1953
+#define set_reference_macro(77,2176
+#define set_release_macro(78,2240
+#define set_unlock(73,2009
+
+../kern/lock.h,324
+#define decl_simple_lock_data(146,4840
+#define decl_simple_lock_data(158,5162
+#define decl_simple_lock_data(161,5288
+#define lock_read_done(267,8097
+#define lock_write_done(268,8136
+#define simple_lock_addr(147,4913
+#define simple_lock_addr(159,5235
+#define simple_lock_init(152,5023
+#define simple_unlock(154,5074
+
+../kern/mach_debug_types.h,0
+
+../kern/sched_prim_macros.h,137
+void thread_go(202,4424
+void thread_go_and_switch(125,2839
+void thread_will_wait(85,2169
+void thread_will_wait_with_timeout(103,2421
+
+../kern/mfs.h,0
+
+../kern/msg_queue.h,98
+#define msg_queue_init(71,1946
+#define msg_queue_lock(68,1837
+#define msg_queue_unlock(69,1889
+
+../kern/mach_swapon.h,0
+
+../kern/port_object.h,0
+
+../kern/mig_user_hack.h,0
+
+../kern/processor.h,292
+#define cpu_idle(220,7093
+#define cpu_state(219,7032
+#define cpu_to_processor(212,6819
+#define current_processor(214,6867
+#define current_processor_set(215,6925
+#define processor_lock(227,7301
+#define processor_unlock(228,7353
+#define	pset_lock(224,7193
+#define pset_unlock(225,7245
+
+../kern/thread.h,270
+#define current_task(360,11436
+#define current_thread(352,11176
+#define ipc_thread_lock(344,10905
+#define ipc_thread_unlock(345,10968
+#define thread_lock(338,10718
+#define thread_pcb(336,10681
+#define thread_should_halt(341,10822
+#define thread_unlock(339,10768
+
+../kern/task.h,215
+#define current_map(291,9359
+#define current_map(293,9410
+#define current_task(290,9312
+#define ipc_task_lock(244,8091
+#define ipc_task_unlock(245,8156
+#define task_lock(241,7983
+#define task_unlock(242,8035
+
+../kern/sched.h,200
+static inline boolean_t _csw_needed(145,3920
+#define csw_needed(137,3699
+#define csw_needed(196,5147
+#define csw_needed(212,5795
+#define invalid_pri(248,6639
+#define thread_timer_delta(275,7198
+
+../kern/timer.h,89
+#define TIMER_DELTA(178,4473
+#define start_timer(135,3369
+#define timer_bump(150,3660
+
+../kern/sched_prim.h,112
+#define thread_wakeup(105,2911
+#define thread_wakeup_one(109,3077
+#define thread_wakeup_with_result(107,2993
+
+../kern/type_conversion.h,0
+
+../kern/syscall_subr.h,0
+
+../kern/thread_modes.h,0
+
+../kern/thread_swap.h,0
+
+../kern/xpr.h,43
+#define XPR(96,3032
+#define XPR(120,3611
+
+../kern/zalloc.h,137
+#define ADD_TO_ZONE(133,4386
+#define REMOVE_FROM_ZONE(140,4594
+#define ZALLOC(156,4994
+#define ZFREE(149,4839
+#define ZGET(167,5250
+
+../kern/zone_info.h,0
+
+../kern/ipc_notify.h,0
+
+../kern/kernel_stack.h,0
+
+../vm/vm_kern.h,0
+
+../vm/vm_object.h,506
+#define		vm_object_cache(159,5104
+#define	vm_object_cache_lock(127,4281
+#define	vm_object_cache_unlock(128,4341
+#define	vm_object_lock(170,5510
+#define	vm_object_lock(177,6096
+#define	vm_object_lock_init(169,5409
+#define	vm_object_lock_init(176,6026
+#define	vm_object_lock_try(172,5718
+#define	vm_object_lock_try(179,6221
+#define	vm_object_sleep(173,5856
+#define	vm_object_sleep(180,6289
+#define		vm_object_uncache(160,5179
+#define	vm_object_unlock(171,5623
+#define	vm_object_unlock(178,6157
+
+../vm/vm_pageout.h,0
+
+../vm/vm_pager.h,36
+#define		vm_pager_has_page(75,2129
+
+../vm/vnode_pager.h,32
+#define		vnode_uncache(63,1560
+
+../vm/pmap.h,0
+
+../vm/vm_fault.h,0
+
+../vm/memory_object.h,0
+
+../vm/vm_map.h,229
+#define		vm_map_lock(163,5237
+#define		vm_map_lock_read(165,5371
+#define		vm_map_max(193,6075
+#define		vm_map_min(192,6029
+#define		vm_map_pmap(194,6121
+#define		vm_map_unlock(164,5313
+#define		vm_map_unlock_read(166,5426
+
+../vm/vm_page.h,445
+#define IS_VM_PHYSADDR(206,6374
+#define IS_VM_PHYSADDR(212,6517
+#define PAGE_ASSERT_WAIT(256,7724
+#define PAGE_WAKEUP(261,7850
+#define PHYS_TO_VM_PAGE(209,6448
+#define PHYS_TO_VM_PAGE(215,6601
+#define	VM_PAGE_CHECK(115,3479
+#define	VM_PAGE_CHECK(122,3783
+#define	VM_PAGE_FREE(269,8002
+#define VM_PAGE_TO_PHYS(203,6312
+#define	vm_page_lock_queues(275,8112
+#define vm_page_set_modified(278,8243
+#define	vm_page_unlock_queues(276,8175
+
+../vm/device_pager.h,0
+
+../vm/vm_inherit.h,0
+
+../vm/vm_param.h,156
+#define	atop(67,2077
+#define	ptoa(68,2126
+#define round_page(78,2354
+#define	round_page(81,2523
+#define trunc_page(79,2439
+#define	trunc_page(82,2619
+
+../vm/vm_prot.h,0
+
+../vm/vm_statistics.h,0
+
+../next/clock.h,27
+#define	LEAPYEAR(122,3542
+
+../next/eventc.h,184
+static inline unsigned int event_delta(118,3914
+static inline unsigned int event_get(88,3190
+static inline void event_set_ts(104,3630
+static inline unsigned int event_sync(74,2793
+
+../next/ipl_meas.h,0
+
+../next/spl.h,628
+#define	SPLD_MACRO(56,1234
+#define	SPLU_MACRO(30,724
+#define SPLU_MACRO(40,866
+#define spl0(66,1426
+#define spl1(67,1455
+#define spl2(68,1484
+#define spl3(69,1513
+#define spl4(70,1542
+#define spl5(71,1571
+#define spl6(72,1600
+#define spl7(73,1629
+#define splbio(96,2112
+#define splclock(95,2072
+#define spldma(93,2000
+#define splhigh(91,1918
+#define splimp(98,2188
+#define	spln(57,1274
+#define splnet(100,2259
+#define splscc(94,2036
+#define splsched(97,2148
+#define splsoftclock(102,2331
+#define spltty(101,2295
+#define splusclock(92,1956
+#define splvm(99,2224
+#define	splx(34,799
+#define splx(47,1047
+
+../next/spl_measured.h,197
+#define	SPLD_MACRO(30,716
+#define SPLD_MACRO(54,1230
+#define	SPLU_MACRO(23,555
+#define SPLU_MACRO(53,1176
+#define	spln(44,1018
+#define spln(57,1318
+#define	splx(37,877
+#define splx(56,1285
+
+../next/FEATURES.h,0
+
+../next/table.h,0
+
+../next/reboot.h,0
+
+../next/unix_traps.h,33
+#define fast_kernel_trap(13,178
+
+../next/xpr.h,0
+
+../next/boolean.h,0
+
+../next/vmparam.h,0
+
+../next/mtio.h,0
+
+../next/param.h,0
+
+../next/signal.h,0
+
+../next/user.h,0
+
+../next/mmu.h,61
+#define	l1ptr_to_phys(55,1008
+#define	phys_to_l1ptr(54,967
+
+../next/psl.h,25
+#define srtoipl(35,1031
+
+../next/trap.h,0
+
+../next/scb.h,0
+
+../next/cframe.h,106
+#define	PROCENTRY(31,651
+#define	PROCENTRY(45,883
+#define	PROCENTRY(60,1133
+#define	PROCENTRY(66,1231
+
+../next/scr.h,0
+
+../next/mem.h,0
+
+../next/printf.h,0
+
+../next/fpc.h,0
+
+../next/cpu.h,123
+#define	I(213,6080
+#define	I_BIT(216,6194
+#define	I_INDEX(214,6129
+#define	I_IPL(215,6160
+#define	cpu_number(274,7579
+
+../next/event_meter.h,60
+#define	event_meter(100,1807
+#define	event_meter(114,2250
+
+../next/pmap.h,430
+#define LOCK_PVH(206,5736
+#define LOCK_PVH(209,5870
+#define	PMAP_ACTIVATE(217,5976
+#define PMAP_CONTEXT(227,6185
+#define	PMAP_DEACTIVATE(220,6040
+#define UNLOCK_PVH(207,5798
+#define	l2ptr_to_phys(67,1488
+#define	l3ptr_to_phys(83,1945
+#define	pai_to_pvh(195,5369
+#define	pfn_to_phys(139,3658
+#define	phys_to_l2ptr(66,1434
+#define	phys_to_l3ptr(82,1891
+#define	phys_to_pfn(138,3608
+#define	pv_lock_table_size(198,5470
+
+../next/reg.h,0
+
+../next/time_stamp.h,0
+
+../next/cons.h,0
+
+../next/exception.h,0
+
+../next/kern_return.h,0
+
+../next/machparam.h,181
+#define	BASEPRI(48,1145
+#define	DELAY(51,1232
+#define	DELAY(54,1304
+#define	USERMODE(47,1099
+#define	btoc(42,978
+#define	ctob(39,914
+#define	ctos(35,851
+#define	stoc(36,871
+
+../next/pcb.h,74
+#define astoff(61,1817
+#define	aston(58,1743
+#define	pcb_synch(67,1950
+
+../next/sched_param.h,0
+
+../next/syscall_sw.h,29
+#define kernel_trap(75,1548
+
+../next/thread.h,0
+
+../next/thread_status.h,27
+#define	USER_REGS(70,1887
+
+../next/timer.h,0
+
+../next/vm_param.h,188
+#define	NeXT_btop(80,2715
+#define	NeXT_ptob(81,2773
+#define NeXT_round_page(89,2979
+#define NeXT_trunc_page(91,3076
+#define round_NeXT_to_vm(98,3260
+#define trunc_NeXT_to_vm(97,3199
+
+../next/vm_types.h,0
+
+../next/pmon_ipc.h,0
+
+../next/pmon.h,0
+
+../next/autoconf.h,0
+
+../next/kernel_pmon.h,74
+static inline void pmon_log_event(36,832
+#define pmon_log_event(64,1487
+
+../next/pmon_targets.h,0
+
+../next/bmap.h,0
+
+../next/ast.h,86
+#define	ast_context(32,713
+#define ast_needed(56,1202
+#define ast_propagate(45,990
+
+../next/us_timer.h,0
+
+../next/malloc_debug.h,0
+
+../next/nextdbg.h,0
+
+../next/loadable_fs.h,0
+
+../next/fptrace.h,0
+
+../nextdev/monreg.h,94
+#define	MON_DEV_ADRS(66,1358
+#define	MON_SNDIN_CTRL(55,1045
+#define	MON_SNDOUT_CTRL(54,996
+
+../nextdev/snd_dsp.h,51
+#define mode_size(222,7327
+#define spldsp(30,650
+
+../nextdev/snd_msgs.h,51
+	int		regs);		// DSP host I/F registers 591,16760
+
+../nextdev/dma.h,174
+#define	DMA_ALIGN(36,965
+#define	DMA_BEGINALIGNED(43,1189
+#define	DMA_ENDALIGN(40,1078
+#define	DMA_ENDALIGNED(44,1267
+#define	DMA_W(95,3159
+#define	dma_enable(210,7472
+
+../nextdev/snd_var.h,25
+#define splsound(22,387
+
+../nextdev/odvar.h,0
+
+../nextdev/screg.h,72
+#define	S5RCLKCONV_FACTOR(119,4128
+#define	S5RSELECT_TIMEOUT(129,4428
+
+../nextdev/scvar.h,0
+
+../nextdev/sgvar.h,75
+#define	SG_DEVT(47,1317
+#define	SG_PART(43,1203
+#define	SG_UNIT(42,1163
+
+../nextdev/ev_vars.h,200
+#define EVASSERT(61,1604
+#define EVCLEARSEMA(133,4168
+#define EVCLEARSEMA(141,4375
+#define EVSETSEMA(129,4029
+#define EVSETSEMA(140,4335
+#define EventsInQueue(121,3779
+#define PtInRect(63,1677
+
+../nextdev/evio.h,0
+
+../nextdev/kmreg.h,113
+#define	KM_POLL(78,2490
+#define	KM_READ_VERS(77,2433
+#define	KM_SET_ADRS(76,2377
+#define	KM_SET_LEDS(79,2543
+
+../nextdev/npio.h,0
+
+../nextdev/npreg.h,87
+#define	GP_BITS_IN(86,2573
+#define	GP_BITS_MASK(88,2660
+#define	GP_BITS_OUT(87,2614
+
+../nextdev/scsireg.h,0
+
+../nextdev/video.h,0
+
+../nextdev/snd_dspreg.h,0
+
+../nextdev/scsivar.h,465
+#define	SCSI_LUN(165,6138
+#define	SCSI_OPGROUP(306,10287
+#define	SCSI_SLAVE(166,6179
+#define	SCSI_TARGET(164,6088
+#define XCDBG(341,11247
+#define XDBG(338,11187
+#define XDBG(351,11455
+#define XNDBG(344,11320
+#define XNDBG(353,11488
+#define	XPR_scsi(337,11150
+#define XSDBG(347,11382
+#define	scsi_expectintr(202,7222
+#define	scsi_expectreselect(214,7457
+#define	scsi_gotintr(209,7375
+#define	scsi_gotreselect(221,7613
+#define	scsi_rejectcmd(242,8205
+
+../nextdev/ohlfs12.h,0
+
+../nextdev/sdvar.h,80
+#define	SD_DEVT(200,7422
+#define	SD_PART(195,7307
+#define	SD_VOLUME(194,7265
+
+../nextdev/stvar.h,80
+#define ST_EXABYTE(77,2660
+#define ST_RETURN(75,2567
+#define	ST_UNIT(74,2527
+
+../nextdev/event.h,31
+#define EventCodeMask(73,2702
+
+../nextdev/td.h,21
+#define LOOP32(6,91
+
+../nextdev/zscom.h,0
+
+../nextdev/canon.h,0
+
+../nextdev/odreg.h,0
+
+../nextdev/busvar.h,27
+#define ipltospl(162,5367
+
+../nextdev/disk.h,0
+
+../nextdev/nbicreg.h,0
+
+../nextdev/slot.h,0
+
+../nextdev/snd_snd.h,0
+
+../nextdev/zsreg.h,279
+#define	ZSFLOWCTL(353,11816
+#define	ZSHARDCAR(354,11872
+#define	ZSOUTWARD(355,11925
+#define	ZSREAD(298,10450
+#define	ZSREAD_A(266,9920
+#define	ZSREAD_B(274,10052
+#define	ZSUNIT(352,11767
+#define	ZSWRITE(306,10588
+#define	ZSWRITE_A(282,10184
+#define	ZSWRITE_B(290,10317
+
+../nextdev/evsio.h,0
+
+../nextdev/keycodes.h,0
+
+../nextdev/sf_access.h,52
+#define	XPR_SFA(102,3193
+#define XPR_SFA(107,3312
+
+../nextdev/insertmsg.h,0
+
+../nextdev/fd_extern.h,0
+
+../nextdev/fd_reg.h,0
+
+../nextdev/fd_vars.h,427
+#define	FD_DEVT(323,10176
+#define	FD_PART(322,10135
+#define	FD_SECTALIGN(588,17839
+#define	FD_VOLUME(321,10093
+#define VALID_DRIVE(198,6410
+#define XADDBG(567,17460
+#define XCDBG(561,17333
+#define XDBG(558,17276
+#define XDBG(577,17652
+#define XIODBG(573,17583
+#define XPDBG(564,17403
+#define XPDBG(579,17685
+#define	XPRFD(557,17244
+#define XTBDBG(570,17520
+#define XTBDBG(581,17720
+#define ts_greater(397,12232
+
+../nextdev/ldd.h,65
+int physio(35,750
+void timeout(55,1381
+void untimeout(54,1340
+
+../nextdev/voldev.h,0
+
+../nextdev/km_pcode.h,651
+#define BRANCH_DEST(126,4664
+#define FIELD1(93,3383
+#define FIELD2(94,3438
+#define FIELD3(95,3493
+#define IMMEDIATE_FOLLOWS_OPCODE(85,3064
+#define KM_ABS_ADDR(29,915
+#define KM_ABS_ADDR(32,1029
+#define KM_BYTE_LANE_ID(18,532
+#define KM_CONVERT_ADDR(25,790
+#define KM_READ_SLOT_BYTE(15,405
+#define KM_SLOT_ID_REG(8,162
+#define OPCODE(84,3008
+#define REG1(109,4048
+#define REG2(110,4099
+#define REG3(111,4150
+#define SET_BRANCH_DEST(129,4767
+#define SET_FIELD1(98,3616
+#define SET_FIELD2(101,3735
+#define SET_FIELD3(104,3854
+#define SET_OPCODE(88,3190
+#define SET_REG1(114,4254
+#define SET_REG2(117,4369
+#define SET_REG3(120,4484
+
+../nextif/if_bus.h,46
+#define dh2end(18,426
+#define	end2dh(17,380
+
+../nextif/if_enreg.h,0
+
+../net/if.h,196
+#define	IF_ADJ(153,5244
+#define	IF_DEQUEUE(173,5687
+#define	IF_DEQUEUEIF(162,5433
+#define	IF_DROP(130,4569
+#define	IF_ENQUEUE(131,4612
+#define	IF_PREPEND(140,4803
+#define	IF_QFULL(129,4508
+
+../net/raw_cb.h,27
+#define	sotorawcb(57,1867
+
+../net/if_arp.h,0
+
+../net/route.h,78
+#define	RTFREE(74,2516
+#define RTHASHMOD(86,2720
+#define RTHASHMOD(88,2771
+
+../net/netisr.h,84
+#define	schednetisr(61,1796
+#define	setsoftnet(32,891
+#define	setsoftnet(46,1322
+
+../net/af.h,0
+
+../net/dli_var.h,0
+
+../net/etherdefs.h,0
+
+../net/netbuf.h,0
+
+../net/netif.h,0
+
+../netimp/if_imp.h,0
+
+../netimp/if_imphost.h,82
+#define	HOSTHASH(80,2889
+#define	HOST_DEQUE(99,3361
+#define	HOST_ENQUE(89,3145
+
+../netinet/icmp_var.h,0
+
+../netinet/if_ether.h,0
+
+../netinet/in_pcb.h,27
+#define	sotoinpcb(40,1474
+
+../netinet/in.h,438
+#define	IN_BADCLASS(152,4159
+#define	IN_CLASSA(131,3460
+#define	IN_CLASSB(137,3639
+#define	IN_CLASSC(143,3829
+#define	IN_CLASSD(148,3989
+#define	IN_EXPERIMENTAL(151,4091
+#define	IN_MULTICAST(149,4052
+#define IN_SET_LOOPBACK_ADDR(166,4572
+#define	htonl(193,5226
+#define htonl(200,5524
+#define	htons(194,5247
+#define htons(201,5550
+#define	ntohl(191,5184
+#define ntohl(197,5361
+#define	ntohs(192,5205
+#define ntohs(199,5469
+
+../netinet/ip.h,89
+#define	IPOPT_CLASS(83,2578
+#define	IPOPT_COPIED(82,2542
+#define	IPOPT_NUMBER(84,2613
+
+../netinet/ip_var.h,0
+
+../netinet/in_systm.h,0
+
+../netinet/in_var.h,24
+#define	IA_SIN(39,1482
+
+../netinet/ip_icmp.h,61
+#define	ICMP_ADVLEN(74,2275
+#define	ICMP_INFOTYPE(108,3745
+
+../netinet/udp.h,0
+
+../netinet/udp_var.h,0
+
+../netinet/pcbheadsw.h,0
+
+../netinet/tcp.h,0
+
+../netinet/tcp_debug.h,0
+
+../netinet/tcp_fsm.h,68
+#define	TCPS_HAVERCVDFIN(38,1531
+#define	TCPS_HAVERCVDSYN(37,1476
+
+../netinet/tcp_seq.h,159
+#define	SEQ_GEQ(23,830
+#define	SEQ_GT(22,789
+#define	SEQ_LEQ(21,746
+#define	SEQ_LT(20,705
+#define	tcp_rcvseqinit(30,1001
+#define	tcp_sendseqinit(33,1078
+
+../netinet/tcp_timer.h,31
+#define	TCPT_RANGESET(94,4011
+
+../netinet/tcp_var.h,56
+#define	intotcpcb(145,5038
+#define	sototcpcb(146,5093
+
+../netinet/tcpip.h,0
+
+../netns/idp.h,0
+
+../netns/idp_var.h,0
+
+../netns/ns.h,201
+#define ns_hosteq(111,2761
+#define ns_hosteqnh(109,2632
+#define ns_neteq(107,2511
+#define ns_neteqnn(105,2417
+#define ns_netof(103,2341
+#define ns_nullhost(112,2821
+#define satons_addr(108,2566
+
+../netns/ns_error.h,0
+
+../netns/ns_if.h,24
+#define	IA_SNS(38,1281
+
+../netns/ns_pcb.h,27
+#define	sotonspcb(47,1632
+
+../netns/sp.h,0
+
+../netns/spidp.h,19
+#define SI(27,813
+
+../netns/spp_debug.h,0
+
+../netns/spp_timer.h,31
+#define	SPPT_RANGESET(91,3747
+
+../netns/spp_var.h,266
+#define	SSEQ_GEQ(185,7265
+#define	SSEQ_GEQ(190,7469
+#define	SSEQ_GT(184,7209
+#define	SSEQ_GT(189,7423
+#define	SSEQ_LEQ(183,7151
+#define	SSEQ_LEQ(188,7375
+#define	SSEQ_LT(182,7095
+#define	SSEQ_LT(187,7329
+#define	nstosppcb(90,3689
+#define	sotosppcb(91,3743
+
+../rpc/svc.h,369
+#define SVC_DESTROY(105,3300
+#define SVC_FREEARGS(100,3095
+#define SVC_GETARGS(90,2733
+#define SVC_RECV(80,2453
+#define SVC_REPLY(95,2936
+#define SVC_STAT(85,2606
+#define svc_destroy(107,3368
+#define svc_freeargs(102,3197
+#define svc_getargs(92,2834
+#define svc_getcaller(70,2272
+#define svc_recv(82,2529
+#define svc_reply(97,3015
+#define svc_stat(87,2669
+
+../rpc/types.h,102
+#define mem_alloc(28,478
+#define mem_alloc(32,586
+#define mem_free(29,517
+#define mem_free(33,640
+
+../rpc/pmap_rmt.h,0
+
+../rpc/pmap_prot.h,0
+
+../rpc/auth.h,311
+#define AUTH_DESTROY(109,2677
+#define AUTH_MARSHALL(94,2184
+#define AUTH_NEXTVERF(89,2035
+#define AUTH_REFRESH(104,2532
+#define AUTH_VALIDATE(99,2353
+#define auth_destroy(111,2749
+#define auth_marshall(96,2268
+#define auth_nextverf(91,2109
+#define auth_refresh(106,2604
+#define auth_validate(101,2442
+
+../rpc/auth_unix.h,0
+
+../rpc/clnt.h,360
+#define	CLNT_ABORT(141,3570
+#define	CLNT_CALL(131,3255
+#define	CLNT_CONTROL(170,4256
+#define	CLNT_DESTROY(190,4883
+#define	CLNT_FREERES(160,3982
+#define	CLNT_GETERR(149,3742
+#define	clnt_abort(142,3625
+#define	clnt_call(133,3387
+#define	clnt_control(171,4327
+#define	clnt_destroy(191,4942
+#define	clnt_freeres(161,4061
+#define	clnt_geterr(150,3810
+
+../rpc/pmap_clnt.h,0
+
+../rpc/rpc.h,0
+
+../rpc/rpc_msg.h,0
+
+../rpc/svc_auth.h,0
+
+../rpc/xdr.h,897
+#define IXDR_GET_BOOL(179,6044
+#define IXDR_GET_ENUM(180,6101
+#define IXDR_GET_LONG(176,5916
+#define IXDR_GET_SHORT(182,6215
+#define IXDR_GET_U_LONG(181,6156
+#define IXDR_GET_U_SHORT(183,6272
+#define IXDR_PUT_BOOL(185,6334
+#define IXDR_PUT_ENUM(186,6399
+#define IXDR_PUT_LONG(177,5976
+#define IXDR_PUT_SHORT(188,6531
+#define IXDR_PUT_U_LONG(187,6464
+#define IXDR_PUT_U_SHORT(189,6597
+#define RNDUP(59,1862
+#define	XDR_DESTROY(141,4650
+#define XDR_GETBYTES(116,3857
+#define XDR_GETLONG(106,3539
+#define XDR_GETPOS(126,4215
+#define	XDR_INLINE(136,4501
+#define XDR_PUTBYTES(121,4036
+#define XDR_PUTLONG(111,3698
+#define XDR_SETPOS(131,4348
+#define	xdr_destroy(143,4716
+#define xdr_getbytes(118,3946
+#define xdr_getlong(108,3618
+#define xdr_getpos(128,4281
+#define	xdr_inline(138,4575
+#define xdr_putbytes(123,4125
+#define xdr_putlong(113,3777
+#define xdr_setpos(133,4424
+
+../rpc/auth_des.h,0
+
+../rpc/key_prot.h,0
+
+../specfs/fifo.h,0
+
+../specfs/fifonode.h,146
+#define FIFOLOCK(48,1535
+#define FIFOMARK(47,1493
+#define FIFOUNLOCK(49,1573
+#define FTOS(43,1409
+#define FTOV(42,1367
+#define VTOF(41,1309
+
+../specfs/snode.h,123
+#define SNLOCK(70,2421
+#define SNUNLOCK(78,2583
+#define	STABLEHASH(110,3314
+#define	STOV(64,2338
+#define	VTOS(63,2288
+
+../sys/disktab.h,0
+
+../sys/msgbuf.h,0
+
+../sys/dnlc.h,151
+#define	INS_HASH(42,1177
+#define	INS_LRU(45,1255
+#define	NC_HASH(36,997
+#define	NULL_HASH(48,1391
+#define	RM_HASH(43,1220
+#define	RM_LRU(46,1338
+
+../sys/pathname.h,176
+#define pn_copy(31,1056
+#define pn_getpath(30,1014
+#define pn_pathleft(29,969
+#define	pn_peekchar(28,902
+#define pn_peekcomponent(25,755
+#define pn_stripcomponent(26,827
+
+../sys/message.h,177
+#define MSG_TYPE_PORT_ANY(230,7035
+#define MSG_TYPE_PORT_ANY(234,7218
+#define MSG_TYPE_PORT_ANY(237,7348
+#define msg_return_rcv(345,10624
+#define msg_return_send(327,10027
+
+../sys/boolean.h,0
+
+../sys/kern_return.h,0
+
+../sys/vnode.h,1046
+#define MFTOVT(242,8091
+#define VN_CMP(226,7580
+#define VN_HOLD(202,7107
+#define VN_INIT(210,7197
+#define VN_RELE(206,7154
+#define VOP_ACCESS(114,3374
+#define VOP_BMAP(132,4401
+#define VOP_BREAD(133,4472
+#define VOP_BRELSE(134,4537
+#define VOP_CLOSE(108,2977
+#define VOP_CMP(137,4733
+#define VOP_CREATE(116,3515
+#define VOP_DUMP(136,4657
+#define VOP_FID(135,4596
+#define VOP_FSYNC(128,4197
+#define VOP_GETATTR(112,3244
+#define VOP_INACTIVE(129,4253
+#define VOP_IOCTL(110,3114
+#define VOP_LINK(119,3671
+#define VOP_LOCKCTL(130,4314
+#define VOP_LOOKUP(115,3435
+#define VOP_MKDIR(122,3833
+#define	VOP_NLINKS(142,5047
+#define VOP_OPEN(107,2912
+#define	VOP_PAGEIN(140,4919
+#define	VOP_PAGEOUT(141,4980
+#define VOP_RDWR(109,3042
+#define VOP_READDIR(124,3968
+#define VOP_READLINK(127,4126
+#define VOP_REALVP(138,4793
+#define VOP_REMOVE(118,3608
+#define VOP_RENAME(120,3744
+#define VOP_RMDIR(123,3907
+#define VOP_SELECT(111,3183
+#define VOP_SETATTR(113,3309
+#define VOP_STRATEGY(139,4856
+#define VOP_SYMLINK(125,4037
+
+../sys/notify.h,0
+
+../sys/port.h,0
+
+../sys/bkmac.h,24
+#define BKINPUT(43,948
+
+../sys/mig_errors.h,0
+
+../sys/reboot.h,0
+
+../sys/buf.h,220
+#define	BUFHASH(96,3461
+#define	binshash(161,6050
+#define	binsheadfree(175,6354
+#define	binstailfree(181,6507
+#define	bremfree(171,6241
+#define	bremhash(157,5943
+#define	clrbuf(205,6965
+#define	notavail(192,6761
+
+../sys/clist.h,0
+
+../sys/dkbad.h,0
+
+../sys/domain.h,0
+
+../sys/gprof.h,52
+#define ROUNDDOWN(86,2144
+#define ROUNDUP(87,2183
+
+../sys/thread_info.h,0
+
+../sys/mman.h,0
+
+../sys/quota.h,0
+
+../sys/task_special_ports.h,316
+#define task_get_bootstrap_port(68,1995
+#define task_get_exception_port(62,1775
+#define task_get_kernel_port(50,1359
+#define task_get_notify_port(56,1567
+#define task_set_bootstrap_port(71,2105
+#define task_set_exception_port(65,1885
+#define task_set_kernel_port(53,1463
+#define task_set_notify_port(59,1671
+
+../sys/thread_special_ports.h,244
+#define thread_get_exception_port(61,1774
+#define thread_get_kernel_port(49,1322
+#define thread_get_reply_port(55,1550
+#define thread_set_exception_port(64,1894
+#define thread_set_kernel_port(52,1436
+#define thread_set_reply_port(58,1662
+
+../sys/timeb.h,0
+
+../sys/times.h,0
+
+../sys/ttydev.h,0
+
+../sys/un.h,0
+
+../sys/vadvise.h,0
+
+../sys/vlimit.h,0
+
+../sys/vm.h,0
+
+../sys/dir.h,110
+#define DIRSIZ(111,4111
+#define rewinddir(142,4779
+#define rewinddir(151,5116
+extern	int scandir(144,4856
+
+../sys/vmmeter.h,0
+
+../sys/vmparam.h,0
+
+../sys/vmsystm.h,0
+
+../sys/syslog.h,52
+#define LOG_MASK(77,2527
+#define LOG_UPTO(78,2591
+
+../sys/callout.h,31
+decl_simple_lock_data(50,1191
+
+../sys/machine.h,0
+
+../sys/metalink.h,0
+
+../sys/mtio.h,0
+
+../sys/param.h,564
+#define	CHECK_SIGNALS(136,3602
+#define	ISSIG(128,3331
+#define	MAX(263,7738
+#define	MIN(260,7678
+#define SHOULDissig(117,2944
+#define _bit_clear(252,7522
+#define _bit_set(251,7486
+#define _bit_tst(253,7558
+#define	bdbtofsb(226,6528
+#define	btodb(215,6138
+#define	claligned(162,4433
+#define	clbase(167,4556
+#define	clbase(171,4659
+#define	clrbit(246,7227
+#define	clrnd(168,4578
+#define	clrnd(173,4750
+#define	dbtob(217,6236
+#define	howmany(270,7847
+#define	isclr(248,7368
+#define	isset(247,7299
+#define	roundup(272,7896
+#define	setbit(245,7158
+
+../sys/errno.h,0
+
+../sys/ioctl.h,120
+#define		UIOCCMD(269,10222
+#define	_IO(126,3509
+#define	_IOR(127,3546
+#define	_IOW(128,3616
+#define	_IOWR(130,3739
+
+../sys/loader.h,0
+
+../sys/ux_exception.h,31
+decl_simple_lock_data(59,1394
+
+../sys/file.h,45
+#define	GETF(97,2434
+#define	GETF(104,2588
+
+../sys/acct.h,22
+#define	acct(50,1418
+
+../sys/dk.h,0
+
+../sys/features.h,0
+
+../sys/proc.h,266
+#define PIDHASH(437,15418
+#define sig_lock(402,14558
+#define sig_lock_or_return(367,13631
+#define sig_lock_simple(404,14618
+#define sig_lock_to_exit(426,15161
+#define sig_lock_to_wait(408,14726
+#define sig_unlock(406,14673
+#define sig_wait_to_lock(414,14848
+
+../sys/fcntl.h,0
+
+../sys/exception.h,0
+
+../sys/kernel.h,0
+
+../sys/mach_extra.h,0
+
+../sys/mbuf.h,265
+#define	MCLALLOC(178,5938
+#define	MCLFREE(198,6486
+#define	MCLGET(188,6277
+#define	MFREE(202,6612
+#define	MGET(160,5322
+#define	MTOCL(186,6213
+#define	M_HASCL(185,6172
+#define	cltom(64,1944
+#define	dtom(68,2100
+#define	mtocl(65,2011
+#define	mtod(71,2188
+
+../sys/stat.h,48
+#define	btosb(111,2713
+#define sbtob(113,2811
+
+../sys/mount.h,0
+
+../sys/msg_type.h,0
+
+../sys/protosw.h,0
+
+../sys/ptrace.h,0
+
+../sys/resource.h,0
+
+../sys/signal.h,109
+#define sigmask(140,4398
+int	(*signal(68,2648
+extern int (*signal(129,4161
+extern void (*signal(131,4207
+
+../sys/socket.h,0
+
+../sys/socketvar.h,278
+#define sballoc(145,5167
+#define sbfree(154,5407
+#define sblock(163,5623
+#define sbspace(120,4380
+#define sbunlock(173,5876
+#define soreadable(129,4666
+#define sorwakeup(184,6127
+#define sosendallatonce(125,4551
+#define sowriteable(134,4833
+#define sowwakeup(185,6179
+
+../sys/systm.h,50
+#define	insque(109,3161
+#define	remque(110,3212
+
+../sys/table.h,0
+
+../sys/task_info.h,0
+
+../sys/thread_status.h,0
+
+../sys/host_info.h,0
+
+../sys/time.h,82
+#define timerclear(75,2180
+#define timercmp(72,2036
+#define timerisset(71,1977
+
+../sys/time_stamp.h,0
+
+../sys/time_value.h,69
+#define time_value_add(57,1325
+#define time_value_add_usec(49,1122
+
+../sys/trace.h,71
+#define pack(146,4577
+#define trace(147,4609
+#define trace(149,4675
+
+../sys/tty.h,77
+#define	TTHIWAT(109,3097
+#define	TTLOWAT(110,3148
+#define	TTYHOG(111,3199
+
+../sys/ttychars.h,22
+#define	CTRL(43,1237
+
+../sys/types.h,200
+#define	FD_CLR(151,4324
+#define	FD_ISSET(152,4401
+#define	FD_SET(150,4248
+#define FD_ZERO(153,4478
+#define	howmany(143,4114
+#define	major(68,2299
+#define	makedev(74,2442
+#define	minor(71,2379
+
+../sys/uio.h,0
+
+../sys/unpcb.h,27
+#define sotounpcb(79,2649
+
+../sys/user.h,0
+
+../sys/vfs.h,279
+#define VFS_INIT(151,5077
+#define VFS_MOUNT(99,3098
+#define VFS_MOUNTROOT(106,3528
+#define VFS_ROOT(102,3252
+#define VFS_STATFS(103,3319
+#define VFS_SWAPVP(109,3633
+#define VFS_SYNC(104,3390
+#define VFS_UNMOUNT(101,3188
+#define VFS_VGET(105,3449
+#define freefid(32,694
+
+../sys/wait.h,87
+#define WIFEXITED(109,3902
+#define WIFSIGNALED(108,3829
+#define WIFSTOPPED(107,3779
+
+../sys/conf.h,0
+
+../sys/version.h,0
+
+../sys/bootconf.h,0
+
+../sys/dirent.h,27
+#define DIRENTSIZ(42,1394
+
+../sys/vfs_stat.h,56
+#define	VFS_RECORD(77,1595
+#define	VFS_RECORD(82,1745
+
+../sys/ucred.h,23
+#define	crhold(29,596
+
+../sys/malloc.h,0
+
+../sys/processor_info.h,0
+
+../sys/netport.h,0
+
+../sys/policy.h,31
+#define invalid_policy(47,997
+
+../sys/printf.h,12
+int 28,629
+
+../sys/thread_switch.h,36
+#define valid_switch_option(36,743
+
+../sys/linedisc.h,34
+extern int tty_ld_install(40,764
+
+../sys/disksort.h,88
+static inline void disksort_qbusy(106,2653
+static inline void disksort_qidle(110,2724
+
+../krpc/lockmgr.h,0
+
+../nfs/nfs_mount.h,0
+
+../nfs/export.h,0
+
+../nfs/nfs.h,161
+#define NA_ISFIFO(84,2390
+#define NA_SETFIFO(88,2525
+#define	geterrno(56,1659
+#define n2v_rdev(175,4841
+#define n2v_type(174,4769
+#define	puterrno(55,1612
+
+../nfs/nfs_clnt.h,164
+#define	CACHE_VALID(91,2841
+#define	PURGE_ATTRCACHE(76,2480
+#define PURGE_STALE_FH(84,2649
+#define	vftomi(23,496
+#define	vtoblksz(33,704
+#define	vtomi(28,595
+
+../nfs/rnode.h,161
+#define	RLOCK(68,2095
+#define	RLOCK(79,2369
+#define	RUNLOCK(91,2648
+#define	rtofh(62,2016
+#define	rtov(59,1894
+#define	vtofh(61,1978
+#define	vtor(60,1928
+
+../nfs/nfs_meas.h,0
+
+../ufs/inode.h,355
+#define IFTOVT(253,8522
+#define	ILOCK(262,8693
+#define IMARK(289,9195
+#define IMARK(303,9492
+#define ITIMES(324,9970
+#define ITOV(246,8357
+#define	IUNLOCK(270,8847
+#define IUPDAT(278,8992
+#define MAKEIMODE(256,8615
+#define OWNER(355,11034
+#define VTOI(245,8309
+#define VTTOIF(254,8573
+#define	idecr_chk(350,10868
+#define	iincr_chk(349,10791
+
+../ufs/mount.h,24
+#define VFSTOM(56,1904
+
+../ufs/fs.h,1133
+#define	FS_FHIWAT(410,16327
+#define	FS_FLOWAT(409,16262
+#define	FS_IHIWAT(412,16455
+#define	FS_ILOWAT(411,16393
+#define	INOPB(460,17816
+#define	INOPF(461,17851
+#define	MAXBPG(321,12949
+#define	NINDIR(466,17977
+#define	NSPB(454,17657
+#define	NSPF(455,17712
+#define blkmap(366,14558
+#define blknum(396,15936
+#define blkoff(378,15010
+#define blkroundup(386,15381
+#define blksize(442,17212
+#define blkstofrags(392,15739
+#define cbtocylno(368,14670
+#define cbtorpos(370,14737
+#define	cgbase(335,13403
+#define	cgdmin(341,13767
+#define	cgimin(340,13694
+#define	cgsblock(338,13548
+#define cgstart(336,13457
+#define	cgtod(339,13623
+#define dblksize(446,17391
+#define	dbtofsb(329,13214
+#define	dtog(359,14354
+#define	dtogd(360,14395
+#define fragnum(394,15841
+#define fragoff(380,15102
+#define fragroundup(388,15507
+#define fragstoblks(390,15634
+#define freefrags(424,16719
+#define freeinodes(417,16580
+#define freespace(435,16977
+#define fs_cs(276,11099
+#define fsbtodb(328,13165
+#define	itod(351,14109
+#define	itog(350,14068
+#define	itoo(349,14030
+#define lblkno(382,15194
+#define numfrags(384,15287
+
+../ufs/fsdir.h,24
+#define DIRSIZ(61,2538
+
+../ufs/quotas.h,75
+#define DQLOCK(110,3883
+#define DQUNLOCK(118,4064
+#define dqoff(58,1910

@@ -1,0 +1,44 @@
+#! /bin/csh -f
+
+set prog=$0
+set prog=$prog:t
+set dirs=(.)
+
+while ($#argv > 0)
+    if ("$argv[1]" !~ -*) break
+    switch ("$argv[1]")
+    case "-r":
+    case "-retry":
+	set retry
+	breaksw
+    default:
+	echo "${prog}: unknown switch $argv[1]"
+	exit
+    endsw
+    shift
+end
+
+if ($#argv != 1) then
+    echo "Usage: $prog <system-abbr>"
+    exit 1
+endif
+
+set sys=$1
+set update=.${sys}update
+
+cd
+if (! $?retry) then
+    tar cvf $sys.tar .empty `find $dirs -newer $update -type f ! -name "*.[ao]" ! -name "*.bak" ! -name "LOG*" ! -name "*.tar" -print`
+endif
+
+ls -l $sys.tar
+ftp $sys -log newsys -type l -stor $sys.tar $sys.tar <~/.${sys}_passwd
+
+echo -n "OK to update $update?  [ no ]  "
+set ans="$<"
+if ("$ans" =~ [Yy] || "$ans" =~ [Yy][Ee][Ss]) then
+    touch $update
+    ls -l $update
+endif
+
+rm -i $sys.tar

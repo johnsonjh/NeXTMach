@@ -1,0 +1,11 @@
+# Associate ports with proc/arg
+
+CALL		mythread_init		0
+CALL		mythread_fork		0
+
+# Start up immediately
+WIRE
+START
+
+
+

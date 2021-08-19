@@ -1,0 +1,97 @@
+*
+*	x_fline.sa 1.4 10/1/90
+*
+*	fpsp_fline --- FPSP handler for fline exception
+*
+*	First determine if the exception is one of the unimplemented
+*	floating point instructions.  If so, let fpsp_unimp handle it.
+*	Next, determine if the instruction is an fmovecr with a non-zero
+*	<ea> field.  If so, handle here and return.  Otherwise, it
+*	must be a real F-line exception.
+*
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+X_FLINE	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+	xref	real_fline
+	xref	fpsp_unimp
+	xref	uni_2
+	xref	mem_read
+
+	xdef	fpsp_fline
+fpsp_fline:
+*
+*	check for unimplemented vector first.  Use EXC_VEC-4 because
+*	the equate is valid only after a 'link a6' has pushed one more
+*	long onto the stack.
+*
+	cmp.w	#UNIMP_VEC,EXC_VEC-4(a7)
+	beq	fpsp_unimp
+
+*
+*	fmovecr with non-zero <ea> handling here
+*
+	sub.l	#4,a7		;4 accounts for 2-word difference between
+*				;six word frame (unimp) and four word frame
+	link	a6,#-LOCAL_SIZE
+	movem.l	d0-d1,USER_D0(a6)
+	movem.l	a0-a1,USER_A0(a6)
+	movea.l	EXC_PC+4(a6),a0	;get address of fline instruction
+	lea.l	L_SCR1(a6),a1	;use L_SCR1 as scratch
+	move.l	#4,d0
+	bsr	mem_read
+	move.l	L_SCR1(a6),d0	;d0 now contains the fline and command word
+	bfextu	d0{4:3},d1	;extract coprocessor id
+	cmpi.b	#1,d1		;check if cpid=1
+	bne.w	not_mvcr	;exit if not
+	bfextu	d0{16:6},d1
+	cmpi.b	#$17,d1		;check if it is an FMOVECR encoding
+	bne.w	not_mvcr	
+*				;if an FMOVECR instruction, fix stack and go
+*				;to FPSP_UNIMP
+fix_stack:
+	sub.l	#UNIMP_SIZE,a7	;emulate an fsave
+	move.l	#UNIMP_FMT,(a7)	;put in unimp format
+
+	move.w	EXC_SR+4(a6),EXC_SR(a6) ;move stacked sr to new position
+
+	move.l	EXC_PC+4(a6),EXC_PC(a6) ;move stacked pc to new position
+
+	fmove.l	EXC_PC(a6),FPIAR	;point FPIAR to fline instruction
+
+	move.l	#4,d1
+	add.l	d1,EXC_PC(a6)	;increment stacked pc value to next instruction
+
+	move.w	#$202c,EXC_VEC(a6) ;make vector look like an unimp vector
+
+	clr.l	EXC_EA(a6)	;clear the EXC_EA field
+
+	move.w	d0,CMDREG1B(a6) ;move the lower word into CMDREG1B
+
+	clr.l	E_BYTE(a6)
+	bset.b	#UFLAG,T_BYTE(a6)
+
+	movem.l	USER_D0(a6),d0-d1	;restore data registers
+	movem.l	USER_A0(a6),a0-a1	;restore address registers
+	bra	uni_2
+	
+
+
+not_mvcr:
+	movem.l	USER_D0(a6),d0-d1 ;restore data registers
+	movem.l	USER_A0(a6),a0-a1 ;restore address registers
+	unlk	a6
+	add.l	#4,a7
+
+	bra	real_fline
+	end

@@ -1,0 +1,79 @@
+OPTIONS/show_space	optional show_space
+OPTIONS/eventmeter	optional eventmeter
+OPTIONS/gdb		optional gdb
+OPTIONS/mallocdebug	optional mallocdebug
+next/autoconf.c		standard
+next/checksum_16.c	standard
+next/clock.c		standard device-driver
+next/clockmmap.c	standard
+next/conf.c		standard
+next/cons.c		standard
+next/dkbad.c		standard
+next/event_meter.c	standard
+next/in_cksum.c		optional inet
+next/ipl_meas.c		optional iplmeas
+next/kernel_pmon.c	optional debug
+next/kern_machdep.c	standard
+next/libc.s		standard
+next/machargs.c		standard
+next/machdep.c		standard
+next/malloc_debug.c	optional mallocdebug
+next/mem.c		standard
+next/next_exception.c	standard
+next/next_init.c	standard
+next/next_table.c	standard
+next/nextdbg.c		optional gdb
+next/nextdbgasm.s	optional gdb
+next/pcb.c		standard
+next/pmap.c		standard
+next/shutdown.c		standard
+next/sys_machdep.c	standard
+next/trap.c		standard
+next/ufs_machdep.c	standard
+next/us_timer.c		standard device-driver
+next/vm_machdep.c	standard
+nextdev/bus.c		standard device-driver
+nextdev/dma.c		standard
+nextdev/ev.c		optional ev device-driver
+nextdev/ev_cursor.c	optional ev device-driver
+nextdev/ev_ioctl.c	optional ev device-driver
+nextdev/ev_kbd.c	optional ev device-driver
+nextdev/ev_mouse.c	optional ev device-driver
+nextdev/fd_cmds.c	optional fd device-driver
+nextdev/fd_driver.c	optional fd device-driver
+nextdev/fd_global.c	optional fd device-driver
+nextdev/fd_io.c		optional fd device-driver
+nextdev/fd_subr.c	optional fd device-driver
+nextdev/km.c		optional km device-driver
+nextdev/ldd.c		optional ldd device-driver
+nextdev/monitor.s	standard
+nextdev/nbic.c		standard
+nextdev/np.c		optional np device-driver
+nextdev/od.c		optional od device-driver
+nextdev/rd.c		optional rd device-driver
+nextdev/sc.c		optional sc device-driver
+nextdev/scsi.c		optional sc sd device-driver
+nextdev/scsiconf.c	optional sc sd device-driver
+nextdev/sd.c		optional sd device-driver
+nextdev/sf_access.c	standard device-driver
+nextdev/sg.c		optional sg device-driver
+nextdev/st.c		optional st device-driver
+nextdev/snd_device.c	optional dsp device-driver
+nextdev/snd_dspcmd.c	optional dsp
+nextdev/snd_dspdev.c	optional dsp device-driver
+nextdev/snd_dspqueue.c	optional dsp device-driver
+nextdev/snd_link.c	optional dsp sound
+nextdev/snd_rcv.c	optional sound
+nextdev/snd_reply.c	optional sound
+nextdev/snd_server.c	optional sound
+nextdev/snd_stream.c	optional sound
+nextdev/snd_unix.c	optional sound device-driver
+nextdev/video.c		standard device-driver
+nextdev/vol.c		optional vol
+nextdev/zs.c		optional zs device-driver
+nextdev/zscom.c		optional zs device-driver
+nextif/if_bus.c		optional inet
+nextif/if_bus.c		optional ns
+nextif/if_en.c		optional en device-driver
+nextif/in_bootp.c	optional inet
+fpsp/fpsp.o		standard

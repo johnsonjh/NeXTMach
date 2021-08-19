@@ -1,0 +1,5 @@
+#
+foreach i ($*)
+	rcs -l RCS/$i,v
+	chmod u+w $i
+end

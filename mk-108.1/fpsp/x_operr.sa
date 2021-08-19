@@ -1,0 +1,293 @@
+*
+*	x_operr.sa 1.15 10/9/90
+*
+*	fpsp_operr --- FPSP handler for operand error exception
+*
+*	See 68040 User's Manual pp. 9-44f
+*
+* Note 1: For trap disabled 040 does the following:
+* If the dest is a fp reg, then an extended precision non_signaling
+* NAN is stored in the dest reg.  If the dest format is b, w, or l and
+* the source op is a NAN, then garbage is stored as the result (actually
+* the upper 32 bits of the mantissa are sent to the integer unit). If
+* the dest format is integer (b, w, l) and the operr is caused by
+* integer overflow, or the source op is inf, then the result stored is
+* garbage.
+* There are three cases in which operr is incorrectly signaled on the 
+* 040.  This occurs for move_out of format b, w, or l for the largest 
+* negative integer (-2^7 for b, -2^15 for w, -2^31 for l).
+*
+*	  On opclass = 011 fmove.(b,w,l) that causes a conversion
+*	  overflow -> OPERR, the exponent in wbte (and fpte) is:
+*		byte    56 - (62 - exp)
+*		word    48 - (62 - exp)
+*		long    32 - (62 - exp)
+*
+*			where exp = (true exp) - 1
+*
+*  So, wbtemp and fptemp will contain the following on erroneoulsy
+*	  signalled operr:
+*			fpts = 1
+*			fpte = $4000  (15 bit externally)
+*		byte	fptm = $ffffffff ffffff80
+*		word	fptm = $ffffffff ffff8000
+*		long	fptm = $ffffffff 80000000
+*
+* Note 2: For trap enabled 040 does the following:
+* If the inst is move_out, then same as Note 1.
+* If the inst is not move_out, the dest is not modified.
+* The exceptional operand is not defined for integer overflow 
+* during a move_out.
+*
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+X_OPERR	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+	xref	mem_write
+	xref	real_operr
+	xref	get_fline
+	xref	fpsp_done
+
+	xdef	fpsp_operr
+fpsp_operr:
+*
+	link		a6,#-LOCAL_SIZE
+	fsave		-(a7)
+	movem.l		d0-d7,USER_D0(a6)
+	movem.l		a0-a1,USER_A0(a6)
+	fmovem.x	fp0/fp1,USER_FP0(a6)
+	fmovem.l	fpcr/fpsr/fpiar,USER_FPCR(a6)
+*
+* Check if this is an opclass 3 instruction.
+*  If so, fall through, else branch to operr_end
+*
+	btst.b	#TFLAG,T_BYTE(a6)
+	beq.b	operr_end
+
+* Handle errata #25, Rev. 1.12.  This code moves the
+* source operand from the fp regs to etemp.  This will
+* be fixed in d43b.
+
+	move.w	CMDREG1B(a6),d0	
+	bfextu	d0{22:3},d0	;isolate source register number
+	subi.l	#7,d0		;form mask for fmovem dynamic
+	neg.l	d0
+	clr.l	d1		
+	bset.l	d0,d1		;set mask in d1
+	fmovem.x d1,ETEMP(a6)	;move source to etemp slot
+*
+
+
+*
+* If the destination size is B,W,or L, the operr must be 
+* handled here.
+*
+	move.l	CMDREG1B(a6),d0
+	bfextu	d0{3:3},d0	;0=long, 4=word, 6=byte
+	cmpi.b	#0,d0		;determine size; check long
+	beq.b	operr_long
+	cmpi.b	#4,d0		;check word
+	beq.b	operr_word
+	cmpi.b	#6,d0		;check byte
+	beq.w	operr_byte
+
+*
+* The size is not B,W,or L, so the operr is handled by the 
+* kernel handler.  Set the operr bits and clean up, leaving
+* only the integer exception frame on the stack, and the 
+* fpu in the original exceptional state.
+*
+operr_end:
+	bset.b		#operr_bit,FPSR_EXCEPT(a6)
+	bset.b		#aiop_bit,FPSR_AEXCEPT(a6)
+
+	movem.l		USER_D0(a6),d0-d7
+	movem.l		USER_A0(a6),a0-a1
+	fmovem.x	USER_FP0(a6),fp0/fp1
+	fmovem.l	USER_FPCR(a6),fpcr/fpsr/fpiar
+	frestore	(a7)+
+	unlk		a6
+	bra		real_operr
+
+operr_long:
+	moveq.l	#4,d1		;write size to d1
+	move.b	STAG(a6),d0	;test stag for nan
+	andi.b	#$e0,d0		;clr all but tag
+	cmpi.b	#$60,d0		;check for nan
+	beq	operr_nan	
+	cmpi.l	#$80000000,FPTEMP_LO(a6) ;test if ls lword is special
+	bne	store_max	;if not eaual, handle real operr
+	bsr	check_upper	;check if exp and ms mant are special
+	tst.l	d0
+	bne	store_max	;if d0 is true, handle real operr
+	move.l	#$80000000,d0	;store special case result
+	bsr	operr_store
+	bra.w	not_enabled	;clean and exit
+
+operr_word:
+	moveq.l	#2,d1		;write size to d1
+	move.b	STAG(a6),d0	;test stag for nan
+	andi.b	#$e0,d0		;clr all but tag
+	cmpi.b	#$60,d0		;check for nan
+	beq.b	operr_nan	
+	cmpi.l	#$ffff8000,FPTEMP_LO(a6) ;test if ls lword is special
+	bne.b	store_max	;if not eaual, handle real operr
+	bsr	check_upper	;check if exp and ms mant are special
+	tst.l	d0
+	bne.b	store_max	;if d0 is true, handle real operr
+	move.l	#$80000000,d0	;store special case result
+	bsr	operr_store
+	bra.w	not_enabled	;clean and exit
+
+operr_byte:
+	moveq.l	#1,d1		;write size to d1
+	move.b	STAG(a6),d0	;test stag for nan
+	andi.b	#$e0,d0		;clr all but tag
+	cmpi.b	#$60,d0		;check for nan
+	beq.b	operr_nan	
+	cmpi.l	#$ffffff80,FPTEMP_LO(a6) ;test if ls lword is special
+	bne.b	store_max	;if not eaual, handle real operr
+	bsr	check_upper	;check if exp and ms mant are special
+	tst.l	d0
+	bne.b	store_max	;if d0 is true, handle real operr
+	move.l	#$80000000,d0	;store special case result
+	bsr	operr_store
+	bra.w	not_enabled	;clean and exit
+*
+* This operr condition is not of the special case.  Set operr
+* and aiop and write the portion of the nan to memory for the
+* given size.
+*
+operr_nan:
+	or.l	#opaop_mask,USER_FPSR(a6) ;set operr & aiop
+
+	move.l	ETEMP_HI(a6),d0	;output will be from upper 32 bits
+	bsr	operr_store
+	bra	end_operr
+*
+* Store_max loads the max pos or negative for the size, sets
+* the operr and aiop bits, and clears inex and ainex, incorrectly
+* set by the 040.
+*
+store_max:
+	or.l	#opaop_mask,USER_FPSR(a6) ;set operr & aiop
+	bclr.b	#inex2_bit,FPSR_EXCEPT(a6)
+	bclr.b	#ainex_bit,FPSR_AEXCEPT(a6)
+	
+	tst.l	FPTEMP_EX(a6)	;check sign
+	blt.b	load_neg
+	move.l	#$7fffffff,d0
+	bsr	operr_store
+	bra	end_operr
+load_neg:
+	move.l	#$80000000,d0
+	bsr	operr_store
+	bra	end_operr
+
+*
+* This routine stores the data in d0, for the given size in d1,
+* to memory or data register as required.  A read of the fline
+* is required to determine the destination.
+*
+operr_store:
+	move.l	d0,-(a7)	;save write data
+	bsr	get_fline	;fline returned in d0
+	move.l	d0,d2		;d2 is saved on the stack
+	bfextu	d2{26:3},d2	;isolate mode bits
+	tst.b	d2		;if mode is zero, dest is Dn
+	bne.b	dest_mem
+*
+* Destination is Dn.  Get register number from d0. Data is on
+* the stack at (a7).
+*
+	andi.l	#7,d0		;isolate register number
+	lea.l	USER_D0(a6),a0	;load ptr to data regs on stack
+	cmpi.l	#4,d1		;select move size
+	beq.b	st_long
+	cmpi.l	#2,d1
+	beq.b	st_word
+
+	move.b	(a7),(a0,d0*4)	;write byte data to Dn on stack
+	move.l	(a7)+,d0	;restore stack
+	rts
+st_word:
+	move.w	(a7),(a0,d0*4)	;write word data to Dn on stack
+	move.l	(a7)+,d0	;restore stack
+	rts
+st_long:
+	move.l	(a7),(a0,d0*4)	;write long data to Dn on stack
+	move.l	(a7)+,d0	;restore stack
+	rts
+
+
+*
+* Destination is memory.  Get <ea> from integer exception frame
+* and call mem_write.
+*
+dest_mem:
+	move.l	a7,a0		;put ptr to write data in a0
+	move.l	EXC_EA(a6),a1	;put user destination address in a1
+	move.l	d1,d0		;put size in d0
+	bsr	mem_write
+	adda.l	#4,a7		;return sp to fsave frame
+	rts
+
+*
+* Check the exponent for $c000 and the upper 32 bits of the 
+* mantissa for $ffffffff.  If both are true, return d0 clr
+* and store the lower n bits of the least lword of FPTEMP
+* to d0 for write out.  If not, it is a real operr, and set d0.
+*
+check_upper:
+	cmpi.w	#$c000,FPTEMP_EX(a6) ;check if incorrectly signalled
+	bne.b	true_operr	;branch if true operr
+
+	cmpi.l	#$ffffffff,FPTEMP_HI(a6) ;check if first byte is all 1's
+	bne.b	true_operr	;if not all 1's then was true operr
+	clr.l	d0		;signal no real operr
+	rts
+
+true_operr:
+	move.l	#1,d0		;signal real operr
+	rts
+
+*
+* End_operr tests for operr enabled.  If not, it cleans up the stack
+* and does an rte.  If enabled, it cleans up the stack and branches
+* to the kernel operr handler with only the integer exception
+* frame on the stack and the fpu in the original exceptional state
+* with correct data written to the destination.
+*
+end_operr:
+	btst.b		#operr_bit,FPCR_ENABLE(a6)
+	beq.b		not_enabled
+enabled:
+	movem.l		USER_D0(a6),d0-d7
+	movem.l		USER_A0(a6),a0-a1
+	fmovem.x	USER_FP0(a6),fp0/fp1
+	fmovem.l	USER_FPCR(a6),fpcr/fpsr/fpiar
+	frestore	(a7)+
+	unlk		a6
+	bra		real_operr
+
+not_enabled:
+*	bclr.b		#E1,E_BYTE(a6)	
+	movem.l		USER_D0(a6),d0-d7
+	movem.l		USER_A0(a6),a0-a1
+	fmovem.x	USER_FP0(a6),fp0/fp1
+	fmovem.l	USER_FPCR(a6),fpcr/fpsr/fpiar
+*	frestore	(a7)+
+	unlk		a6
+	bra		fpsp_done
+
+	end

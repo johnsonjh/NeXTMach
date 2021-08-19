@@ -1,0 +1,140 @@
+/* 
+ * Copyright (c) 1989 NeXT, Inc.
+ *
+ * HISTORY
+ * 24-May-89  Gregg Kellogg (gk) at NeXT
+ *	Created.
+ *
+ */
+
+/*
+ * interface for user to kern_loader communication.
+ */
+subsystem kern_loader 300;
+
+#include <std_types.defs>
+#include <mach_types.defs>
+
+type server_name_t = (MSG_TYPE_STRING,8*256);
+type server_reloc_t = server_name_t;
+type server_name_array_t = ^ array[] of server_name_t;
+type port_name_string_array_t = server_name_array_t;
+type server_state_t = int;
+type boolean_array_t = ^ array[] of boolean_t;
+
+import <kernserv/kern_loader_types.h>;
+
+/*
+ * Cause the kernel loader server to shut down.
+ */
+routine kern_loader_abort (
+		loader_port	: port_t;
+		priv_port	: port_t;
+		restart		: boolean_t);
+
+/*
+ * Load a kernel server.
+ */
+routine kern_loader_load_server (
+		loader_port	: port_t;
+		server_name	: server_name_t);
+		
+
+/*
+ * Unload a kernel server.
+ */
+routine kern_loader_unload_server (
+		loader_port	: port_t;
+		task_port	: port_t;
+		server_name	: server_name_t);
+
+/*
+ * Add a server load file for future use.
+ */
+routine kern_loader_add_server (
+		loader_port	: port_t;
+		task_port	: port_t;
+		server_reloc	: server_reloc_t);
+
+/*
+ * Remove a server load file for future use.
+ */
+routine kern_loader_delete_server (
+		loader_port	: port_t;
+		task_port	: port_t;
+		server_name	: server_name_t);
+
+/*
+ * Get the task port the the specified server.
+ */
+routine kern_loader_server_task_port (
+		loader_port	: port_t;
+		task_port	: port_t;
+		server_name	: server_name_t;
+	out	server_task_port: port_t);
+
+/*
+ * Return the communication port used to communicate with this server.
+ */
+routine kern_loader_server_com_port (
+		loader_port	: port_t;
+		task_port	: port_t;
+		server_name	: server_name_t;
+	out	server_com_port	: port_t);
+
+/*
+ * Provide a port to the kern_loader for it to send status messages to.
+ * All messages up to listen_level will be sent to listen_port.
+ */
+simpleroutine kern_loader_status_port (
+		loader_port	: port_t;
+		listen_port	: port_t);
+
+
+/*
+ * Cause the kern_loader to send us a ping message back, used for
+ * synchronization.
+ */
+simpleroutine kern_loader_ping (
+		loader_port	: port_t;
+		ping_port	: port_t;
+		id		: int);
+
+/*
+ * Set the log level of the loaded server.  (Turns logging on and off).
+ */
+routine kern_loader_log_level (
+		loader_port	: port_t;
+		server_com_port	: port_t;
+		log_level	: int);
+
+/*
+ * Retrieve the contents of the log.
+ */
+routine kern_loader_get_log (
+		loader_port	: port_t;
+		server_com_port	: port_t;
+		reply_port	: port_t);
+
+/*
+ * Get a list of all the servers known by the kern_loader.
+ */
+routine kern_loader_server_list (
+		loader_port	: port_t;
+	out	servers		: server_name_array_t);
+
+/*
+ * Find out the state of a loaded server.
+ */
+routine kern_loader_server_info (
+		loader_port	: port_t;
+		task_port	: port_t;
+		server_name	: server_name_t;
+	out	server_state	: server_state_t;
+	out	load_address	: vm_address_t;
+	out	load_size	: vm_size_t;
+	out	relocatable	: server_reloc_t;
+	out	loadable	: server_reloc_t;
+	out	port_list	: port_name_array_t;
+	out	names		: port_name_string_array_t;
+	out	advertised	: boolean_array_t);

@@ -1,0 +1,77 @@
+*
+*	x_unimp.sa 1.7 10/8/90
+*
+*	fpsp_unimp --- FPSP handler for unimplemented instruction	
+*	exception.
+*
+*	Invoked when the user program encounters a floating-point
+*	op-code that hardware does not support.  Trap vector# 11
+*	(See table 8-1 MC68030 User's Manual).
+*
+* 
+*	Note: An fsave for an unimplemented inst. will create a short
+*	fsave stack.
+*
+*  Input: 1. Six word stack frame for unimplemented inst, four word
+*            for illegal
+*            (See table 8-7 MC68030 User's Manual).
+*         2. Unimp (short) fsave state frame created here by fsave
+*            instruction.
+*
+*
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+X_UNIMP	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include fpsp.h
+
+	xref	get_op
+	xref	do_func
+	xref	sto_res
+	xref	gen_except
+
+	xdef	fpsp_unimp
+	xdef	uni_2
+fpsp_unimp:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(a7)
+uni_2:
+	movem.l		d0-d7,USER_D0(a6)
+	movem.l		a0-a1,USER_A0(a6)
+	fmovem.x	fp0/fp1,USER_FP0(a6)
+	fmovem.l	fpcr/fpsr/fpiar,USER_FPCR(a6)
+*
+*	Temporary D25B Fix
+*	The following lines are used to ensure that the FPSR
+*	exception byte and condition codes are clear before proceeding
+*
+	move.l		USER_FPSR(a6),d0
+	and.l		#$FF,d0	;clear all but accrued exceptions
+	move.l		d0,USER_FPSR(a6)
+*	fmove.l		#0,FPCR	;clear all user exceptions for FPSP
+*
+*
+*	Temporary D43B fix for unimp frame stacked as a busy frame.
+*	Set bits in the flag UFLG_TMP, used in place of UFLAG on 
+*	the fsave stack.
+*
+	clr.b		UFLG_TMP(a6)	;clr flag for unsupp data
+
+	bsr		get_op		;go get operand(s)
+	clr.b		STORE_FLG(a6)
+	bsr		do_func		;do the function
+	fsave		-(a7)		;capture possible exc state
+	tst.b		STORE_FLG(a6)
+	bne.b		no_store	;if STORE_FLG is set, no store
+	bsr		sto_res		;store the result in user space
+no_store:
+	bra		gen_except	;post any exceptions and return
+
+	end

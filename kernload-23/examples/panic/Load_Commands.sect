@@ -1,0 +1,8 @@
+CALL		panic_signon		0
+SMAP	panic	panic_server		0
+ADVERTISE	panic
+WIRE
+START
+
+
+

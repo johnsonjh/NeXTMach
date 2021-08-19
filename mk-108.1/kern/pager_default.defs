@@ -1,0 +1,61 @@
+/* 
+ * Mach Operating System
+ * Copyright (c) 1987 Carnegie-Mellon University
+ * All rights reserved.  The CMU software License Agreement specifies
+ * the terms and conditions for use and redistribution.
+ */
+
+subsystem pager_default 2250;
+
+/*
+ * File:	kern/pager_default.defs
+ *
+ * Abstract:
+ *	Mach external memory management interface declaration; subset
+ *	that is applicable to managers of kernel-created memory objects.
+ *
+ * HISTORY
+ *  9-Dec-87  Michael Young (mwyoung) at Carnegie-Mellon University
+ *	Created.
+ */
+
+type int = MSG_TYPE_INTEGER_32;
+
+type boolean_t = MSG_TYPE_BOOLEAN;
+
+type port_t = MSG_TYPE_PORT;
+type port_all_t = MSG_TYPE_PORT_ALL;
+type paging_object_t = port_t;
+type vm_offset_t = int;
+type vm_size_t = int;
+type vm_prot_t = int;
+
+type pointer_t = ^array [] of (MSG_TYPE_INTEGER_8, 8);
+
+import "kern/mach_types.h";
+
+/*
+ *	Pass on responsibility for the new kernel-created memory
+ *	object.  The port on which this request is that port
+ *	(possibly a memory object itself) registered as the "default
+ *	pager".  Other arguments are as described for pager_init.
+ *	[No reply required.]
+ */
+simpleroutine	pager_create(
+		old_paging_object	: paging_object_t;
+		new_paging_object	: port_all_t;
+		new_request_port	: port_t;
+		new_name		: port_t;
+		new_page_size		: vm_size_t);
+
+/*
+ *	Provide initial data contents for this region of
+ *	the memory object.  If data has already been written
+ *	to the object, this value must be discarded; otherwise,
+ *	this call acts identically to pager_data_write.
+ */
+simpleroutine	pager_data_initialize(
+		paging_object		: paging_object_t;
+		pager_request_port	: port_t;
+		offset			: vm_offset_t;
+		data			: pointer_t);

@@ -1,0 +1,211 @@
+*
+*	x_unfl.sa 1.7 10/4/90
+*
+*	fpsp_unfl --- FPSP handler for underflow exception
+*
+* Trap disabled results
+*	For 881/2 compatibility, sw must denormalize the intermediate 
+* result, then store the result.  Denormalization is accomplished 
+* by taking the intermediate result (which is always normalized) and 
+* shifting the mantissa right while incrementing the exponent until 
+* it is equal to the denormalized exponent for the destination 
+* format.  After denormalizatoin, the result is rounded to the 
+* destination format.
+*		
+* Trap enabled results
+* 	All trap disabled code applies.	In addition the exceptional 
+* operand needs to made available to the user with a bias of $6000 
+* added to the exponent.
+*
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+X_UNFL	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+	xref	denorm
+	xref	round
+	xref	store
+	xref	g_intop
+	xref	g_rndpr
+	xref	g_opcls
+	xref	g_dfmtou
+	xref	real_unfl
+	xref	real_inex
+	xref	fpsp_done
+
+	xdef	fpsp_unfl
+fpsp_unfl:
+	link		a6,#-LOCAL_SIZE
+	fsave		-(a7)
+	movem.l		d0-d7,USER_D0(a6)
+	movem.l		a0-a1,USER_A0(a6)
+	fmovem.x	fp0/fp1,USER_FP0(a6)
+	fmovem.l	fpcr/fpsr/fpiar,USER_FPCR(a6)
+*
+	bsr		unf_res	;denormalize, round & store interm op
+*
+*	if underflow exceptions are not enabled, check for inexact
+*	exception
+*
+	btst.b		#unfl_bit,FPCR_ENABLE(a6)
+	beq.b		ck_inex
+
+	movem.l		USER_D0(a6),d0-d7
+	movem.l		USER_A0(a6),a0-a1
+	fmovem.x	USER_FP0(a6),fp0/fp1
+	fmovem.l	USER_FPCR(a6),fpcr/fpsr/fpiar
+	frestore	(a7)+
+	unlk		a6
+	bra		real_unfl
+
+*
+* If inexact trap not enabled, then we are done
+*
+ck_inex:
+	btst.b		#inex2_bit,FPCR_ENABLE(a6)
+	beq.b		unfl_done
+	btst.b		#inex2_bit,FPSR_EXCEPT(a6)
+	beq.b		unfl_done
+
+*
+* Inexact enabled and reported, and we must take an inexact exception
+*
+	move.b		#INEX_VEC,EXC_VEC+1(a6)
+	movem.l         USER_D0(a6),d0-d7
+	movem.l         USER_A0(a6),a0-a1
+	fmovem.x        USER_FP0(a6),fp0/fp1
+	fmovem.l        USER_FPCR(a6),fpcr/fpsr/fpiar
+	frestore        (a7)+
+	unlk            a6
+	bra		real_inex
+
+unfl_done:
+	movem.l		USER_D0(a6),d0-d7
+	movem.l		USER_A0(a6),a0-a1
+	fmovem.x	USER_FP0(a6),fp0/fp1
+	fmovem.l	USER_FPCR(a6),fpcr/fpsr/fpiar
+	bclr.b		#E3,E_BYTE(a6)
+	beq.b		e1_set		;if set then branch
+
+	frestore	(a7)+
+e1_set:
+	unlk		a6
+	bra		fpsp_done
+*
+*	unf_res --- underflow result calculation
+*
+unf_res:
+
+	btst.b		#E3,E_BYTE(a6)
+	beq.b		unf_E1
+unf_E3:
+	lea		WBTEMP(a6),a0	;a0 now points to operand
+	bra.b		unf_cont
+unf_E1:
+	lea		FPTEMP(a6),a0	;a0 now points to operand
+unf_cont:
+	bclr.b		#sign_bit,LOCAL_EX(a0)	;clear sign bit
+	sne		LOCAL_SGN(a0)		;store sign
+
+	move.l		d2,-(a7)
+	bsr		g_rndpr		;returns RND_PREC in d0 0=ext,
+*					;1=sgl, 2=dbl
+	move.l		d0,d2		;copy RND_PREC in d2
+*
+	bsr		denorm		;returns denorm, a0 points to it
+*
+*WARNING:
+*				;d0 has guard,round sticky bit
+*				;make sure that it is not corrupted
+*				;before it reaches the round subroutine
+*				;also ensure that a0 isn't corrupted
+
+*
+*	set up d1 for round subroutine
+* 	d1 contains the PREC/MODE information respectively on upper/
+* 	lower register halves.
+*
+	bfextu		FPCR_MODE(a6){2:2},d1	;get mode from FPCR
+*						;mode in lower d1
+	swap		d2			;rnd prec in upper d2
+	add.l		d2,d1			;merge PREC/MODE
+*
+*WARNING: a0 and d0 are assumed to be intact between the denorm and
+*	round subroutines. All code between these two subroutines
+*	must not corrupt a0 and d0.
+*
+*
+* Perform Round	
+*	Input:		a0 points to input operand
+*			d0{31:29} has guard, round, sticky
+*			d1{01:00} has rounding mode
+*			d1{17:16} has rounding precision
+*	Output:		a0 points to rounded operand
+*
+
+	bsr		round		;returns rounded denorm at (a0)
+	move.l		(a7)+,d2	;restore d2
+*
+* Differentiate between store to memory vs. store to register
+*
+	bsr		g_opcls		;returns opclass in d0{2:0}
+	cmpi.b		#$3,d0
+	bne.b		not_opc011
+*
+* At this point, a store to memory is pending
+*
+opc011:
+	bsr		g_dfmtou
+	tst.b		d0
+	beq.b		ext_opc011	;If extended, do not subtract
+* 				;If destination format is sgl/dbl, 
+	subq.w		#1,LOCAL_EX(a0)	;account for denorm bias vs.
+*				;normalized bias
+*				;          normalized   denormalized
+*				;single       $7f           $7e
+*				;double       $3ff          $3fe
+*
+ext_opc011:
+	bsr		store		;stores to memory
+	bra.b		unf_done	;finish up
+
+*
+* At this point, a store to a float register is pending
+*
+not_opc011:
+	bsr		store	;stores to float register
+*				;a0 is not corrupted on a store to a
+*				;float register.
+*
+* Set the condition codes according to result
+*
+	tst.l		LOCAL_HI(a0)	;check upper mantissa
+	bne.b		ck_sgn
+	tst.l		LOCAL_LO(a0)	;check lower mantissa
+	bne.b		ck_sgn
+	bset.b		#z_bit,FPSR_CC(a6) ;set condition codes if zero
+ck_sgn:
+	btst.b 		#sign_bit,LOCAL_EX(a0)	;check the sign bit
+	beq.b		unf_done
+	bset.b		#neg_bit,FPSR_CC(a6)
+
+*
+* Finish.  
+*
+unf_done:
+	btst.b		#inex2_bit,FPSR_EXCEPT(a6)
+	beq.b		no_aunfl
+	bset.b		#aunfl_bit,FPSR_AEXCEPT(a6)
+no_aunfl:
+	rts
+
+	end

@@ -1,0 +1,745 @@
+*
+*	do_func.sa 1.15 10/9/90
+*
+* Do_func performs the unimplemented operation.  The operation
+* to be performed is determined from the lower 7 bits of the
+* extension word (except in the case of fmovecr and fsincos).
+* The opcode and tag bits form an index into a jump table in 
+* tbldo.sa.  Cases of zero, infinity and NaN are handled in 
+* do_func by forcing the default result.  Normalized and
+* denormalized (there are no unnormalized numbers at this
+* point) are passed onto the emulation code.  
+*
+* CMDREG1B and STAG are extracted from the fsave frame
+* and combined to form the table index.  The function called
+* will start with a0 pointing to the ETEMP operand.  Dyadic
+* functions can find FPTEMP at -12(a0).
+*
+* Called functions return their result in fp0.  Sincos returns
+* sin(x) in fp0 and cos(x) in fp1.
+*
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+DO_FUNC	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+	xref	t_dz2
+	xref	t_operr
+	xref	t_ovfl
+	xref	t_unfl
+	xref	t_inx2
+	xref	dst_nan
+	xref	src_nan
+	xref	nrm_set
+	xref	sto_cos
+
+	xref	tblpre
+	xref	slognp1,slogn,slog10,slog2
+	xref	smod,srem
+
+PONE	dc.l	$3fff0000,$80000000,$00000000	;+1
+MONE	dc.l	$bfff0000,$80000000,$00000000	;-1
+PZERO	dc.l	$00000000,$00000000,$00000000	;+0
+MZERO	dc.l	$80000000,$00000000,$00000000	;-0
+PINF	dc.l	$7fff0000,$00000000,$00000000	;+inf
+MINF	dc.l	$ffff0000,$00000000,$00000000	;-inf
+QNAN	dc.l	$7fff0000,$ffffffff,$ffffffff	;non-signaling nan
+PPIBY2  dc.l	$3FFF0000,$C90FDAA2,$2168C235	;+PI/2
+MPIBY2  dc.l	$bFFF0000,$C90FDAA2,$2168C235	;-PI/2
+
+	xdef	do_func
+do_func:
+	move.w	CMDREG1B(a6),d0
+	and.l	#$7F,d0
+	cmpi.l	#$38,d0		;if the extension is >= $38, 
+	bge.b	serror		;it is illegal
+	bfextu	STAG(a6){0:3},d1
+	lsl.l	#3,d0		;make room for STAG
+	add.l	d1,d0		;combine for final index into table
+
+#if	FP_DEBUG
+	move.l	d0,sp@-
+	move.l	d1,sp@-
+	move.l	a0,sp@-
+	move.l	a1,sp@-
+	lea.l	ETEMP(a6),a0
+	move.l	a0,sp@-
+	move.l	EXC_PC(a6),sp@-
+	move.l	d0,sp@-
+	move.l	#6,sp@-
+	jsr	_fp_trace
+	add.l	#16,sp
+	move.l	sp@+,a1
+	move.l	sp@+,a0
+	move.l	sp@+,d1
+	move.l	sp@+,d0
+#endif	FP_DEBUG
+
+	lea.l	tblpre,a1	;start of monster jump table
+	move.l	(a1,d0.w*4),a1	;real target address
+	lea.l	ETEMP(a6),a0	;a0 is pointer to src op
+	jmp	(a1)
+*
+*	ERROR
+*
+	xdef	serror
+serror:
+	st.b	STORE_FLG(a6)
+	rts
+*
+* These routines load forced values into fp0.  They are called
+* by index into tbldo.
+*
+* Load a signed zero to fp0 and set inex2/ainex
+*
+	xdef	snzrinx
+snzrinx:
+	btst.b	#sign_bit,LOCAL_EX(a0)	;get sign of source operand
+	bne.b	ld_mzinx	;if negative, branch
+	bsr	ld_pzero	;bsr so we can return and set inx
+	bra	t_inx2		;now, set the inx for the next inst
+ld_mzinx:
+	bsr	ld_mzero	;if neg, load neg zero, return here
+	bra	t_inx2		;now, set the inx for the next inst
+*
+* Load a signed zero to fp0; do not set inex2/ainex 
+*
+	xdef	szero
+szero:
+	btst.b	#sign_bit,LOCAL_EX(a0) ;get sign of source operand
+	bne	ld_mzero	;if neg, load neg zero
+	bra	ld_pzero	;load positive zero
+*
+* Load a signed infinity to fp0; do not set inex2/ainex 
+*
+	xdef	sinf
+sinf:
+	btst.b	#sign_bit,LOCAL_EX(a0)		;get sign of source operand
+	bne	ld_minf		;if negative branch
+	bra	ld_pinf
+*
+* Load a signed one to fp0; do not set inex2/ainex 
+*
+	xdef	sone
+sone:
+	btst.b	#sign_bit,LOCAL_EX(a0)		;check sign of source
+	bne	ld_mone
+	bra	ld_pone
+*
+* Load a signed pi/2 to fp0; do not set inex2/ainex 
+*
+	xdef	spi_2
+spi_2:
+	btst.b	#sign_bit,LOCAL_EX(a0)		;check sign of source
+	bne	ld_mpi2
+	bra	ld_ppi2
+*
+* Load either a +0 or +inf for plus/minus operand
+*
+	xdef	szr_inf
+szr_inf:
+	btst.b	#sign_bit,LOCAL_EX(a0)		;check sign of source
+	bne	ld_pzero
+	bra	ld_pinf
+*
+* Result is either an operr or +inf for plus/minus operand
+* [Used by slogn, slognp1, slog10, and slog2]
+*
+	xdef	sopr_inf
+sopr_inf:
+	btst.b	#sign_bit,LOCAL_EX(a0)		;check sign of source
+	bne	t_operr
+	bra	ld_pinf
+*
+*	FMOVECR
+*
+	xdef	smovcr
+smovcr:
+	fmovem.x (a0),fp0			;fmovecr
+	rts
+*
+*	FLOGNP1 
+*
+	xdef	sslognp1
+sslognp1:
+	fmovem.x (a0),fp0
+	fcmp.b	#-1,fp0
+#if	NeXT
+	//  GNU assembler generates bad floating pt branch to external symbols!
+	fble	0f
+	jmp	slognp1
+0:
+	fbne	1f
+	jmp	t_dz2		;if = -1, divide by zero exception
+1:
+#else	NeXT
+	fbgt	slognp1		
+	fbeq	t_dz2		;if = -1, divide by zero exception
+#endif	NeXT
+	fmove.l	#0,FPSR		;clr N flag
+	bra	t_operr		;take care of operands < -1
+*
+*	FETOXM1
+*
+	xdef	setoxm1i
+setoxm1i:
+	btst.b	#sign_bit,LOCAL_EX(a0)	;check sign of source
+	bne	ld_mone
+	bra	ld_pinf
+*
+*	FLOGN
+*
+	xdef	sslogn
+sslogn:
+	btst.b	#sign_bit,LOCAL_EX(a0) 
+	beq	slogn
+	bra	t_operr		;take care of operands < 0
+*
+*	FLOG10
+*
+	xdef	sslog10
+sslog10:
+	btst.b	#sign_bit,LOCAL_EX(a0)
+	beq	slog10
+	bra	t_operr		;take care of operands < 0
+*
+*	FLOG2
+*
+	xdef	sslog2
+sslog2:
+	btst.b	#sign_bit,LOCAL_EX(a0)
+	beq	slog2
+	bra	t_operr		;take care of operands < 0
+*
+*	FGETEXP
+*
+	xdef	sgetexp
+sgetexp:
+	move.w	LOCAL_EX(a0),d0	;get the exponent
+	bclr.l	#15,d0		;clear the sign bit
+	sub.w	#$3fff,d0	;subtract off the bias
+	fmove.w  d0,fp0		;move the exp to fp0
+	rts
+
+	xdef	sgetexpd
+sgetexpd:
+	bclr.b	#sign_bit,LOCAL_EX(a0)
+	bsr	nrm_set		;normalize (exp will go negative)
+	move.w	LOCAL_EX(a0),d0	;load resulting exponent into d0
+	sub.w	#$3fff,d0	;subtract off the bias
+	fmove.w	d0,fp0		;move the exp to fp0
+	rts
+
+*Shift mantissa till msb =1, load exp with $3fff
+	xdef	sgetmand
+sgetmand:
+	move.l LOCAL_HI(a0),d0	;load ms mant in d0
+	move.l LOCAL_LO(a0),d1	;load ls mant in d1
+	bsr	shft		;shift mantissa bits till msbit is set
+	move.l d0,LOCAL_HI(a0)
+*				;put ms mant back on stack
+	move.l d1,LOCAL_LO(a0)
+*				;put ls mant back on stack
+
+*Leave mantissa alone, load exp with $3fff
+	xdef	sgetman
+sgetman:
+	move.l	USER_FPCR(a6),d0
+	andi.l	#$ffffff00,d0	;clear rounding precision and mode
+	fmove.l	d0,fpcr		;this fpcr setting is used by the 882
+
+	move.w	LOCAL_EX(a0),d0	;get the exp (really just want sign bit)
+	or.w	#$7fff,d0	;clear old exp
+	bclr.l	#14,d0	 	;make it the new exp +-3fff
+	move.w d0,LOCAL_EX(a0)
+*				;move the sign & exp back to fsave stack
+
+	fmove.x	(a0),fp0	;put new value back in fp0
+	rts
+*
+* FINT with extended denorm inputs.
+*
+	xdef	sintd
+sintd:
+	btst.b	#5,FPCR_MODE(a6)
+	beq.w	snzrinx		;if round nearest or round zero, +/- 0
+	btst.b	#4,FPCR_MODE(a6)
+	beq.b	rnd_mns
+rnd_pls:
+	btst.b	#sign_bit,LOCAL_EX(a0)
+	bne.b	sintmz
+	bsr	ld_pone		;if round plus inf and positive, answer is +1
+	bra	t_inx2
+rnd_mns:
+	btst.b	#sign_bit,LOCAL_EX(a0)
+	beq.b	sintpz
+	bsr	ld_mone		;if round mns inf and negative, answer is -1
+	bra	t_inx2
+
+	xdef	sintpz
+sintpz:
+	bsr	ld_pzero
+	bra	t_inx2
+
+	xdef	sintmz
+sintmz:
+	bsr	ld_mzero
+	bra	t_inx2
+
+*
+*	FMOD
+*
+pmodt:
+*				;$21 fmod
+*				;dtag,stag
+	dc.l	smod		;  00,00  norm,norm = normal  
+	dc.l	smod_oper	;  00,01  norm,zero = nan with operr
+	dc.l	smod_fpn	;  00,10  norm,inf  = fpn with possible exc.
+	dc.l	smod_snan	;  00,11  norm,nan  = nan
+	dc.l	smod_zro	;  01,00  zero,norm = +-zero
+	dc.l	smod_oper	;  01,01  zero,zero = nan with operr
+	dc.l	smod_zro	;  01,10  zero,inf  = +-zero
+	dc.l	smod_snan	;  01,11  zero,nan  = nan     
+	dc.l	smod_oper	;  10,00  inf,norm  = nan with operr      
+	dc.l	smod_oper	;  10,01  inf,zero  = nan with operr     
+	dc.l	smod_oper	;  10,10  inf,inf   = nan with operr
+	dc.l	smod_snan	;  10,11  inf,nan   = nan       
+	dc.l	smod_dnan	;  11,00  nan,norm  = nan       
+	dc.l	smod_dnan	;  11,01  nan,zero  = nan      
+	dc.l	smod_dnan	;  11,10  nan,inf   = nan
+	dc.l	smod_dnan	;  11,11  nan,nan   = nan   
+
+	xdef	pmod
+pmod:
+	bfextu	STAG(a6){0:3},d0 ;stag = d0
+	bfextu	DTAG(a6){0:3},d1 ;dtag = d1
+
+	bclr.l	#2,d0		;alias extended denorm to normal(for table jump)
+	bclr.l	#2,d1		;alias extended denorm to normal(for table jump)
+
+	lsl.b	#2,d1
+	or.b	d0,d1		;d1{3:2} = dtag, d1{1:0} = stag
+*				;Tag values:
+*				;00 = norm or denorm
+*				;01 = zero
+*				;10 = inf
+*				;11 = nan
+	lea	pmodt,a1
+	move.l	(a1,d1.w*4),a1
+	jmp	(a1)
+
+smod_snan:
+	bra	src_nan
+smod_dnan:
+	bra	dst_nan
+smod_oper:
+	bra	t_operr
+smod_zro:
+	move.b	ETEMP(a6),d1	;get sign of src op
+	move.b	FPTEMP(a6),d0	;get sign of dst op
+	eor.b	d0,d1		;get exor of sign bits
+	btst.l	#7,d1		;test for sign
+	beq.b	smod_zsn	;if clr, do not set sign big
+	bset.b	#q_sn_bit,FPSR_QBYTE(a6) ;set q-byte sign bit
+smod_zsn:
+	btst.l	#7,d0		;test if + or -
+	beq	ld_pzero	;if pos then load +0
+	bra	ld_mzero	;else neg load -0
+	
+smod_fpn:
+	move.b	ETEMP(a6),d1	;get sign of src op
+	move.b	FPTEMP(a6),d0	;get sign of dst op
+	eor.b	d0,d1		;get exor of sign bits
+	btst.l	#7,d1		;test for sign
+	beq.b	smod_fsn	;if clr, do not set sign big
+	bset.b	#q_sn_bit,FPSR_QBYTE(a6) ;set q-byte sign bit
+smod_fsn:
+	fmove.x FPTEMP(a6),fp0	;load dest operand to fp0
+	rts
+*
+*	FREM
+*
+premt:
+*				;$25 frem
+*				;dtag,stag
+	dc.l	srem		;  00,00  norm,norm = normal  
+	dc.l	srem_oper	;  00,01  norm,zero = nan with operr
+	dc.l	srem_fpn	;  00,10  norm,inf  = fpn with possible exc.
+	dc.l	srem_snan	;  00,11  norm,nan  = nan
+	dc.l	srem_zro	;  01,00  zero,norm = +-zero
+	dc.l	srem_oper	;  01,01  zero,zero = nan with operr
+	dc.l	srem_zro	;  01,10  zero,inf  = +-zero
+	dc.l	srem_snan	;  01,11  zero,nan  = nan     
+	dc.l	srem_oper	;  10,00  inf,norm  = nan with operr      
+	dc.l	srem_oper	;  10,01  inf,zero  = nan with operr     
+	dc.l	srem_oper	;  10,10  inf,inf   = nan with operr
+	dc.l	srem_snan	;  10,11  inf,nan   = nan       
+	dc.l	srem_dnan	;  11,00  nan,norm  = nan       
+	dc.l	srem_dnan	;  11,01  nan,zero  = nan      
+	dc.l	srem_dnan	;  11,10  nan,inf   = nan
+	dc.l	srem_dnan	;  11,11  nan,nan   = nan   
+
+	xdef	prem
+prem:
+
+	bfextu	STAG(a6){0:3},d0 ;stag = d0
+	bfextu	DTAG(a6){0:3},d1 ;dtag = d1
+
+	bclr	#2,d0		;alias extended denorm to normal(for table jump)
+	bclr	#2,d1		;alias extended denorm to normal(for table jump)
+
+	lsl.b	#2,d1
+	or.b	d0,d1		;d1{3:2} = dtag, d1{1:0} = stag
+*				;Tag values:
+*				;00 = norm or denorm
+*				;01 = zero
+*				;10 = inf
+*				;11 = nan
+	lea	premt,a1
+	move.l	(a1,d1.w*4),a1
+	jmp	(a1)
+	
+srem_snan:
+	bra	src_nan
+srem_dnan:
+	bra	dst_nan
+srem_oper:
+	bra	t_operr
+srem_zro:
+	move.b	ETEMP(a6),d1	;get sign of src op
+	move.b	FPTEMP(a6),d0	;get sign of dst op
+	eor.b	d0,d1		;get exor of sign bits
+	btst.l	#7,d1		;test for sign
+	beq.b	srem_zsn	;if clr, do not set sign big
+	bset.b	#q_sn_bit,FPSR_QBYTE(a6) ;set q-byte sign bit
+srem_zsn:
+	btst.l	#7,d0		;test if + or -
+	beq	ld_pzero	;if pos then load +0
+	bra	ld_mzero	;else neg load -0
+	
+srem_fpn:
+	move.b	ETEMP(a6),d1	;get sign of src op
+	move.b	FPTEMP(a6),d0	;get sign of dst op
+	eor.b	d0,d1		;get exor of sign bits
+	btst.l	#7,d1		;test for sign
+	beq.b	srem_fsn	;if clr, do not set sign big
+	bset.b	#q_sn_bit,FPSR_QBYTE(a6) ;set q-byte sign bit
+srem_fsn:
+	fmove.x FPTEMP(a6),fp0	;return dest to fp0
+	rts
+*
+*	FSCALE
+*
+pscalet:
+*				;$26 fscale
+*				;dtag,stag
+	dc.l	sscale		;  00,00  norm,norm = result
+	dc.l	scl_fpn		;  00,01  norm,zero = fpn
+	dc.l	scl_opr		;  00,10  norm,inf  = nan with operr
+	dc.l	scl_snan	;  00,11  norm,nan  = nan
+	dc.l	scl_zro		;  01,00  zero,norm = +-zero
+	dc.l	scl_zro		;  01,01  zero,zero = +-zero
+	dc.l	scl_opr		;  01,10  zero,inf  = nan with operr
+	dc.l	scl_snan	;  01,11  zero,nan  = nan
+	dc.l	scl_inf		;  10,00  inf,norm  = +-inf
+	dc.l	scl_inf		;  10,01  inf,zero  = +-inf
+	dc.l	scl_opr		;  10,10  inf,inf   = nan with operr
+ 	dc.l	scl_snan	;  10,11  inf,nan   = nan
+ 	dc.l	scl_dnan	;  11,00  nan,norm  = nan
+ 	dc.l	scl_dnan	;  11,01  nan,zero  = nan
+ 	dc.l	scl_dnan	;  11,10  nan,inf   = nan
+	dc.l	scl_dnan	;  11,11  nan,nan   = nan
+
+	xdef	pscale
+pscale:
+	fmove.l	#0,FPCR		;load IEEE defaults
+	btst.b	#7,STAG(a6)	;check if source op is a denorm
+	beq.b	scl_cnt		;branch if norm
+	move.b	#$20,STAG(a6)	;set tag to zero
+	clr.l	ETEMP_HI(a6)
+	clr.l	ETEMP_LO(a6)	;source denorm becomes 0
+scl_cnt:
+* At this point, the destination is still capable of being a denorm while
+* the source cannot.
+*
+	bfextu	STAG(a6){0:3},d0 ;stag in d0
+	bfextu	DTAG(a6){0:3},d1 ;dtag in d1
+	lsl.b	#2,d1
+	or.b	d0,d1		;d1{4:2} = dtag, d1{1:0} = stag
+*				;dtag values     stag values:
+*				;000 = norm      00 = norm
+*				;001 = zero	 01 = zero
+*				;010 = inf	 10 = inf
+*				;011 = nan	 11 = nan
+*				;100 = dnrm
+*
+	bclr.l	#4,d1		;alias  denorm into norm
+*
+	lea.l	pscalet,a1	;load start of jump table
+	move.l	(a1,d1.w*4),a1	;load a1 with routine label depending on tag
+	jmp	(a1)		;go to the routine
+
+sscale:
+*
+* The following lines are needed to ensure that the fmove.l fp0,d0
+* not cause an operr. Also, ensure that the catastrophic overflow/
+* underflow cases are taken out
+*
+	move.w	ETEMP(a6),d0	;get source exponent
+	bclr.l	#15,d0		;get rid of sign
+	cmpi.w	#$400d,d0	;if source exponent > 14
+	bge.b	pot_prob	;the integer value is > 65536 or < -65536
+	fmove.x ETEMP(a6),fp0	;get the source op
+
+	fmove.l	#x_mode+rz_mode,fpcr
+	fmove.l	fp0,d0		;convert to integer
+
+	clr.l	d1		;assume scale to be zero
+	btst.b	#7,DTAG(a6)	;check for denormalized dtag
+	beq.b	scalen
+*
+* At this point, fptemp is denormalized. It can be normalized by 
+* borrowing 2^100 from etemp into fptemp. The 2^100 given to fptemp
+* is used to normalize fptemp.
+*
+	move.l	d2,-(a7)	;save d2
+	sub.w	#100,d0		;take off 
+	move.l	d0,d2		;d2 is not corrupted by any subroutine
+	lea	FPTEMP(a6),a0
+	btst.b	#sign_bit,LOCAL_EX(a0)
+	sne	LOCAL_SGN(a0)	;change to internal extended format
+	add.w	#100,LOCAL_EX(a0) ;add scale to fptemp
+	bsr	nrm_set		;normalize fptemp
+	bfclr	LOCAL_SGN(a0){0:8}
+	beq.b	scps
+	bset.b	#sign_bit,LOCAL_EX(a0)
+*				;return to ieee extended format
+scps:
+	move.l	d2,d0		;restore d0
+	move.l	(a7)+,d2	;restore d2
+
+* There should be no more denorms from this point on.
+scalen:
+	move.l	#$3fff0000,ETEMP(a6)
+	move.l	#$80000000,ETEMP_HI(a6)
+	move.l	#$00000000,ETEMP_LO(a6)
+*				;write (1.0 X 2^0) into source operand location
+
+	add.w	d0,ETEMP(a6)	;source operand now equivalent to (1.0 X 2^d0) 
+	fmovem.x ETEMP(a6),fp0	;load into fp0
+	fmove.l	USER_FPCR(a6),fpcr ;load in user's fpcr
+	fmul.x	FPTEMP(a6),fp0	;multiply destination operand
+	rts
+
+pot_prob:
+	btst.b	#sign_bit,ETEMP(a6)	
+	beq.b	scl_ovf		;fall through for underflow case
+scl_unf:
+	lea	ETEMP(a6),a0	;t_unfl needs temporary area
+
+	btst.b	#sign_bit,FPTEMP(a6) ;t_ovfl uses the sign bit of ETEMP
+	beq.b	sclu_pos	;since fscale's sign is dependent on FPTEMP ,
+
+	bset.b	#sign_bit,ETEMP(a6)
+	bra	t_unfl
+sclu_pos:
+	bclr.b	#sign_bit,ETEMP(a6)
+	bra	t_unfl
+
+scl_ovf:
+	btst.b	#sign_bit,FPTEMP(a6)	;t_ovfl uses the sign bit of ETEMP
+	beq.b	scl_pos		;since fscale's sign is dependent on FPTEMP,
+	bset.b	#sign_bit,ETEMP(a6)	;sign is msb of ETEMP for t_ovfl
+	bsr	t_ovfl
+	bclr.b	#inex2_bit,FPSR_EXCEPT(a6)
+	rts
+scl_pos:
+	bclr.b	#sign_bit,ETEMP(a6)	;sign is msb of ETEMP for t_ovfl
+	bsr	t_ovfl
+	bclr.b	#inex2_bit,FPSR_EXCEPT(a6)
+	rts
+
+scl_fpn:
+	btst.b	#7,DTAG(a6)	;check for denorm case
+	bne.b	scl_fpnd
+	fmove.l	USER_FPCR(a6),fpcr ;restore user's fpcr
+	fmove.x FPTEMP(a6),fp0
+	rts
+
+*
+* scl_fpnd yields an answer different from that of the 882 for 
+* rounding prec/mode other than extended.
+*
+scl_fpnd:
+	fmovem.x FPTEMP(a6),fp0
+	fmovem.x fp0,FP_SCR1(a6)	;load for gen_except
+	btst.b	 #sign_bit,FPTEMP_EX(a6)
+	beq.b	 sclfpndp
+	bset.b	 #neg_bit,FPSR_CC(a6)
+sclfpndp:
+	bset.b	 #unfl_bit,FPSR_EXCEPT(a6)
+	btst.b	 #inex2_bit,FPSR_EXCEPT(a6)
+	beq.b	 sclnd
+	bset.b	 #aunfl_bit,FPSR_AEXCEPT(a6)
+sclnd:
+	rts
+
+scl_opr:
+	bra	t_operr
+
+scl_dnan:
+	bra	dst_nan
+
+scl_zro:
+	btst.b	#sign_bit,FPTEMP_EX(a6)	;test if + or -
+	beq	ld_pzero		;if pos then load +0
+	bra	ld_mzero		;if neg then load -0
+scl_inf:
+	btst.b	#sign_bit,FPTEMP_EX(a6)	;test if + or -
+	beq	ld_pinf			;if pos then load +inf
+	bra	ld_minf			;else neg load -inf
+scl_snan:
+	bra	src_nan
+*
+*	FSINCOS
+*
+	xdef	ssincosz
+ssincosz:
+	btst.b	#sign_bit,ETEMP(a6)	;get sign
+	beq.b	sincosp
+	fmove.x	MZERO,fp0
+	bra.b	sincoscom
+sincosp:
+	fmove.x PZERO,fp0
+sincoscom:
+  	fmovem.x PONE,fp1	;do not allow FPSR to be affected
+	bra	sto_cos		;store cosine result
+
+	xdef	ssincosi
+ssincosi:
+	fmove.x QNAN,fp1	;load NAN
+	bsr	sto_cos		;store cosine result
+	fmove.x QNAN,fp0	;load NAN
+	bra	t_operr
+
+	xdef	ssincosnan
+ssincosnan:
+	move.l	ETEMP_EX(a6),FP_SCR1(a6)
+	move.l	ETEMP_HI(a6),FP_SCR1+4(a6)
+	move.l	ETEMP_LO(a6),FP_SCR1+8(a6)
+	bset.b	#signan_bit,FP_SCR1+4(a6)
+	fmovem.x FP_SCR1(a6),fp1
+	bsr	sto_cos
+	bra	src_nan
+*
+*	SHFT
+*
+*	Shifts the mantissa bits until msbit is set.
+*	input:
+*		ms mantissa part in d0
+*		ls mantissa part in d1
+*	output:
+*		shifted bits in d0 and d1
+shft:
+	tst.l	d0		;if any bits set in ms mant
+	bne.b	upper		;then branch
+*				;else no bits set in ms mant
+	tst.l	d1		;test if any bits set in ls mant
+	bne.b	cont		;if set then continue
+	bra.b	shft_end	;else return
+cont:
+	move.l	d3,-(a7)	;save d3
+	exg	d0,d1		;shift ls mant to ms mant
+
+	bfffo	d0{0:32},d3	;find first 1 in ls mant (put count in d3)
+
+	lsl.l	d3,d0		;shift first 1 to integer bit in ms mant
+	move.l	(a7)+,d3	;restore d3
+	bra.b	shft_end
+upper:
+
+	movem.l	d3/d5/d6,-(a7)	;save registers
+	bfffo	d0{0:32},d3	;find first 1 in ls mant (put count in d3)
+
+
+	lsl.l	d3,d0		;shift ms mant by count so first one in integer
+
+	move.l	d1,d6		;save ls mant in d6
+	lsl.l	d3,d1		;shift ls mant by count
+	move.l	#32,d5
+	sub.l	d3,d5		;sub 32 from shift to get other side of shift
+	lsr.l	d5,d6		;shift off all bits but those that will be
+*				;shifted into ms mant
+	or.l	d6,d0		;shift the ls mant bits into the ms mant
+	movem.l	(a7)+,d3/d5/d6	;restore registers
+shft_end:
+	rts
+*
+* This code forces default values for the zero, inf, and nan cases 
+* in the transcendentals code.  The CC bits must be set in the
+* stacked FPSR to be correctly reported.
+*
+***Returns +PI/2
+	xdef	ld_ppi2
+ld_ppi2:
+	fmove.x PPIBY2,fp0		;load +pi/2
+	bra	t_inx2			;set inex2 exc
+
+***Returns -PI/2
+	xdef	ld_mpi2
+ld_mpi2:
+	fmove.x MPIBY2,fp0		;load -pi/2
+	or.l	#neg_mask,USER_FPSR(a6)	;set N bit
+	bra	t_inx2			;set inex2 exc
+
+***Returns +inf
+	xdef	ld_pinf
+ld_pinf:
+	fmove.x PINF,fp0		;load +inf
+	or.l	#inf_mask,USER_FPSR(a6)	;set I bit
+	rts
+
+***Returns -inf
+	xdef	ld_minf
+ld_minf:
+	fmove.x MINF,fp0		;load -inf
+	or.l	#neg_mask+inf_mask,USER_FPSR(a6)	;set N and I bits
+	rts
+
+***Returns +1
+	xdef	ld_pone
+ld_pone:
+	fmove.x PONE,fp0		;load +1
+	rts
+
+***Returns -1
+	xdef	ld_mone
+ld_mone:
+	fmove.x MONE,fp0		;load -1
+	or.l	#neg_mask,USER_FPSR(a6)	;set N bit
+	rts
+
+***Returns +0
+	xdef	ld_pzero
+ld_pzero:
+	fmove.x PZERO,fp0		;load +0
+	or.l	#z_mask,USER_FPSR(a6)	;set Z bit
+	rts
+
+***Returns -0
+	xdef	ld_mzero
+ld_mzero:
+	fmove.x MZERO,fp0		;load -0
+	or.l	#neg_mask+z_mask,USER_FPSR(a6)	;set N and Z bits
+	rts
+
+	end

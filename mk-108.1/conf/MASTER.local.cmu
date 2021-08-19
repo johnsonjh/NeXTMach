@@ -1,0 +1,111 @@
+#
+# Mach Operating System
+# Copyright (c) 1986 Carnegie-Mellon University
+# All rights reserved.  The CMU software License Agreement
+# specifies the terms and conditions for use and redistribution.
+#  
+#######################################################################
+#
+#	Master machine independent configuration file for a specific site.
+#
+#	This file allows specific sites to easily maintain local
+#	configuration without touching the official Mach Master configuration
+#	files.  All machine independent local options and configurations can
+#	(and should) be placed in this file.
+#
+#	This version of the file is specific to the CMU CS/RI Facilities
+#	and should be replaced at each site.
+#
+#######################################################################
+# HISTORY
+# 13-Oct-87  Mike Accetta (mja) at Carnegie-Mellon University
+#	Revised DEFAULT configurations for common workstation cases;
+#	flush EXTRA configurations.
+#	[ V5.1(XF18) ]
+#
+# 17-Sep-87  Mike Accetta (mja) at Carnegie-Mellon University
+#	Flush "oldfs" and "fe" attributes from all configurations.
+#	[ V5.1(XF16) ]
+#
+# 15-Aug-87  Mike Accetta (mja) at Carnegie-Mellon University
+#	Flush LINT_* configurations;  flush "lint" attribute;  flush
+#	"compat" attribute from all configurations.
+#	[ V5.1(XF16) ]
+#
+# 12-Jun-87  Mike Accetta (mja) at Carnegie-Mellon University
+#	Now configure with at most 1 Front End.
+#	[ V5.1(XF12) ]
+#
+# 08-May-87  Mike Accetta (mja) at Carnegie-Mellon University
+#	Added new "ild", "nbc", "oldfs", "oldipc", "sl", "slow",
+#	"timing", and "unix" attributes; replaced "multi" attribute
+#	with "multi16", "multi32" and "multi64" and added "large" and
+#	"xlarge" attributes to better distinguish configuration sizes;
+#	removed obsolete MACH_ONLY option; adjusted MACH_NET option for
+#	use only when the "unix" attribute is not specified until the
+#	performance impact can be investigated;  codified production
+#	configuration descriptions to simply maintenance;  added
+#	missing standard production configurations:  DEFAULT- for the
+#	VAX and SUN, LINT- for the RT and SUN, and EXTRA- for the SUN.
+#	[ V5.1(XF11) ]
+#
+#  7-May-87  David Black (dlb) at Carnegie-Mellon University
+#	Removed SPEECHS configuration.
+#
+# 11-Apr-87  Avadis Tevanian (avie) at Carnegie-Mellon University
+#	Enable CS_IPC only for "compat" systems.
+#
+# 06-Apr-87  Avadis Tevanian (avie) at Carnegie-Mellon University
+#	Created.
+#
+#######################################################################
+#
+#  PSEUDO-DEVICES (select any combination)
+#
+#	fe   = CMU CS Front End terminal
+#
+#######################################################################
+#  
+#  Generic Configurations:
+#  ------- --------------
+#
+#  GENERIC_VAX   = [debug vice mach small  multi16]
+#  GENERIC_RT	 = [debug vice mach small         ]
+#  GENERIC_SUN   = [debug vice mach small         ]
+#
+#
+#  Standard CMU CS/RI Production Configurations:
+#  -------- --- -- -- ---------- --------------
+#
+#  DEFAULT_VAX   = [debug mach unix vice small ]
+#
+#  LARGE_VAX     = [debug      unix vice large ]
+#  MULTI_VAX     = [debug mach unix vice large ]
+#  MACRO_VAX     = [debug mach unix vice xsmall]
+#  MICRO_VAX     = [      mach unix vice xsmall]
+#  SMALL_VAX     = [           unix vice small ]
+#  UBOOT_VAX     = [      mach unix      uboot ]
+#
+#  COMPAT_VAX    = [debug      unix vice large ]
+#  PT_VAX        = [           unix vice small ]
+#  TAPE_VAX      = [           unix vice xsmall]
+#
+#  MULTI_VAX     = [multi16     ]
+#
+#
+#  DEFAULT_RT	 = [debug vice mach unix small      ]
+#
+#  XSMALL_RT	 = [      vice mach unix xsmall     ]
+#
+#
+#  DEFAULT_SUN	 = [debug vice mach unix small     ]
+#
+#
+#  
+#######################################################################
+#
+options 	CS_IPC		# Old CMU IPC support		# <compat>
+#
+#  CMU Front End service
+#
+pseudo-device	fe	1		# <fe>

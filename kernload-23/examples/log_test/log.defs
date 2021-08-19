@@ -1,0 +1,22 @@
+/*
+ * Copyright 1989, 1990 NeXT, Inc.  All rights reserved.
+ *
+ * Loadable kernel server example showing how to log events.
+ */
+
+subsystem log 100;
+
+#include <std_types.defs>
+
+serverprefix log_;
+userprefix log_;
+
+simpleroutine msg (
+		log_port	: port_t;
+		level		: int);
+
+simpleroutine async (
+		log_port	: port_t;
+		level		: int;
+		interval	: int;		/* Interval in usec */
+		iterations	: int);		/* Number of times to log */

@@ -1,0 +1,4 @@
+# Termination
+
+CALL		cfs_terminate		0
+

@@ -1,0 +1,1069 @@
+*
+*	util.sa 1.12 10/10/90
+*
+*	This file contains routines used by other programs.
+*
+*	ovf_res: used by overflow to force the correct
+*		 result. ovf_r_k, ovf_r_x2, ovf_r_x3 are 
+*		 derivatives of this routine.
+*	denorm:	 used by underflow to denormalize the
+*		 intermediate result.
+*	round:	 used by underflow to round an extended
+*		 precision value to a specified rounding
+*		 precision and size.
+*	get_fline: get user's opcode word
+*
+
+*		Copyright (C) Motorola, Inc. 1990
+*			All Rights Reserved
+*
+*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF MOTOROLA 
+*	The copyright notice above does not evidence any  
+*	actual or intended publication of such source code.
+
+UTIL	IDNT    2,1 Motorola 040 Floating Point Software Package
+
+	section	8
+
+	include	fpsp.h
+
+	xref	mem_read
+	xdef	g_dfmtou
+	xdef	g_opcls
+	xdef	g_rndpr
+	xdef	g_intop
+	xdef	get_fline
+	xdef	nrm_zero
+	xdef	nrm_set
+
+*
+* Final result table for ovf_res. Note that the negative counterparts
+* are unnecessary as ovf_res always returns the sign separately from
+* the exponent.
+*					;+inf
+EXT_PINF	dc.l	$7fff0000,$00000000,$00000000,$00000000	
+*					;largest +ext
+EXT_PLRG	dc.l	$7ffe0000,$ffffffff,$ffffffff,$00000000	
+*					;largest magnitude +sgl in ext
+SGL_PLRG	dc.l	$407e0000,$ffffff00,$00000000,$00000000	
+*					;largest magnitude +dbl in ext
+DBL_PLRG	dc.l	$43fe0000,$ffffffff,$fffff800,$00000000	
+*					;largest -ext
+
+tblovfl:
+	dc.l	EXT_RN
+	dc.l	EXT_RZ
+	dc.l	EXT_RM
+	dc.l	EXT_RP
+	dc.l	SGL_RN
+	dc.l	SGL_RZ
+	dc.l	SGL_RM
+	dc.l	SGL_RP
+	dc.l	DBL_RN
+	dc.l	DBL_RZ
+	dc.l	DBL_RM
+	dc.l	DBL_RP
+	dc.l	error
+	dc.l	error
+	dc.l	error
+	dc.l	error
+
+*
+*	ovf_r_k --- overflow result calculation
+*
+* This entry point is used by kernel_ex.  
+* This forces the destination precision to be extended
+*
+* Input:	none
+* Output:	a result is in ETEMP (internal extended format)
+*
+	xdef	ovf_r_k
+ovf_r_k:
+	lea	ETEMP(a6),a0	;a0 points to source operand	
+	bclr.b	#sign_bit,ETEMP_EX(a6)
+	sne	ETEMP_SGN(a6)	;convert to internal ieee format
+
+	bfextu	FPCR_MODE(a6){0:2},d0 ;set round precision
+	bra.b	ovf_res		
+*
+*
+*	ovf_r_x2 --- overflow result calculation
+*
+* This entry point used by x_ovfl.  (opclass 0 and 2)
+* Input		a0  points to an operand in the internal extended format
+* Output	a0  points to the result in the internal extended format
+* This sets the round precision according to the user's FPCR
+*
+	xdef	ovf_r_x2
+ovf_r_x2:
+	bfextu	FPCR_MODE(a6){0:2},d0 ;set round precision
+	bra.b	ovf_res
+*
+*
+*	ovf_r_x3 --- overflow result calculation
+*
+* This entry point used by x_ovfl, (opclass 3 only)
+* Input		a0  points to an operand in the internal extended format
+* Output	a0  points to the result in the internal extended format
+* This sets the round precision according to the destination size
+*
+	xdef	ovf_r_x3
+ovf_r_x3:
+	bsr	g_dfmtou	;get dest fmt in d0{1:0}
+*				;for fmovout, the destination format
+*				;is the rounding precision
+
+*
+*	ovf_res --- overflow result calculation
+*
+* Input:
+*	a0 	points to operand in internal extended format
+*
+* Output:
+*	a0 	points to result in internal extended format
+*
+	xdef	ovf_res
+ovf_res:
+	lsl.l	#2,d0		;move round precision to d0{3:2}
+	bfextu	FPCR_MODE(a6){2:2},d1 ;set round mode
+	or.l	d1,d0		;index is fmt:mode in d0{3:0}
+	lea.l	tblovfl,a1	;load a1 with table address
+	move.l	(a1,d0*4),a1	;use d0 as index to the table
+	jmp	(a1)		;go to the correct routine
+*
+*case DEST_FMT = EXT
+*
+EXT_RN:
+	lea.l	EXT_PINF,a1	;answer is +/- infinity
+	bset.b	#inf_bit,FPSR_CC(a6)
+	bra	set_sign	;now go set the sign	
+EXT_RZ:
+	lea.l	EXT_PLRG,a1	;answer is +/- large number
+	bra	set_sign	;now go set the sign
+EXT_RM:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	e_rm_pos
+e_rm_neg:
+	lea.l	EXT_PINF,a1	;answer is negative infinity
+	or.l	#neginf_mask,USER_FPSR(a6)
+	bra	end_ovfr
+e_rm_pos:
+	lea.l	EXT_PLRG,a1	;answer is large positive number
+	bra	end_ovfr
+EXT_RP:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	e_rp_pos
+e_rp_neg:
+	lea.l	EXT_PLRG,a1	;answer is large negative number
+	bset.b	#neg_bit,FPSR_CC(a6)
+	bra	end_ovfr
+e_rp_pos:
+	lea.l	EXT_PINF,a1	;answer is positive infinity
+	bset.b	#inf_bit,FPSR_CC(a6)
+	bra	end_ovfr
+*
+*case DEST_FMT = DBL
+*
+DBL_RN:
+	lea.l	EXT_PINF,a1	;answer is +/- infinity
+	bset.b	#inf_bit,FPSR_CC(a6)
+	bra	set_sign
+DBL_RZ:
+	lea.l	DBL_PLRG,a1	;answer is +/- large number
+	bra	set_sign	;now go set the sign
+DBL_RM:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	d_rm_pos
+d_rm_neg:
+	lea.l	EXT_PINF,a1	;answer is negative infinity
+	or.l	#neginf_mask,USER_FPSR(a6)
+	bra	end_ovfr	;inf is same for all precisions (ext,dbl,sgl)
+d_rm_pos:
+	lea.l	DBL_PLRG,a1	;answer is large positive number
+	bra	end_ovfr
+DBL_RP:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	d_rp_pos
+d_rp_neg:
+	lea.l	DBL_PLRG,a1	;answer is large negative number
+	bset.b	#neg_bit,FPSR_CC(a6)
+	bra	end_ovfr
+d_rp_pos:
+	lea.l	EXT_PINF,a1	;answer is positive infinity
+	bset.b	#inf_bit,FPSR_CC(a6)
+	bra	end_ovfr
+*
+*case DEST_FMT = SGL
+*
+SGL_RN:
+	lea.l	EXT_PINF,a1	;answer is +/-  infinity
+	bset.b	#inf_bit,FPSR_CC(a6)
+	bra.b	set_sign
+SGL_RZ:
+	lea.l	SGL_PLRG,a1	;anwer is +/- large number
+	bra.b	set_sign
+SGL_RM:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	s_rm_pos
+s_rm_neg:
+	lea.l	EXT_PINF,a1	;answer is negative infinity
+	or.l	#neginf_mask,USER_FPSR(a6)
+	bra.b	end_ovfr
+s_rm_pos:
+	lea.l	SGL_PLRG,a1	;answer is large positive number
+	bra.b	end_ovfr
+SGL_RP:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	s_rp_pos
+s_rp_neg:
+	lea.l	SGL_PLRG,a1	;answer is large negative number
+	bset.b	#neg_bit,FPSR_CC(a6)
+	bra.b	end_ovfr
+s_rp_pos:
+	lea.l	EXT_PINF,a1	;answer is postive infinity
+	bset.b	#inf_bit,FPSR_CC(a6)
+	bra.b	end_ovfr
+
+set_sign:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	end_ovfr
+neg_sign:
+	bset.b	#neg_bit,FPSR_CC(a6)
+
+end_ovfr:
+	move.w	LOCAL_EX(a1),LOCAL_EX(a0) ;be careful not to overwrite sign
+	move.l	LOCAL_HI(a1),LOCAL_HI(a0)
+	move.l	LOCAL_LO(a1),LOCAL_LO(a0)
+	rts
+
+
+*
+*	ERROR
+*
+error:
+	rts
+*
+*	denorm --- 
+*
+* Input: 
+*	a0	 points to the operand to be denormalized
+*		 (in the internal extended format)
+*		 
+*	d0: 	 rounding precision
+* Output:
+*	a0	 points to the denormalized result
+*		 (in the internal extended format)
+*
+*	d0 	is guard,round,sticky
+*
+* d0 comes into this routine with the rounding precision. It 
+* is then loaded with the denormalized exponent threshold for the 
+* rounding precision.
+*
+
+	xdef	denorm
+denorm:
+	btst.b	#6,LOCAL_EX(a0)	;check for exponents between $7fff-$4000. 
+	beq.b	no_sgn_ext	
+	bset.b	#7,LOCAL_EX(a0)	;sign extend if it is so
+no_sgn_ext:
+
+	cmpi.b	#0,d0		;if 0 then extended precision
+	bne.b	not_ext		;else branch
+
+	clr.l	d1		;load d1 with ext threshold
+	clr.l	d0		;clear the sticky flag
+	bsr	dnrm_lp		;denormalize the number
+	tst.b	d1		;check for inex
+	beq.w	no_inex		;if clr, no inex
+	bra.b	dnrm_inex	;if set, set inex
+
+not_ext:
+	cmpi.l	#1,d0		;if 1 then single precision
+	beq.b	load_sgl	;else must be 2, double prec
+
+load_dbl:
+	move.w	#dbl_thresh,d1	;put copy of threshold in d1
+	move.l	d1,d0		;copy d1 into d0
+	sub.w	LOCAL_EX(a0),d0	;diff = threshold - exp
+	cmp.w	#67,d0		;if diff > 67 (mant + grs bits)
+	bpl.b	chk_stky	;then branch (all bits would be 
+*				; shifted off in denorm routine)
+	clr.l	d0		;else clear the sticky flag
+	bsr.b	dnrm_lp		;denormalize the number
+	tst.b	d1		;check flag
+	beq.b	no_inex		;if clr, no inex
+	bra.b	dnrm_inex	;if set, set inex
+
+load_sgl:
+	move.w	#sgl_thresh,d1	;put copy of threshold in d1
+	move.l	d1,d0		;copy d1 into d0
+	sub.w	LOCAL_EX(a0),d0	;diff = threshold - exp
+	cmp.w	#67,d0		;if diff > 67 (mant + grs bits)
+	bpl.b	chk_stky	;then branch (all bits would be 
+*				; shifted off in denorm routine)
+	clr.l	d0		;else clear the sticky flag
+	bsr.b	dnrm_lp		;denormalize the number
+	tst.b	d1		;check flag
+	beq.b	no_inex		;if clr, no inex
+	bra.b	dnrm_inex	;if set, set inex
+
+chk_stky:
+	tst.l	LOCAL_HI(a0)	;check for any bits set
+	bne.b	set_stky
+	tst.l	LOCAL_LO(a0)	;check for any bits set
+	bne.b	set_stky
+	bra.b	clr_mant
+set_stky:
+	or.l	#inx2a_mask,USER_FPSR(a6) ;set inex2/ainex
+	move.l	#$20000000,d0	;set sticky bit in return value
+clr_mant:
+	move.w	d1,LOCAL_EX(a0)		;load exp with threshold
+	move.l	#0,LOCAL_HI(a0) 	;set d1 = 0 (ms mantissa)
+	move.l	#0,LOCAL_LO(a0)		;set d2 = 0 (ms mantissa)
+	rts
+dnrm_inex:
+	or.l	#inx2a_mask,USER_FPSR(a6) ;set inex2/ainex
+no_inex:
+	rts
+*
+* dnrm_lp routine is used to normalize the exponent/mantissa
+* to the denorm threshold of the required size. 
+* Input:
+*	a0		points to the operand to be denormalized (in 
+*			the internal extended format
+*	d0{31:29} 	initial guard,round,sticky
+*	d1{15:0}	denormalization threshold
+* Output:
+*	a0		points to the denormalized operand (in
+*			the internal extended format)
+*	d0{31:29}	final guard,round,sticky
+*	d1.b		inexact flag:  all ones means inexact result
+*
+	xdef	dnrm_lp
+dnrm_lp:
+	movem.l	d3-d4,-(a7)		;save registers
+	move.l	LOCAL_HI(a0),d3		;HI mantissa into d3
+	move.l	LOCAL_LO(a0),d4		;LO mantissa into d4
+	clr.l	-(sp)			;stickyflag
+
+loop:
+	btst.l	#rnd_stky_bit,d0	;get sticky bit status
+	beq.b	shift			;if no sticky, skip to shift
+	move.l	#1,(sp)			;else set stickyflag
+shift:
+	cmp.w	LOCAL_EX(a0),d1		;if exp = exp_denorm threshold
+	beq.b	end_sh			;then done
+	addq.w	#1,LOCAL_EX(a0)		;else increment exponent
+	lsr.l	#1,d3
+	roxr.l	#1,d4
+	roxr.l	#1,d0
+	bra	loop			;go check if sticky bit is set
+end_sh:
+	clr.l	d1			;clear inexact flag
+	tst.l	(sp)+			;test and discard stickyflag 
+	beq.b	end_den
+	bset.l	#rnd_stky_bit,d0	;make sure sticky is set
+	st	d1			;set up inexact flag
+end_den:
+	and.l	#$e0000000,d0		;clear all but guard, 
+*					;round & sticky
+	move.l	d3,LOCAL_HI(a0)		;restore LOCAL_HI mantissa
+	move.l	d4,LOCAL_LO(a0)		;restore LOCAL_LO mantissa
+	movem.l	(a7)+,d3-d4		;restore registers
+	rts
+*
+*	round --- round result according to precision/mode
+*
+*	a0 points to the input operand in the internal extended format 
+*	d1(high word) contains rounding precision:
+*		ext = $0000xxxx
+*		sgl = $0001xxxx
+*		dbl = $0002xxxx
+*	d1(low word) contains rounding mode:
+*		RN  = $xxxx0000
+*		RZ  = $xxxx0001
+*		RP  = $xxxx0010
+*		RM  = $xxxx0011
+*	d0{31:29} contains the g,r,s bits (extended)
+*
+*	On return the value pointed to by a0 is correctly rounded,
+*	a0 is preserved and the g-r-s bits in d0 are cleared.
+*	The result is not typed - the tag field is invalid.  The
+*	result is still in the internal extended format.
+*
+*	The INEX bit of USER_FPSR will be set if the rounded result was
+*	inexact (i.e. if any of the g-r-s bits were set).
+*
+
+	xdef	round
+round:
+* If g=r=s=0 then result is exact and round is done, else set 
+* the inex flag in status reg and continue.  
+*
+	bsr.b	ext_grs			;this subroutine looks at the 
+*					:rounding precision and sets 
+*					;the appropriate g-r-s bits.
+	tst.l	d0			;if grs are zero, go force
+	bne.w	rnd_cont		;lower bits to zero for size
+	
+	swap	d1			;set up d1.w for round prec.
+	bra.w	truncate
+
+rnd_cont:
+*
+* Use rounding mode as an index into a jump table for these modes.
+*
+	or.l	#inx2a_mask,USER_FPSR(a6) ;set inex2/ainex
+	lea	mode_tab,a1
+	move.l	(a1,d1.w*4),a1
+	jmp	(a1)
+*
+* Jump table indexed by rounding mode in d1.w.  All following assumes
+* grs != 0.
+*
+mode_tab:
+	dc.l	rnd_near
+	dc.l	rnd_zero
+	dc.l	rnd_mnus
+	dc.l	rnd_plus
+*
+*	ROUND PLUS INFINITY
+*
+*	If sign of fp number = 0 (positive), then add 1 to l.
+*
+rnd_plus:
+	swap 	d1			;set up d1 for round prec.
+	tst.b	LOCAL_SGN(a0)		;check for sign
+	bmi.w	truncate		;if positive then truncate
+	move.l	#$ffffffff,d0		;force g,r,s to be all f's
+	lea	add_to_l,a1
+	move.l	(a1,d1.w*4),a1
+	jmp	(a1)
+*
+*	ROUND MINUS INFINITY
+*
+*	If sign of fp number = 1 (negative), then add 1 to l.
+*
+rnd_mnus:
+	swap 	d1			;set up d1 for round prec.
+	tst.b	LOCAL_SGN(a0)		;check for sign	
+	bpl.w	truncate		;if negative then truncate
+	move.l	#$ffffffff,d0		;force g,r,s to be all f's
+	lea	add_to_l,a1
+	move.l	(a1,d1.w*4),a1
+	jmp	(a1)
+*
+*	ROUND ZERO
+*
+*	Always truncate.
+rnd_zero:
+	swap 	d1			;set up d1 for round prec.
+	bra.w	truncate
+*
+*
+*	ROUND NEAREST
+*
+*	If (g=1), then add 1 to l and if (r=s=0), then clear l
+*	Note that this will round to even in case of a tie.
+*
+rnd_near:
+	swap 	d1			;set up d1 for round prec.
+	asl.l	#1,d0			;shift g-bit to c-bit
+	bcc.w	truncate		;if (g=1) then
+	lea	add_to_l,a1
+	move.l	(a1,d1.w*4),a1
+	jmp	(a1)
+
+*
+*	ext_grs --- extract guard, round and sticky bits
+*
+* Input:	d1 =		PREC:ROUND
+* Output:  	d0{31:29}=	guard, round, sticky
+*
+* The ext_grs extract the guard/round/sticky bits according to the
+* selected rounding precision. It is called by the round subroutine
+* only.  All registers except d0 are kept intact. d0 becomes an 
+* updated guard,round,sticky in d0{31:29}
+*
+* Notes: the ext_grs uses the round PREC, and therefore has to swap d1
+*	 prior to usage, and needs to restore d1 to original.
+*
+ext_grs:
+	swap	d1			;have d1.w point to round precision
+	cmpi.w	#0,d1
+	bne.b	sgl_or_dbl
+	bra.b	end_ext_grs
+ 
+sgl_or_dbl:
+	movem.l	d2/d3,-(a7)		;make some temp registers
+	cmpi.w	#1,d1
+	bne.b	grs_dbl
+grs_sgl:
+	bfextu	LOCAL_HI(a0){24:2},d3	;sgl prec. g-r are 2 bits right
+	move.l	#30,d2			;of the sgl prec. limits
+	lsl.l	d2,d3			;shift g-r bits to MSB of d3
+	move.l	LOCAL_HI(a0),d2		;get word 2 for s-bit test
+	andi.l	#$0000003f,d2		;s bit is the or of all other 
+	bne.b	st_stky			;bits to the right of g-r
+	tst.l	LOCAL_LO(a0)		;test lower mantissa
+	bne.b	st_stky			;if any are set, set sticky
+	tst.l	d0			;test original g,r,s
+	bne.b	st_stky			;if any are set, set sticky
+	bra.b	end_sd			;if words 3 and 4 are clr, exit
+grs_dbl:    
+	bfextu	LOCAL_LO(a0){21:2},d3	;dbl-prec. g-r are 2 bits right
+	move.l	#30,d2			;of the dbl prec. limits
+	lsl.l	d2,d3			;shift g-r bits to the MSB of d3
+	move.l	LOCAL_LO(a0),d2		;get lower mantissa  for s-bit test
+	andi.l	#$000001ff,d2		;s bit is the or-ing of all 
+	bne.b	st_stky			;other bits to the right of g-r
+	tst.l	d0			;test word original g,r,s
+	bne.b	st_stky			;if any are set, set sticky
+	bra.b	end_sd			;if clear, exit
+st_stky:
+	bset	#rnd_stky_bit,d3
+end_sd:
+	move.l	d3,d0			;return grs to d0
+	movem.l	(a7)+,d2/d3		;restore scratch registers
+end_ext_grs:
+	swap	d1			;restore d1 to original
+	rts
+
+********************  Local Equates
+ad_1_sgl equ	$00000100	constant to add 1 to l-bit in sgl prec
+ad_1_dbl equ	$00000800	constant to add 1 to l-bit in dbl prec
+
+
+*Jump table for adding 1 to the l-bit indexed by rnd prec
+
+add_to_l:
+	dc.l	add_ext
+	dc.l	add_sgl
+	dc.l	add_dbl
+*
+*	ADD SINGLE
+*
+add_sgl:
+	add.l	#ad_1_sgl,LOCAL_HI(a0)
+	bcc.b	scc_clr			;no mantissa overflow
+	roxr.w  LOCAL_HI(a0)		;shift v-bit back in
+	roxr.w  LOCAL_HI+2(a0)		;shift v-bit back in
+	add.w	#$1,LOCAL_EX(a0)	;and incr exponent
+scc_clr:
+	tst.l	d0			;test for rs = 0
+	bne.b	sgl_done
+	andi.w  #$fe00,LOCAL_HI+2(a0)	;clear the l-bit
+sgl_done:
+	andi.l	#$ffffff00,LOCAL_HI(a0) ;truncate bits beyond sgl limit
+	clr.l	LOCAL_LO(a0)		;clear d2
+	rts
+
+*
+*	ADD EXTENDED
+*
+add_ext:
+	addq.l  #1,LOCAL_LO(a0)		;add 1 to l-bit
+	bcc.b	xcc_clr			;test for carry out
+	addq.l  #1,LOCAL_HI(a0)		;propogate carry
+	bcc.b	xcc_clr
+	roxr.w  LOCAL_HI(a0)		;mant is 0 so restore v-bit
+	roxr.w  LOCAL_HI+2(a0)		;mant is 0 so restore v-bit
+	roxr.w	LOCAL_LO(a0)
+	roxr.w	LOCAL_LO+2(a0)
+	add.w	#$1,LOCAL_EX(a0)	;and inc exp
+xcc_clr:
+	tst.l	d0			;test rs = 0
+	bne.b	add_ext_done
+	andi.b	#$fe,LOCAL_LO+3(a0)	;clear the l bit
+add_ext_done:
+	rts
+*
+*	ADD DOUBLE
+*
+add_dbl:
+	add.l	#ad_1_dbl,LOCAL_LO(a0)
+	bcc.b	dcc_clr
+	addq.l	#1,LOCAL_HI(a0)		;propogate carry
+	bcc.b	dcc_clr
+	roxr.w	LOCAL_HI(a0)		;mant is 0 so restore v-bit
+	roxr.w	LOCAL_HI+2(a0)		;mant is 0 so restore v-bit
+	roxr.w	LOCAL_LO(a0)
+	roxr.w	LOCAL_LO+2(a0)
+	add.w	#$1,LOCAL_EX(a0)	;incr exponent
+dcc_clr:
+	tst.l	d0			;test for rs = 0
+	bne.b	dbl_done
+	andi.w	#$f000,LOCAL_LO+2(a0)	;clear the l-bit
+
+dbl_done:
+	andi.l	#$fffff800,LOCAL_LO(a0) ;truncate bits beyond dbl limit
+	rts
+
+*
+* Truncate all other bits
+*
+trunct:
+	dc.l	end_rnd
+	dc.l	sgl_done
+	dc.l	dbl_done
+truncate:
+	lea	trunct,a1
+	move.l	(a1,d1.w*4),a1
+	jmp	(a1)
+
+end_rnd:
+	rts
+
+*
+*	get_fline --- get f-line opcode of interrupted instruction
+*
+*	If exception was from Supervisor mode (not very likely) then
+*	just move the data.  Otherwise, call mem_read to get it
+*	from user space via whatever way the system provides.
+*
+*	Returns opcode in d0.  overwrites sfc register.
+*
+get_fline:
+	move.l	USER_FPIAR(a6),a0	;opcode address
+	btst.b	#5,EXC_SR(a6)	;check for supervisor state
+	beq.b	user_fetch
+	move.l	#0,d0
+	move.w	(a0),d0
+	rts
+user_fetch:
+	move.l	#0,-(a7)	;reserve a word on the stack
+	lea.l	2(a7),a1	;point to low word of temporary
+	move.l	#2,d0		;count
+	bsr	mem_read
+	move.l	(a7)+,d0
+	rts
+*
+*	g_intop --- put intermediate operand in d0,d1,d2,d3,d7
+*
+*	If E1 is set, the IO is FPTEMP; if E3,
+*	the IO is WBTEMP.  The output will be in:
+*		d0{14:0} fpte{14:00}/wbte{14:00}
+*		d1	 fptm{63:32}/wbte{65:34}
+*		d2	 fptm{31:00}/wbte{33:02}
+*		d7	 X/wbts
+*
+g_intop:
+	btst.b	#E3,E_BYTE(a6)
+	beq.b	g_int2			;then exceptional op in fptemp (dest)
+*					;else in wbtemp	(E3 exception)
+	move.l	WBTEMP_EX(a6),d0	;get exp
+	bfexts	d0{0:1},d7		;get sign and sign extend
+	swap	d0			;put exp in d0{14:0}
+	and.l	#$00007fff,d0		;strip off sign bit
+	move.l	WBTEMP_HI(a6),d1
+	move.l	WBTEMP_LO(a6),d2
+	move.l	WBTEMP_GRS(a6),d3
+	lsl.l	#6,d3
+	andi.l	#$e0000000,d3		;WBTM1,WBTMO,SBIT (g,r,s) in d3{31:29} 
+	rts
+g_int2:
+	move.w	FPTEMP_EX(a6),d0
+	andi.l	#$ffff,d0		;exponent= d0
+	move.l	FPTEMP_HI(a6),d1	;MS mant = d1
+	move.l	FPTEMP_LO(a6),d2	;LS mant = d2
+	moveq.l	#0,d3			;zero out d3 (g,r,s)
+	rts
+*
+* 	g_rndpr --- put rounding precision in d0{1:0}
+*
+*begin
+*get rounding precision (cmdreg3b{6:5})
+*begin
+*  case	opclass = 011 (move out)
+*	get destination format - this is the same as the rounding precision
+*
+*  case	opclass = 0x0
+*	if E3
+*	    *case RndPr(from cmdreg3b{6:5} = 11  then RND_PREC = DBL
+*	    *case RndPr(from cmdreg3b{6:5} = 10  then RND_PREC = SGL
+*	     case RndPr(from cmdreg3b{6:5} = 00 | 01
+*		use precision from FPCR{7:6}
+*			case 00 then RND_PREC = EXT
+*			case 01 then RND_PREC = SGL
+*			case 10 then RND_PREC = DBL
+*	else E1
+*	     use precision in FPCR{7:6}
+*	     case 00 then RND_PREC = EXT
+*	     case 01 then RND_PREC = SGL
+*	     case 10 then RND_PREC = DBL
+*end
+*
+g_rndpr:
+	bsr.b	g_opcls		;get opclass in d0{2:0}
+	cmp.w	#$0003,d0	;check for opclass 011
+	bne.b	op_0x0
+
+*For move out instructions (opclass 011) the destination format is the same as
+*the rounding precision.  Pass results from g_dfmtou.
+	bsr.b 	g_dfmtou	
+	rts
+op_0x0:
+	btst.b	#E3,E_BYTE(a6)
+	beq.b	rnd_e1
+
+	move.l	CMDREG3B(a6),d0
+	bfextu	d0{9:2},d0	;move the rounding prec bits d0{9:10} to d0{1:0}
+#if	NeXT
+	cmp.w	#3,d0
+	bne	0f
+	movl	#2,d0		; DBL
+	rts
+0:
+	cmp.w	#2,d0
+	bne	rnd_e1
+	movl	#1,d0		; SGL
+	rts
+#else	NeXT
+	beq.b	rnd_e1		;if cmd3b has size=ext, check FPCR bits
+	rts
+#endif	NeXT
+*
+*get rounding precision set in FPCR{7:6}
+*
+rnd_e1:
+	move.l	USER_FPCR(a6),d0
+	bfextu	d0{24:2},d0	;move the rounding prec bits d0{7:6} to d0{1:0}
+	rts
+*
+*	g_opcls --- put opclass in d0{2:0}
+*
+g_opcls:
+	btst.b	#E3,E_BYTE(a6)
+	beq.b	opc_1b		;if set, go to cmdreg1b
+opc_3b:
+	clr.l	d0		;if E3, only opclass 0x0 is possible
+	rts
+opc_1b:
+	move.l	CMDREG1B(a6),d0
+	bfextu	d0{0:3},d0	;shift opclass bits d0{31:29} to d0{2:0}
+	rts
+*
+*	g_dfmtou --- put destination format in d0{1:0}
+*
+*	If E1, the format is from cmdreg1b{12:10}
+*	If E3, the format is extended.
+*
+*	Dest. Fmt.	
+*		extended  010 -> 00
+*		single    001 -> 01
+*		double    101 -> 10
+*
+g_dfmtou:
+	btst.b	#E3,E_BYTE(a6)
+	beq.b	op011
+	clr.l	d0		;if E1, size is always ext
+	rts
+op011:
+	move.l	CMDREG1B(a6),d0
+	bfextu	d0{3:3},d0	;dest fmt from cmdreg1b{12:10}
+	cmp.b	#1,d0		;check for single
+	bne.b	not_sgl
+	move.l	#1,d0
+	rts
+not_sgl:
+	cmp.b	#5,d0		;check for double
+	bne.b	not_dbl
+	move.l	#2,d0
+	rts
+not_dbl:
+	clr.l	d0		;must be extended
+	rts
+
+*
+*
+* Final result table for ovf_res. Note that the negative counterparts
+* are unnecessary as ovf_res always returns the sign separately from
+* the exponent.
+*					;+zero
+EXT_PZRO	dc.l	$00000000,$00000000,$00000000,$00000000	
+*					;+zero
+SGL_PZRO	dc.l	$3f810000,$00000000,$00000000,$00000000	
+*					;+zero
+DBL_PZRO	dc.l	$3c010000,$00000000,$00000000,$00000000	
+*					;smallest +ext denorm
+EXT_PSML	dc.l	$00000000,$00000000,$00000001,$00000000	
+*					;smallest +sgl denorm
+SGL_PSML	dc.l	$3f810000,$00000100,$00000000,$00000000	
+*					;smallest +dbl denorm
+DBL_PSML	dc.l	$3c010000,$00000000,$00000800,$00000000	
+*
+*	UNF_SUB --- underflow result calculation
+*
+* Input:
+*	d0 	contains round precision
+*	a0	points to input operand in the internal extended format
+*
+* Output:
+*	a0 	points to correct internal extended precision result.
+*
+
+tblunf:
+	dc.l	uEXT_RN
+	dc.l	uEXT_RZ
+	dc.l	uEXT_RM
+	dc.l	uEXT_RP
+	dc.l	uSGL_RN
+	dc.l	uSGL_RZ
+	dc.l	uSGL_RM
+	dc.l	uSGL_RP
+	dc.l	uDBL_RN
+	dc.l	uDBL_RZ
+	dc.l	uDBL_RM
+	dc.l	uDBL_RP
+	dc.l	error
+	dc.l	error
+	dc.l	error
+	dc.l	error
+
+	xdef	unf_sub
+unf_sub:
+	lsl.l	#2,d0		;move round precision to d0{3:2}
+	bfextu	FPCR_MODE(a6){2:2},d1 ;set round mode
+	or.l	d1,d0		;index is fmt:mode in d0{3:0}
+	lea.l	tblunf,a1	;load a1 with table address
+	move.l	(a1,d0*4),a1	;use d0 as index to the table
+	jmp	(a1)		;go to the correct routine
+*
+*case DEST_FMT = EXT
+*
+uEXT_RN:
+	lea.l	EXT_PZRO,a1	;answer is +/- zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra	uset_sign	;now go set the sign	
+uEXT_RZ:
+	lea.l	EXT_PZRO,a1	;answer is +/- zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra	uset_sign	;now go set the sign
+uEXT_RM:
+	tst.b	LOCAL_SGN(a0)	;if negative underflow
+	beq.b	ue_rm_pos
+ue_rm_neg:
+	lea.l	EXT_PSML,a1	;answer is negative smallest denorm
+	bset.b	#neg_bit,FPSR_CC(a6)
+	bra	end_unfr
+ue_rm_pos:
+	lea.l	EXT_PZRO,a1	;answer is positive zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra	end_unfr
+uEXT_RP:
+	tst.b	LOCAL_SGN(a0)	;if negative underflow
+	beq.b	ue_rp_pos
+ue_rp_neg:
+	lea.l	EXT_PZRO,a1	;answer is negative zero
+	ori.l	#negz_mask,USER_FPSR(a6)
+	bra	end_unfr
+ue_rp_pos:
+	lea.l	EXT_PSML,a1	;answer is positive smallest denorm
+	bra	end_unfr
+*
+*case DEST_FMT = DBL
+*
+uDBL_RN:
+	lea.l	DBL_PZRO,a1	;answer is +/- zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra	uset_sign
+uDBL_RZ:
+	lea.l	DBL_PZRO,a1	;answer is +/- zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra	uset_sign	;now go set the sign
+uDBL_RM:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	ud_rm_pos
+ud_rm_neg:
+	lea.l	DBL_PSML,a1	;answer is smallest denormalized negative
+	bset.b	#neg_bit,FPSR_CC(a6)
+	bra	end_unfr
+ud_rm_pos:
+	lea.l	DBL_PZRO,a1	;answer is positive zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra	end_unfr
+uDBL_RP:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	ud_rp_pos
+ud_rp_neg:
+	lea.l	DBL_PZRO,a1	;answer is negative zero
+	ori.l	#negz_mask,USER_FPSR(a6)
+	bra	end_unfr
+ud_rp_pos:
+	lea.l	DBL_PSML,a1	;answer is smallest denormalized negative
+	bra	end_unfr
+*
+*case DEST_FMT = SGL
+*
+uSGL_RN:
+	lea.l	SGL_PZRO,a1	;answer is +/- zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra.b	uset_sign
+uSGL_RZ:
+	lea.l	SGL_PZRO,a1	;answer is +/- zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra.b	uset_sign
+uSGL_RM:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	us_rm_pos
+us_rm_neg:
+	lea.l	SGL_PSML,a1	;answer is smallest denormalized negative
+	bset.b	#neg_bit,FPSR_CC(a6)
+	bra.b	end_unfr
+us_rm_pos:
+	lea.l	SGL_PZRO,a1	;answer is positive zero
+	bset.b	#z_bit,FPSR_CC(a6)
+	bra.b	end_unfr
+uSGL_RP:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	us_rp_pos
+us_rp_neg:
+	lea.l	SGL_PZRO,a1	;answer is negative zero
+	ori.l	#negz_mask,USER_FPSR(a6)
+	bra.b	end_unfr
+us_rp_pos:
+	lea.l	SGL_PSML,a1	;answer is smallest denormalized positive
+	bra.b	end_unfr
+
+uset_sign:
+	tst.b	LOCAL_SGN(a0)	;if negative overflow
+	beq.b	end_unfr
+uneg_sign:
+	bset.b	#neg_bit,FPSR_CC(a6)
+
+end_unfr:
+	move.w	LOCAL_EX(a1),LOCAL_EX(a0) ;be careful not to overwrite sign
+	move.l	LOCAL_HI(a1),LOCAL_HI(a0)
+	move.l	LOCAL_LO(a1),LOCAL_LO(a0)
+	rts
+*
+*	NORMALIZE
+*
+* These routines (nrm_zero & nrm_set) normalize the unnorm.  This 
+* is done by shifting the mantissa left while decrementing the 
+* exponent.
+*
+* NRM_SET shifts and decrements until there is a 1 set in the integer 
+* bit of the mantissa (msb in d1).
+*
+* NRM_ZERO shifts and decrements until there is a 1 set in the integer 
+* bit of the mantissa (msb in d1) unless this would mean the exponent 
+* would go less than 0.  In that case the number becomes a denorm - the 
+* exponent (d0) is set to 0 and the mantissa (d1 & d2) is not 
+* normalized.
+*
+* Note that both routines have been optimized (for the worst case) and 
+* therefore do not have the easy to follow decrement/shift loop.
+*
+*	NRM_ZERO
+*
+*	Distance to first 1 bit in mantissa = X
+*	Distance to 0 from exponent = Y
+*	If X < Y
+*	Then
+*	  nrm_set
+*	Else
+*	  shift mantissa by Y
+*	  set exponent = 0
+*
+*input:
+*	FP_SCR1 = exponent, ms mantissa part, ls mantissa part
+*output:
+*	L_SCR1{4} = fpte15 or ete15 bit
+*
+nrm_zero:
+	move.w	LOCAL_EX(a0),d0
+	cmp.w   #64,d0          ;see if exp > 64 
+	bmi.b	d0_less
+	bsr	nrm_set		;exp > 64 so exp won't exceed 0 
+	rts
+d0_less:
+	movem.l	d2/d3/d5/d6,-(a7)
+	move.l	LOCAL_HI(a0),d1
+	move.l	LOCAL_LO(a0),d2
+
+	bfffo	d1{0:32},d3	;get the distance to the first 1 
+*				;in ms mant
+	beq.b	ms_clr		;branch if no bits were set
+	cmp.w	d3,d0		;of X>Y
+	bmi.b	greater		;then exp will go past 0 (neg) if 
+*				;it is just shifted
+	bsr	nrm_set		;else exp won't go past 0
+	movem.l	(a7)+,d2/d3/d5/d6
+	rts	
+greater:
+	move.l	d2,d6		;save ls mant in d6
+	lsl.l	d0,d2		;shift ls mant by count
+	lsl.l	d0,d1		;shift ms mant by count
+	move.l	#32,d5
+	sub.l	d0,d5		;make op a denorm by shifting bits 
+	lsr.l	d5,d6		;by the number in the exp, then 
+*				;set exp = 0.
+	or.l	d6,d1		;shift the ls mant bits into the ms mant
+	move.l	#0,d0		;same as if decremented exp to 0 
+*				;while shifting
+	move.w	d0,LOCAL_EX(a0)
+	move.l	d1,LOCAL_HI(a0)
+	move.l	d1,LOCAL_LO(a0)
+	movem.l	(a7)+,d2/d3/d5/d6
+	rts
+ms_clr:
+	bfffo	d2{0:32},d3	;check if any bits set in ls mant
+	beq.b	all_clr		;branch if none set
+	add.w	#32,d3
+	cmp.w	d3,d0		;if X>Y
+	bmi.b	greater		;then branch
+	bsr	nrm_set		;else exp won't go past 0
+	movem.l	(a7)+,d2/d3/d5/d6
+	rts
+all_clr:
+	move.w	#0,LOCAL_EX(a0)	;no mantissa bits set. Set exp = 0.
+	movem.l	(a7)+,d2/d3/d5/d6
+	rts
+
+*
+*	NRM_SET
+*
+nrm_set:
+	move.l	d7,-(a7)
+	bfffo	LOCAL_HI(a0){0:32},d7 ;find first 1 in ms mant to d7)
+	beq.b	lower		;branch if ms mant is all 0's
+
+	move.l	d6,-(a7)
+
+	sub.w	d7,LOCAL_EX(a0)	;sub exponent by count
+	move.l	LOCAL_HI(a0),d0	;d0 has ms mant
+	move.l	LOCAL_LO(a0),d1 ;d1 has ls mant
+
+	lsl.l	d7,d0		;shift first 1 to j bit position
+	move.l	d1,d6		;copy ls mant into d6
+	lsl.l	d7,d6		;shift ls mant by count
+	move.l	d6,LOCAL_LO(a0)	;store ls mant into memory
+	moveq.l	#32,d6
+	sub.l	d7,d6		;continue shift
+	lsr.l	d6,d1		;shift off all bits but those that will
+*				;be shifted into ms mant
+	or.l	d1,d0		;shift the ls mant bits into the ms mant
+	move.l	d0,LOCAL_HI(a0)	;store ms mant into memory
+	movem.l	(a7)+,d7/d6	;restore registers
+	rts
+
+*
+* We get here if ms mant was = 0, and we assume ls mant has bits 
+* set (otherwise this would have been tagged a zero not a denorm).
+*
+lower:
+	move.w	LOCAL_EX(a0),d0	;d0 has exponent
+	move.l	LOCAL_LO(a0),d1	;d1 has ls mant
+	sub.w	#32,d0		;account for ms mant being all zeros
+	bfffo	d1{0:32},d7	;find first 1 in ls mant to d7)
+	sub.w	d7,d0		;subtract shift count from exp
+	lsl.l	d7,d1		;shift first 1 to integer bit in ms mant
+	move.w	d0,LOCAL_EX(a0)	;store ms mant
+	move.l	d1,LOCAL_HI(a0)	;store exp
+	clr.l	LOCAL_LO(a0)	;clear ls mant
+	move.l	(a7)+,d7
+	rts
+
+	end

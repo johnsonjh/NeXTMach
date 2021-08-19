@@ -1,0 +1,65 @@
+ident		MACH
+options		QUOTA
+options		INET
+options		HW_AST
+options 	MACH
+options		MACH_ASSERT
+options		MACH_COMPAT
+options		MACH_DEBUG
+options		MACH_FIXPRI
+options		MACH_LDEBUG
+options		MACH_NBC
+options		MACH_NET
+options		STAT_TIME
+options		XPR_DEBUG
+options		MACH_OLD_VM_COPY
+timezone	8 dst
+maxusers	8
+pseudo-device	cpus		1
+pseudo-device	ether
+pseudo-device	inet
+pseudo-device	loop
+machine		NeXT
+cpu		"NeXT"
+makeoptions	"RELOC=04000000"
+options		GDB
+makeoptions	"GDBOPTS=-g"
+options		SUN_VFS
+options		SUN_RPC
+options		SUN_NFS
+options		NFS_CLIENT
+options		NFS_SERVER
+options		DEBUG
+options		SHOW_SPACE
+options		EVENTMETER
+options		SIMPLE_CLOCK
+options		KERNSERV
+options		MALLOCDEBUG
+config		mach		swap generic
+pseudo-device	pty	32
+controller	bus0	at nexus ?
+pseudo-device	venip	init venip_config
+controller	fc0	at bus? csr 0x02014100
+disk		fd0	at fc0 drive 0
+controller	sc0	at bus? csr 0x02014000
+disk		sd0	at sc0 drive ?
+disk		sd1	at sc0 drive ?
+disk		sd2	at sc0 drive ?
+disk		sd3	at sc0 drive ?
+disk		sd4	at sc0 drive ?
+disk		sd5	at sc0 drive ?
+disk		sd6	at sc0 drive ?
+device		st0	at sc0 drive ?
+device		st1	at sc0 drive ?
+device		sg0	at sc0 drive ?
+controller	oc0	at bus? csr 0x02012000
+disk		od0	at oc0 drive 0
+disk		od1	at oc0 drive 1
+pseudo-device	zs	2 init zsintsetup
+pseudo-device	km
+pseudo-device	ev
+device		en0	at bus? csr 0x02006000
+device		dsp0	at bus? csr 0x020000d0
+device		np0	at bus? csr 0x0200f000
+device		sound0	at bus?	csr 0x0200e000
+pseudo-device	vol

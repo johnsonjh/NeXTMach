@@ -1,0 +1,6 @@
+#
+# 	RELEASE-specific makefile fragment for msdos filesystem project
+#
+CFLAGS=-MD -O -I../header -I.. -Wimplicit -DKERNEL -DKERNEL_FEATURES \
+	-DMACH -DNeXT_MOD
+LOADABLE_RULE=

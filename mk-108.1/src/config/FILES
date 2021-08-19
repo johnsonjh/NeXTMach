@@ -1,0 +1,12 @@
+FILES
+Makefile
+config.h
+config.l
+config.y
+main.c
+mkglue.c
+mkheaders.c
+mkioconf.c
+mkmakefile.c
+mkswapconf.c
+newvers.sh

@@ -1,0 +1,7 @@
+#! /bin/csh -f
+#
+#HISTORY
+# 08-Jan-87  Robert Beck (beck) at Sequent Computer Systems, Inc.
+#	Shell to invoke Makefile for parallel make and -DCMU.
+#
+make "P=&" CFLAGS="-O -DCMU" -P10
